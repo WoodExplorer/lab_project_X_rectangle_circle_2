@@ -3,6 +3,19 @@ import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('mysql://root:root@localhost/happykimi', convert_unicode=True, echo=True)#echo=False)
+Base = declarative_base()
+Base.metadata.reflect(engine)
+
+from sqlalchemy.orm import relationship, backref
+
+class Users(Base):
+    __table__ = Base.metadata.tables['ot_user']
+
+###
 
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , flaskr.py
@@ -18,9 +31,11 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 def connect_db():
     """Connects to the specific database."""
-    rv = sqlite3.connect(app.config['DATABASE'])
-    rv.row_factory = sqlite3.Row
-    return rv
+    #rv = sqlite3.connect(app.config['DATABASE'])
+    #rv.row_factory = sqlite3.Row
+
+    conn = engine.connect()
+    return conn
 
 def get_db():
     """Opens a new database connection if there is none yet for the
@@ -45,6 +60,7 @@ def init_db():
 @app.cli.command('initdb')
 def initdb_command():
     """Initializes the database."""
+    assert(False)
     init_db()
     print('Initialized the database.')
 
@@ -52,7 +68,7 @@ def initdb_command():
 @app.route('/')
 def show_entries():
     db = get_db()
-    cur = db.execute('select title, text from entries order by id desc')
+    cur = db.execute('select UE_ID title, UE_account text from ot_user order by UE_ID desc')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
