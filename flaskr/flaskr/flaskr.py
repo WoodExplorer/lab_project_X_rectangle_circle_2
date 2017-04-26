@@ -8,15 +8,17 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('mysql://root:root@localhost/happykimi', convert_unicode=True, echo=True)#echo=False)
-Base = declarative_base()
-Base.metadata.reflect(engine)
+engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
+Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
 
-class Users(Base):
-    __table__ = Base.metadata.tables['ot_user']
+class OT_User(Base):
+    """"""
+    __tablename__ = 'ot_user'
+    __table_args__ = {'autoload':True}
 
 ###
 
@@ -98,10 +100,36 @@ def register_backend():
         flash(u'两次输入的密码不一致')
         return redirect(url_for('register'))
 
-    db = get_db()
-    db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
-                 [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
-    db.commit()
+    #
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # insert
+    entry = OT_User()
+    #entry.ue_id = current_ue_id
+    #current_ue_id += 1
+    
+    # populate fields with information supplied by users
+    entry.UE_account = UE_account
+    entry.UE_password = UE_password
+    entry.UE_truename = UE_truename
+    entry.UE_accName = UE_accName
+    
+    # populate other fields with not-null constraint
+    entry.jihuouser = 'None'
+    entry.tx_leiji = 0
+    entry.UE_verMail = 'None'
+    entry.zcr = UE_account
+    entry.UE_regTime = datetime.now()
+    
+    session.add(entry)
+    session.commit()
+    session.close()
+
+    #db = get_db()
+    #db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
+    #             [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
+    #db.commit()
     flash('New user was successfully registered')
     return redirect(url_for('show_entries'))
 
