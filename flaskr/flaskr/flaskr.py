@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
+from MD5 import md5
 
 engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
@@ -111,7 +112,7 @@ def register_backend():
     
     # populate fields with information supplied by users
     entry.UE_account = UE_account
-    entry.UE_password = UE_password
+    entry.UE_password = md5(UE_password)
     entry.UE_truename = UE_truename
     entry.UE_accName = UE_accName
     
@@ -135,17 +136,29 @@ def register_backend():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
+    error_str = None
+    flag = False
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
+        user_name = request.form['username']
+        password = request.form['password']
+
+        Session = sessionmaker(bind=engine)
+        ses = Session()
+
+        if ses.query(OT_User).filter_by(UE_account=user_name).count() == 0:
+            error_str = u'用户名错误'
+        elif md5(password) != ses.query(OT_User).filter_by(UE_account=user_name)[0].UE_password:
+            error_str = u'密码错误'
         else:
+            flag = True
             session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('show_entries'))
-    return render_template('login.html', error=error)
+            flash(u'登陆成功')
+        ses.close()
+
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+        return render_template('login.html', error=error_str)
 
 @app.route('/logout')
 def logout():
