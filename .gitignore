@@ -87,4 +87,4 @@ $RECYCLE.BIN/
 *.pyc
 flaskr/flaskr/flaskr.pyc
 *.pyc
-*.pyc
+*/*/*.pyc
