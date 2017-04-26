@@ -1,3 +1,5 @@
+#coding=utf-8 
+
 # all the imports
 import os
 import sqlite3
@@ -5,6 +7,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 engine = create_engine('mysql://root:root@localhost/happykimi', convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base()
@@ -83,6 +86,24 @@ def add_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
 
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/register_backend', methods=['POST'])
+def register_backend():  
+    UE_account, UE_password, UE_password_again, UE_truename, UE_accName, = request.form['UE_account'], request.form['UE_password'], request.form['UE_password_again'], request.form['UE_truename'], request.form['UE_accName']
+
+    if UE_password != UE_password_again:
+        flash(u'两次输入的密码不一致')
+        return redirect(url_for('register'))
+
+    db = get_db()
+    db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
+                 [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
+    db.commit()
+    flash('New user was successfully registered')
+    return redirect(url_for('show_entries'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

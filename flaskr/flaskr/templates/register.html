@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>注册</h2>
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <form action="{{ url_for('register_backend') }}" method=post>
+    <dl>
+      <dt>邮箱账号:
+      <dd><input type=text name=UE_account>
+      <dt>密码:
+      <dd><input type=password name=UE_password>
+	  <dt>再次输入密码:
+      <dd><input type=password name=UE_password_again>
+	  <dt>真实姓名:
+      <dd><input type=text name=UE_truename>
+	  <dt>邀请人号码:
+      <dd><input type=text name=UE_accName>
+	
+      <dd><input type=submit value=Register>
+    </dl>
+  </form>
+{% endblock %}
