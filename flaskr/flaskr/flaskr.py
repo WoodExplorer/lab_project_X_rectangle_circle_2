@@ -181,15 +181,13 @@ def register_backend():
 def flash_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
-            flash(u"Error in the %s field - %s" % (
-                getattr(form, field).label.text,
-                error
-            ))
-            
+            #flash(u"Error in the %s field - %s" % (getattr(form, field).label.text, error))
+            flash(u"错误：%s" % (error))
+
 class InvestmentForm(FlaskForm):
-    time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired()])
-    charge = TextField(u'排单币', validators=[DataRequired()])
-    investment = TextField(u'投资金额', validators=[DataRequired()])
+    time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired(message=u'请选择投资时间')])
+    charge = TextField(u'排单币', validators=[DataRequired(message=u'请填写排单币')])
+    investment = TextField(u'投资金额', validators=[DataRequired(message=u'请填写投资金额')])
     submit = SubmitField(u'提交')
 
 @app.route('/investment', methods=['GET', 'POST'])
