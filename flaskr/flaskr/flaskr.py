@@ -178,7 +178,14 @@ def register_backend():
     flash(u'注册成功')
     return redirect(url_for('show_entries'))
 
-
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the %s field - %s" % (
+                getattr(form, field).label.text,
+                error
+            ))
+            
 class InvestmentForm(FlaskForm):
     time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired()])
     charge = TextField(u'排单币', validators=[DataRequired()])
@@ -193,7 +200,7 @@ def investment():
 
     form = InvestmentForm()
     if request.method == 'POST':
-        if form.validate():
+        if form.validate_on_submit():
             entry = Entry()
             print 'form.check:'
             print form.check
@@ -224,7 +231,8 @@ def investment():
             ses.close()
 
         else:
-            flash("Your form contained errors")
+            #flash(u'请确保您正确填写了表单')
+            flash_errors(form)
 
     if flag:
         return redirect(url_for('show_entries'))
