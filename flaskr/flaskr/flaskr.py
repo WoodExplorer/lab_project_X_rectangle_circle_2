@@ -89,6 +89,50 @@ def add_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
 
+def flash_and_close_session(error_str, session):
+    flash(error_str)
+    session.close()
+
+@app.route('/change_password')
+def change_password():
+    return render_template('change_password.html')
+
+@app.route('/change_password_backend', methods=['POST'])
+def change_password_backend():
+    if not session.get('logged_in'):
+        abort(401)
+
+    UE_password, new_UE_password, new_UE_password_again, = request.form['UE_password'], request.form['new_UE_password'], request.form['new_UE_password_again']
+
+    if new_UE_password != new_UE_password_again:
+        flash(u'两次输入的新密码不一致')
+        return redirect(url_for('change_password'))
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    UE_account = session.get('logged_in_account')
+    ret = ses.query(OT_User).filter_by(UE_account=UE_account)
+    if 0 == ret.count():
+        flash_and_close_session(u'用户不存在', ses)
+        return redirect(url_for('show_entries'))
+    if 1 < ret.count():
+        flash_and_close_session(u'存在同名用户', ses)
+        return redirect(url_for('show_entries'))
+
+    entry = ret[0]
+    if md5(UE_password) != entry.UE_password:
+        flash_and_close_session(u'密码错误', ses)
+        return redirect(url_for('change_password'))
+    
+    entry.UE_password = md5(new_UE_password)
+    
+    ses.commit()
+    ses.close()
+
+    flash(u'修改密码成功')
+    return redirect(url_for('show_entries'))
+
 @app.route('/register')
 def register():
     return render_template('register.html')
@@ -131,7 +175,7 @@ def register_backend():
     #db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
     #             [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
     #db.commit()
-    flash('New user was successfully registered')
+    flash(u'注册成功')
     return redirect(url_for('show_entries'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -152,6 +196,7 @@ def login():
         else:
             flag = True
             session['logged_in'] = True
+            session['logged_in_account'] = user_name
             flash(u'登陆成功')
         ses.close()
 
