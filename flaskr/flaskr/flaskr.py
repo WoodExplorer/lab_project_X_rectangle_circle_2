@@ -3,8 +3,10 @@
 # all the imports
 import os
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask_wtf import FlaskForm
+from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField
+from wtforms.validators import DataRequired, ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -73,10 +75,8 @@ def initdb_command():
 #########################
 @app.route('/')
 def show_entries():
-    db = get_db()
-    cur = db.execute('select UE_ID title, UE_account text from ot_user order by UE_ID desc')
-    entries = cur.fetchall()
-    return render_template('show_entries.html', entries=entries)
+    
+    return render_template('show_entries.html', entries=[])
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -178,6 +178,61 @@ def register_backend():
     flash(u'注册成功')
     return redirect(url_for('show_entries'))
 
+
+class InvestmentForm(FlaskForm):
+    time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired()])
+    charge = TextField(u'排单币', validators=[DataRequired()])
+    investment = TextField(u'投资金额', validators=[DataRequired()])
+    submit = SubmitField(u'提交')
+
+@app.route('/investment', methods=['GET', 'POST'])
+def investment():
+    error_str = None
+    flag = False
+
+
+    form = InvestmentForm()
+    if request.method == 'POST':
+        if form.validate():
+            entry = Entry()
+            print 'form.check:'
+            print form.check
+            print 'request.form.getlist("check")'
+            print request.form.getlist("check")
+            form.populate_obj(entry)
+            db.session.add(entry)
+            db.session.commit()
+            flash('New entry was successfully posted')
+
+
+    
+            user_name = request.form['username']
+            password = request.form['password']
+
+            Session = sessionmaker(bind=engine)
+            ses = Session()
+
+            if ses.query(OT_User).filter_by(UE_account=user_name).count() == 0:
+                error_str = u'用户名错误'
+            elif md5(password) != ses.query(OT_User).filter_by(UE_account=user_name)[0].UE_password:
+                error_str = u'密码错误'
+            else:
+                flag = True
+                session['logged_in'] = True
+                session['logged_in_account'] = user_name
+                flash(u'登陆成功')
+            ses.close()
+
+        else:
+            flash("Your form contained errors")
+
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+
+        return render_template('investment.html', error=error_str, form=form)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error_str = None
@@ -208,6 +263,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('logged_in_account', None)
     flash(u'登出成功')
     return redirect(url_for('show_entries'))
 
