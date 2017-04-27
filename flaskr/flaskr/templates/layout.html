@@ -11,14 +11,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		
 		<style>
-		  body {
-			padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-		  }
 		</style>
 	</head>
 <body>
+
+	<div class="container">
+	
 	<!--<div class=page>-->
-	<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar navbar-inverse">
       <div class="navbar-inner">
         <div class="container">
           <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -52,7 +52,6 @@
       </div>
     </div>
 	
-	<div class="container">
 	  
 	  {% for message in get_flashed_messages() %}
 		<div class=flash>{{ message }}</div>
