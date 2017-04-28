@@ -3,6 +3,7 @@
 # all the imports
 import os
 import sqlite3
+import math
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField
@@ -21,6 +22,11 @@ from sqlalchemy.orm import relationship, backref
 class OT_User(Base):
     """"""
     __tablename__ = 'ot_user'
+    __table_args__ = {'autoload':True}
+
+class OT_Tgbz(Base):
+    """"""
+    __tablename__ = 'ot_tgbz'
     __table_args__ = {'autoload':True}
 
 ###
@@ -147,7 +153,7 @@ def register_backend():
 
     #
     Session = sessionmaker(bind=engine)
-    session = Session()
+    ses = Session()
 
     # insert
     entry = OT_User()
@@ -167,9 +173,9 @@ def register_backend():
     entry.zcr = UE_account
     entry.UE_regTime = datetime.now()
     
-    session.add(entry)
-    session.commit()
-    session.close()
+    ses.add(entry)
+    ses.commit()
+    ses.close()
 
     #db = get_db()
     #db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
@@ -186,12 +192,25 @@ def flash_errors(form):
 
 class InvestmentForm(FlaskForm):
     time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired(message=u'请选择投资时间')])
-    charge = TextField(u'排单币', validators=[DataRequired(message=u'请填写排单币')])
+    #charge = TextField(u'排单币', validators=[DataRequired(message=u'请填写排单币')])
     investment = TextField(u'投资金额', validators=[DataRequired(message=u'请填写投资金额')])
     submit = SubmitField(u'提交')
 
+    def validate_investment(form, field):
+        investment_int = None
+        try:
+            investment_int = int(field.data)
+        except Exception, e:
+            raise ValidationError(u'请输入合法数字')
+        if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
+            raise ValidationError(u'请输入(0,5000]之间的100的倍数')
+
 @app.route('/investment', methods=['GET', 'POST'])
 def investment():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
     error_str = None
     flag = False
 
@@ -199,34 +218,53 @@ def investment():
     form = InvestmentForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            entry = Entry()
-            print 'form.check:'
-            print form.check
-            print 'request.form.getlist("check")'
-            print request.form.getlist("check")
-            form.populate_obj(entry)
-            db.session.add(entry)
-            db.session.commit()
-            flash('New entry was successfully posted')
-
-
-    
-            user_name = request.form['username']
-            password = request.form['password']
-
             Session = sessionmaker(bind=engine)
             ses = Session()
 
-            if ses.query(OT_User).filter_by(UE_account=user_name).count() == 0:
-                error_str = u'用户名错误'
-            elif md5(password) != ses.query(OT_User).filter_by(UE_account=user_name)[0].UE_password:
-                error_str = u'密码错误'
+            cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+            
+            if 1 == cur_user.UE_status:
+                error_str = u'当前帐户已被封号'
+                ses.close()
+                return render_template('investment.html', error=error_str, form=form)
+
+            entry = OT_Tgbz()
+
+            #print dir(form)
+            #print 'form.check:'
+            #print form.check
+            print 'request.form.getlist("time_span")'
+            print request.form.getlist("time_span")
+
+            # set time_span
+            time_span = request.form.getlist("time_span")[0]
+            assert('30_days' == time_span or '15_days' == time_span)
+            if '30_days' == time_span:
+                entry.zffs2 = 1
             else:
-                flag = True
-                session['logged_in'] = True
-                session['logged_in_account'] = user_name
-                flash(u'登陆成功')
+                entry.zffs1 = 1
+
+            #
+            investment = int(form.investment.data)
+            entry.jb = investment
+            entry.user = UE_account
+            entry.user_tjr = cur_user.UE_account
+            entry.date = datetime.now()
+            entry.user_nc = cur_user.UE_truename
+
+            charge = int(math.ceil(investment / 1000))
+            if cur_user.pai < charge:
+                error_str = u'排单币不足，当前排单币为：%d' % cur_user.pai
+                ses.close()
+                return render_template('investment.html', error=error_str, form=form)
+            cur_user.pai -= charge
+
+            ses.add(entry)
+            ses.commit()
             ses.close()
+
+            flash(u'投资成功')
+            return redirect(url_for('show_entries'))
 
         else:
             #flash(u'请确保您正确填写了表单')
