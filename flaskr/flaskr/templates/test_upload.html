@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+  <form action="{{ url_for('test_upload') }}" method="post" role="form" enctype="multipart/form-data">
+  {{ form.csrf_token }}
+    {{ form.hidden_tag() }}
+	
+        <p>
+           Upload a file
+             {{form.fileName()}}
+         </p>
+        <p><input type="submit" value="Submit"></p>
+     </form>
+	
+{% endblock %}

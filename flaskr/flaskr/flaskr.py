@@ -7,8 +7,9 @@ import math
 from datetime import datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask_wtf import FlaskForm
-from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField
+from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField 
 from wtforms.validators import DataRequired, ValidationError
+from werkzeug.utils import secure_filename
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
@@ -41,6 +42,7 @@ app.config.update(dict(
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default',
+    UPLOAD_FOLDER='./upload',
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
@@ -326,6 +328,25 @@ def investment():
     else:
         return render_template('investment.html', error=error_str, form=form)
 
+class myForm(FlaskForm):
+   fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
+
+@app.route('/test_upload', methods=['GET', 'POST'])
+def test_upload():
+    error_str = None
+    flag = False
+    form = myForm()
+    if request.method == 'POST':
+        print '*' * 10, ' here'
+        if form.validate_on_submit():
+            filename = secure_filename(form.fileName.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print 'file_path:', file_path
+            form.fileName.data.save(file_path)
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+        return render_template('test_upload.html', error=error_str, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
