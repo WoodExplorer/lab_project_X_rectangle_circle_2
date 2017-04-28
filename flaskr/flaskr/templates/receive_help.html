@@ -1,17 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>正投资</h2>
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <h2>得到帮助</h2>
+  {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
   
-  <form role="form" action="{{ url_for('investment') }}" method=post>
+  <form role="form" action="{{ url_for('receive_help') }}" method=post>
     {{ form.csrf_token }}
     {{ form.hidden_tag() }}
 	
 	<div class="form-group">
-		{{ form.time_span.label }}
-		<!--{{ form.time_span(class_='a') }} -->
+		{{ form.purse_type.label }}
+		<!--{{ form.purse_type(class_='a') }} -->
 		
-		{% for subfield in form.time_span %}
+		{% for subfield in form.purse_type %}
 		<div class="radio">
 		  
 			{{ subfield }}
@@ -23,8 +23,8 @@
 	
 	
 	<div class="form-group">
-		{{ form.investment.label }}
-		{{ form.investment }}
+		{{ form.amount.label }}
+		{{ form.amount }}
 	</div>
 	
 	<div class="form-group">

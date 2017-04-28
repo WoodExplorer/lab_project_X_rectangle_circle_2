@@ -5,6 +5,7 @@ import os
 import sqlite3
 import math
 from datetime import datetime
+import decimal
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField 
@@ -15,7 +16,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm
+
+decimal.getcontext().prec = 2
 
 engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
@@ -30,6 +33,16 @@ class OT_User(Base):
 class OT_Tgbz(Base):
     """"""
     __tablename__ = 'ot_tgbz'
+    __table_args__ = {'autoload':True}
+
+class OT_Jsbz(Base):
+    """"""
+    __tablename__ = 'ot_jsbz'
+    __table_args__ = {'autoload':True}
+
+class OT_Userget(Base):
+    """"""
+    __tablename__ = 'ot_userget'
     __table_args__ = {'autoload':True}
 
 ###
@@ -249,7 +262,7 @@ def investment():
             if 1 == cur_user.UE_status:
                 error_str = u'当前帐户已被封号'
                 ses.close()
-                return render_template('investment.html', error=error_str, form=form)
+                return render_template('show_entries.html', error=error_str, form=form)
 
 
             entry = OT_Tgbz()
@@ -316,6 +329,10 @@ def investment():
 
 @app.route('/test_upload', methods=['GET', 'POST'])
 def test_upload():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
     error_str = None
     flag = False
     form = myForm()
@@ -347,6 +364,8 @@ def calc_level_users(user, max_level, find_next_level):
 
 @app.route('/dynamic_purse', methods=['GET', 'POST'])
 def dynamic_purse():
+    assert(False)
+
     error_str = None
     flag = False
     form = myForm()
@@ -365,20 +384,78 @@ def dynamic_purse():
 
 @app.route('/receive_help', methods=['GET', 'POST'])
 def receive_help():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
     error_str = None
     flag = False
-    form = myForm()
+    form = ExtractFromStaticPurseForm()
     if request.method == 'POST':
-        print '*' * 10, ' here'
         if form.validate_on_submit():
-            filename = secure_filename(form.fileName.data.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print 'file_path:', file_path
-            form.fileName.data.save(file_path)
+            Session = sessionmaker(bind=engine)
+            ses = Session()
+
+            cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+            cur_time = datetime.now() 
+
+            # check: 账号未被封
+            if 1 == cur_user.UE_status:
+                error_str = u'当前帐户已被封号'
+                ses.close()
+                return render_template('show_entries.html', error=error_str, form=form)
+
+            # check: 输入的金额不得高于静态钱包的总额
+            amount = decimal.Decimal(form.amount.data)
+            cur_UE_money = decimal.Decimal(cur_user.UE_money)
+            if cur_UE_money <= amount:
+                error_str = u'输入的金额不得高于静态钱包的总额'
+                ses.close()
+                return render_template('receive_help.html', error=error_str, form=form)
+
+            # 更新ot_user表中的UE_money字段
+            cur_user.UE_money = str(cur_UE_money - amount)
+
+            # 在jsbz表中添加记录
+            entry = OT_Jsbz()
+            entry.user = cur_user.UE_account
+            entry.jb = amount
+            entry.user_nc = cur_user.UE_truename
+            entry.user_tjr = cur_user.UE_accName
+            entry.date = cur_time
+            entry.zt = 0
+            entry.qr_zt = 0
+            entry.qb = 1
+            ses.add(entry)
+
+            # 往userget表中添加记录
+            entry = OT_Userget()
+            entry.UG_account = cur_user.UE_account
+            entry.UG_type = 'jb'
+            entry.UG_allGet = amount
+            entry.UG_money = '-' + str(amount)
+            entry.UG_balance = cur_user.UE_money
+            entry.UG_dataType = 'jsbz'
+            entry.UG_note = u'静态钱包提现'
+            entry.UG_getTime = cur_time
+            entry.jiang_zt = 0  # database not-null constraint
+            ses.add(entry)
+
+            ses.commit()
+            ses.close()
+
+            flash(u'操作成功')
+            return redirect(url_for('show_entries'))
+
+        else:
+            #flash(u'请确保您正确填写了表单')
+            flash_errors(form)
+
+
     if flag:
         return redirect(url_for('show_entries'))
     else:
-        return render_template('test_upload.html', error=error_str, form=form)
+        return render_template('receive_help.html', error=error_str, form=form)
 
 
 
