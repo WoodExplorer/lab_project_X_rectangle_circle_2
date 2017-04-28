@@ -15,5 +15,52 @@
 	<a href="{{ url_for('receive_help') }}">得到帮助</a>
   </h2>
   
+  <hr />
+  <h4>等待</h4>
+  <h5>15天</h5>
+  {% if 0 < entries_for_15_days.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_for_15_days %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无“等待-15天”类型的记录</em>
+  {% endif %}
+  
+  <h5>30天</h5>
+  {% if 0 < entries_for_30_days.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_for_30_days %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无“等待-30天”类型的记录</em>
+  {% endif %}
   
 {% endblock %}

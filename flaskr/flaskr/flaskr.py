@@ -98,8 +98,18 @@ def initdb_command():
 #########################
 @app.route('/')
 def show_entries():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0)
+    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
     
-    return render_template('show_entries.html', entries=[])
+    ses.close()
+    return render_template('show_entries.html', entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
