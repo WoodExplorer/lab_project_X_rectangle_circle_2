@@ -4,13 +4,14 @@
 import os
 import sqlite3
 import math
+from datetime import datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
 
@@ -184,6 +185,9 @@ def register_backend():
     flash(u'注册成功')
     return redirect(url_for('show_entries'))
 
+def calc_pai(investment):
+    return int(math.ceil(investment / 1000))
+
 def flash_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
@@ -205,6 +209,37 @@ class InvestmentForm(FlaskForm):
         if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
             raise ValidationError(u'请输入(0,5000]之间的100的倍数')
 
+G_INTEREST_RATE_FOR_15_DAYS = 0.12
+G_INTEREST_RATE_FOR_30_DAYS = 0.40
+G_MONEY_PER_PAI = 50
+
+@app.route('/static_purse', methods=['GET'])
+def static_purse():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1)
+    total_sum_for_15_days = sum(map(lambda x: x.jb, entries_for_15_days))
+    total_pai_for_15_days = sum([calc_pai(x.jb) for x in entries_for_15_days])
+    #print 'total_sum_for_15_days:', total_sum_for_15_days
+    total_profit_for_15_days = float(total_sum_for_15_days) + float(total_sum_for_15_days) * G_INTEREST_RATE_FOR_15_DAYS + float(total_pai_for_15_days) * G_MONEY_PER_PAI
+
+    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1)
+    total_sum_for_30_days = sum(map(lambda x: x.jb, entries_for_30_days))
+    total_pai_for_30_days = sum([calc_pai(x.jb) for x in entries_for_30_days])
+    total_profit_for_30_days = float(total_sum_for_30_days) + float(total_sum_for_30_days) * G_INTEREST_RATE_FOR_30_DAYS + float(total_pai_for_30_days) * G_MONEY_PER_PAI
+
+    ses.close()
+    return render_template('static_purse.html', 
+        total_profit_for_15_days=total_profit_for_15_days, 
+        entries_for_15_days=entries_for_15_days,
+        total_profit_for_30_days=total_profit_for_30_days, 
+        entries_for_30_days=entries_for_30_days,)
+
 @app.route('/investment', methods=['GET', 'POST'])
 def investment():
     if not session.get('logged_in'):
@@ -213,7 +248,6 @@ def investment():
 
     error_str = None
     flag = False
-
 
     form = InvestmentForm()
     if request.method == 'POST':
@@ -248,6 +282,7 @@ def investment():
                 entry.zffs1 = 1
                 time_span_days = 15
 
+            # check for repeated investment in too short a period
             previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account).order_by(OT_Tgbz.id.desc())
             if 0 == previous_investments.count():
                 pass
@@ -267,7 +302,8 @@ def investment():
             entry.date = cur_time
             entry.user_nc = cur_user.UE_truename
 
-            charge = int(math.ceil(investment / 1000))
+            # check for enough pai
+            charge = calc_pai(investment)
             if cur_user.pai < charge:
                 error_str = u'排单币不足，当前排单币为：%d' % cur_user.pai
                 ses.close()
@@ -288,7 +324,6 @@ def investment():
     if flag:
         return redirect(url_for('show_entries'))
     else:
-
         return render_template('investment.html', error=error_str, form=form)
 
 

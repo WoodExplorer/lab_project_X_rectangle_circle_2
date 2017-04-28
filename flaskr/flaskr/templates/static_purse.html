@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+  <h2>静态钱包</h2>
+  
+  <h3>15天投资</h3>
+  <h4>总额：{{ total_profit_for_15_days }}</h4>
+  <h4>明细</h4>
+  
+  
+  {% if 0 < entries_for_15_days.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_for_15_days %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无投资</em>
+  {% endif %}
+  
+  <h3>30天投资</h3>
+  <h4>总额：{{ total_profit_for_30_days }}</h4>
+  
+  <h4>明细</h4>
+  
+  {% if 0 < entries_for_30_days.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_for_30_days %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无投资</em>
+  {% endif %}
+  
+{% endblock %}
