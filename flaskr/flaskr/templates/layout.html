@@ -26,11 +26,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">聚方圆</a>
+          <a class="brand" href="{{ url_for('show_entries') }}">聚方圆</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active">
-				<a href="/">主页</a></li>
+				<a href="{{ url_for('show_entries') }}">主页</a></li>
 			  </li>
               <li><a href="{{ url_for('register') }}">注册</a></li>
 			  

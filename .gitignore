@@ -89,3 +89,4 @@ flaskr/flaskr/flaskr.pyc
 *.pyc
 */*/*.pyc
 flaskr/flaskr/upload/*
+flaskr/flaskr/.ipynb_checkpoints/*

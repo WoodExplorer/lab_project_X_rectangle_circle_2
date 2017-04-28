@@ -2,11 +2,18 @@
 {% block body %}
   
   
-  <ul class=entries>
-    <a href="{{ url_for('investment') }}">参与正投资</a>
+  <h2>
+	<a href="{{ url_for('investment') }}">参与正投资</a>
+  </h2>
+  <h2>
 	<a href="{{ url_for('static_purse') }}">静态钱包</a>
-	
-  </ul>
+  </h2>
+  <h2>
+	<a href="{{ url_for('dynamic_purse') }}">动态钱包</a>
+  </h2>
+  <h2>
+	<a href="{{ url_for('receive_help') }}">得到帮助</a>
+  </h2>
   
   
 {% endblock %}

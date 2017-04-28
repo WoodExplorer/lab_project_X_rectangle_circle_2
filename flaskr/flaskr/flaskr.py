@@ -332,6 +332,19 @@ def test_upload():
         return render_template('test_upload.html', error=error_str, form=form)
 
 
+def calc_level_users(user, max_level, find_next_level):
+    next_queue = [user]
+    queue = []
+    ret = []
+    for _ in xrange(0, max_level):
+        queue = next_queue
+        next_queue = []
+        for q in queue:
+            next_queue += find_next_level(q)
+        ret.append(next_queue[:])
+    return ret
+
+
 @app.route('/dynamic_purse', methods=['GET', 'POST'])
 def dynamic_purse():
     error_str = None
@@ -347,7 +360,7 @@ def dynamic_purse():
     if flag:
         return redirect(url_for('show_entries'))
     else:
-        return render_template('test_upload.html', error=error_str, form=form)
+        return render_template('dynamic_purse.html', error=error_str, form=form)
 
 
 @app.route('/receive_help', methods=['GET', 'POST'])
