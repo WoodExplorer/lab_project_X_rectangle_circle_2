@@ -15,6 +15,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
+from my_forms import InvestmentForm, myForm
 
 engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
@@ -196,21 +197,6 @@ def flash_errors(form):
             #flash(u"Error in the %s field - %s" % (getattr(form, field).label.text, error))
             flash(u"错误：%s" % (error))
 
-class InvestmentForm(FlaskForm):
-    time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired(message=u'请选择投资时间')])
-    #charge = TextField(u'排单币', validators=[DataRequired(message=u'请填写排单币')])
-    investment = TextField(u'投资金额', validators=[DataRequired(message=u'请填写投资金额')])
-    submit = SubmitField(u'提交')
-
-    def validate_investment(form, field):
-        investment_int = None
-        try:
-            investment_int = int(field.data)
-        except Exception, e:
-            raise ValidationError(u'请输入合法数字')
-        if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
-            raise ValidationError(u'请输入(0,5000]之间的100的倍数')
-
 G_INTEREST_RATE_FOR_15_DAYS = 0.12
 G_INTEREST_RATE_FOR_30_DAYS = 0.40
 G_MONEY_PER_PAI = 50
@@ -328,9 +314,6 @@ def investment():
     else:
         return render_template('investment.html', error=error_str, form=form)
 
-class myForm(FlaskForm):
-   fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
-
 @app.route('/test_upload', methods=['GET', 'POST'])
 def test_upload():
     error_str = None
@@ -347,6 +330,44 @@ def test_upload():
         return redirect(url_for('show_entries'))
     else:
         return render_template('test_upload.html', error=error_str, form=form)
+
+
+@app.route('/dynamic_purse', methods=['GET', 'POST'])
+def dynamic_purse():
+    error_str = None
+    flag = False
+    form = myForm()
+    if request.method == 'POST':
+        print '*' * 10, ' here'
+        if form.validate_on_submit():
+            filename = secure_filename(form.fileName.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print 'file_path:', file_path
+            form.fileName.data.save(file_path)
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+        return render_template('test_upload.html', error=error_str, form=form)
+
+
+@app.route('/receive_help', methods=['GET', 'POST'])
+def receive_help():
+    error_str = None
+    flag = False
+    form = myForm()
+    if request.method == 'POST':
+        print '*' * 10, ' here'
+        if form.validate_on_submit():
+            filename = secure_filename(form.fileName.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print 'file_path:', file_path
+            form.fileName.data.save(file_path)
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+        return render_template('test_upload.html', error=error_str, form=form)
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
