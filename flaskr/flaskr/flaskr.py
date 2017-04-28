@@ -222,14 +222,15 @@ def investment():
             ses = Session()
 
             cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
-            
+            cur_time = datetime.now() 
+
             if 1 == cur_user.UE_status:
                 error_str = u'当前帐户已被封号'
                 ses.close()
                 return render_template('investment.html', error=error_str, form=form)
 
-            entry = OT_Tgbz()
 
+            entry = OT_Tgbz()
             #print dir(form)
             #print 'form.check:'
             #print form.check
@@ -238,18 +239,32 @@ def investment():
 
             # set time_span
             time_span = request.form.getlist("time_span")[0]
+            time_span_days = None
             assert('30_days' == time_span or '15_days' == time_span)
             if '30_days' == time_span:
                 entry.zffs2 = 1
+                time_span_days = 30
             else:
                 entry.zffs1 = 1
+                time_span_days = 15
+
+            previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account).order_by(OT_Tgbz.id.desc())
+            if 0 == previous_investments.count():
+                pass
+            else:
+                last_investment = previous_investments[0]
+                last_investment_datetime = last_investment.date
+                if (cur_time - last_investment_datetime ).total_seconds() < time_span_days * 24 * 3600:
+                    error_str = u'您在%d天内已经发起一次投资，不能重复投资' % time_span_days
+                    ses.close()
+                    return render_template('investment.html', error=error_str, form=form)
 
             #
             investment = int(form.investment.data)
             entry.jb = investment
             entry.user = UE_account
             entry.user_tjr = cur_user.UE_account
-            entry.date = datetime.now()
+            entry.date = cur_time
             entry.user_nc = cur_user.UE_truename
 
             charge = int(math.ceil(investment / 1000))
