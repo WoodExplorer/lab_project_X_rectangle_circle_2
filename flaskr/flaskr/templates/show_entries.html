@@ -74,6 +74,7 @@
 		<tr>
 		  <th>金额</th>
 		  <th>日期</th>
+		  <th>详细信息</th>
 		  <th>我要操作</th>
 		</tr>
 	  </thead>
@@ -82,6 +83,7 @@
 		<tr>
 		  <td>{{ entry.jb }}</td>
 		  <td>{{ entry.date }}</td>
+		  <td><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></td>
 		  <td><a href="{{ url_for('entry_waiting_operation', entry_id=entry.id) }}">我要操作</a></td>
 		</tr>
 		{% endfor %}

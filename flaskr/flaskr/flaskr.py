@@ -119,6 +119,29 @@ def show_entries():
             entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, entries_waiting=entries_waiting,
         )
 
+@app.route('/entry_waiting_detail/<entry_id>')
+def entry_waiting_detail(entry_id):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    #print '*' * 10, 'got it, entry_id:', entry_id
+    # 查询ppdd表中p_id 等于当前订单号的记录
+    rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
+    assert(1 == rec_in_ppdd.count())
+    rec_in_ppdd = rec_in_ppdd[0]
+
+    g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
+    p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
+
+    ses.close()
+    return render_template('entry_waiting_detail.html', 
+            g_user=g_user, p_user=p_user,
+        )
+
 @app.route('/entry_waiting_operation/<entry_id>')
 def entry_waiting_operation(entry_id):
     if not session.get('logged_in'):
@@ -141,7 +164,6 @@ def entry_waiting_operation(entry_id):
     return render_template('entry_waiting_operation.html', 
             g_user=g_user, p_user=p_user,
         )
-
 
 @app.route('/add', methods=['POST'])
 def add_entry():
