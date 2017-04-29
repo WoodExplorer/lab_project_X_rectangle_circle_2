@@ -7,7 +7,7 @@ import math
 from datetime import datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from flask_wtf import FlaskForm
-from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField 
+from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField, HiddenField
 from wtforms.validators import DataRequired, ValidationError
 from werkzeug.utils import secure_filename
 from sqlalchemy import create_engine
@@ -49,8 +49,12 @@ class ExtractFromStaticPurseForm(FlaskForm):
 
 
 class UploadCertificateForm(FlaskForm):
-   certificate = FileField(u'上传凭证', validators=[DataRequired(message=u'请选择文件')])
-   submit = SubmitField(u'提交')
+    entry_id = HiddenField(u"Field1")
+    certificate = FileField(u'上传凭证', validators=[DataRequired(message=u'请选择文件')])
+    submit = SubmitField(u'提交')
+
+    def set_entry_id(self, entry_id):
+        self.entry_id.data = entry_id
 
 class myForm(FlaskForm):
-   fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
+    fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
