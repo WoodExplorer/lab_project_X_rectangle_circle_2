@@ -140,8 +140,12 @@ def entry_waiting_detail(entry_id):
     ses.close()
     return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user,)
 
-@app.route('/entry_waiting_operation/<entry_id>', methods=['GET', 'POST'])
+@app.route('/entry_waiting_operation/<int:entry_id>', methods=['GET', 'POST'])
 def entry_waiting_operation(entry_id):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
     error_str = None
     form = UploadCertificateForm()
     #print '*' * 10, 'entry_id:', entry_id
@@ -152,6 +156,25 @@ def entry_waiting_operation(entry_id):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print 'file_path:', file_path
             form.certificate.data.save(file_path)
+
+            Ses = sessionmaker(bind=engine)
+            ses = Ses()
+
+            #print '*' * 10, 'got it, entry_id:', entry_id
+            # 查询ppdd表中p_id 等于当前订单号的记录
+            target_rec = ses.query(OT_Tgbz).filter_by(id=entry_id)
+            assert(1 == target_rec.count())
+            target_rec = target_rec[0]
+            target_rec.qr_zt = 1
+
+            rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
+            assert(1 == rec_in_ppdd.count())
+            rec_in_ppdd = rec_in_ppdd[0]
+            rec_in_ppdd.zt = 1
+
+            ses.commit()
+            ses.close()
+
             return redirect(url_for('show_entries'))
         else:
             pass
