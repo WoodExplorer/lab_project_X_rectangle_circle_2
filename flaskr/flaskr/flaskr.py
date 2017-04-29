@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm
 
 decimal.getcontext().prec = 2
 
@@ -138,32 +138,26 @@ def entry_waiting_detail(entry_id):
     p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
 
     ses.close()
-    return render_template('entry_waiting_detail.html', 
-            g_user=g_user, p_user=p_user,
-        )
+    return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user,)
 
 @app.route('/entry_waiting_operation/<entry_id>')
-def entry_waiting_operation(entry_id):
-    if not session.get('logged_in'):
-        abort(401)
-    UE_account = session.get('logged_in_account')
+def entry_waiting_operation(entry_id, methods=['GET', 'POST']):
+    error_str = None
+    flag = False
+    form = UploadCertificateForm()
+    print '*' * 10
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            filename = secure_filename(form.certificate.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print 'file_path:', file_path
+            form.fileName.data.save(file_path)
+            flag = True
+    if flag:
+        return redirect(url_for('show_entries'))
+    else:
+        return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
 
-    Ses = sessionmaker(bind=engine)
-    ses = Ses()
-
-    #print '*' * 10, 'got it, entry_id:', entry_id
-    # 查询ppdd表中p_id 等于当前订单号的记录
-    rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
-    assert(1 == rec_in_ppdd.count())
-    rec_in_ppdd = rec_in_ppdd[0]
-
-    g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
-    p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
-
-    ses.close()
-    return render_template('entry_waiting_operation.html', 
-            g_user=g_user, p_user=p_user,
-        )
 
 @app.route('/add', methods=['POST'])
 def add_entry():

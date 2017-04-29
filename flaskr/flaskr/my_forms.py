@@ -48,5 +48,9 @@ class ExtractFromStaticPurseForm(FlaskForm):
             raise ValidationError(u'请输入大于等于100的100的倍数')
 
 
+class UploadCertificateForm(FlaskForm):
+   certificate = FileField(u'上传凭证', validators=[DataRequired(message=u'请选择文件')])
+   submit = SubmitField(u'提交')
+
 class myForm(FlaskForm):
    fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
