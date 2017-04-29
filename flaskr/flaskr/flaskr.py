@@ -140,29 +140,21 @@ def entry_waiting_detail(entry_id):
     ses.close()
     return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user,)
 
-
-@app.route('/entry_waiting_operation_backend/<entry_id>', methods=['POST'])
-def entry_waiting_operation_backend(entry_id):
+@app.route('/entry_waiting_operation/<entry_id>', methods=['GET', 'POST'])
+def entry_waiting_operation(entry_id):
     error_str = None
     form = UploadCertificateForm()
-    
-    print '*' * 10, 'entry_id:', entry_id
+    #print '*' * 10, 'entry_id:', entry_id
 
-    assert('POST' == request.method)
-    if form.validate_on_submit():
-        filename = secure_filename(form.certificate.data.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print 'file_path:', file_path
-        form.certificate.data.save(file_path)
-        return redirect(url_for('show_entries'))
-    else:
-        return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
-
-@app.route('/entry_waiting_operation/<entry_id>')
-def entry_waiting_operation(entry_id, methods=['GET']):
-    error_str = None
-    form = UploadCertificateForm()
-    form.set_entry_id(1028)
+    if ('POST' == request.method):
+        if form.validate_on_submit():
+            filename = secure_filename(form.certificate.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print 'file_path:', file_path
+            form.certificate.data.save(file_path)
+            return redirect(url_for('show_entries'))
+        else:
+            pass
     return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
 
 

@@ -49,12 +49,12 @@ class ExtractFromStaticPurseForm(FlaskForm):
 
 
 class UploadCertificateForm(FlaskForm):
-    entry_id = HiddenField(u"Field1")
+    #entry_id = HiddenField(u"Field1")
     certificate = FileField(u'上传凭证', validators=[DataRequired(message=u'请选择文件')])
     submit = SubmitField(u'提交')
 
-    def set_entry_id(self, entry_id):
-        self.entry_id.data = entry_id
+    #def set_entry_id(self, entry_id):
+    #    self.entry_id.data = entry_id
 
 class myForm(FlaskForm):
     fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])
