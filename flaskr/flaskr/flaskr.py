@@ -4,7 +4,10 @@
 import os
 import sqlite3
 import math
+import platform
+import time
 from datetime import datetime
+import random
 import decimal
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, send_from_directory
 from flask_wtf import FlaskForm
@@ -64,6 +67,10 @@ app.config.update(dict(
     UPLOAD_FOLDER='./upload',
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+random.seed(2)
+def get_time_random_str():
+    return time.strftime('%Y-%m-%d_%H_%M_%S',time.localtime(time.time())) + '_' + str(random.randint(0, 99999999))
 
 def connect_db():
     """Connects to the specific database."""
@@ -156,7 +163,7 @@ def entry_waiting_operation(entry_id):
 
     if ('POST' == request.method):
         if form.validate_on_submit():
-            filename = secure_filename(form.certificate.data.filename)
+            filename = secure_filename(form.certificate.data.filename) + get_time_random_str()
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print 'file_path:', file_path
             form.certificate.data.save(file_path)
@@ -183,12 +190,16 @@ def entry_waiting_operation(entry_id):
             pass
     return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
 
-@app.route('/view_certificate/<certificate_path>', methods=['GET'])
+@app.route('/view_certificate/<path:certificate_path>', methods=['GET'])
 def view_certificate(certificate_path):
     if not session.get('logged_in'):
         abort(401)
     UE_account = session.get('logged_in_account')
 
+    print 'certificate_path:', certificate_path
+    #certificate_path = secure_filename(certificate_path)
+    #print 'certificate_path:', certificate_path
+    certificate_path = certificate_path.replace('\\', '/')
     return send_from_directory('', certificate_path)
 
 @app.route('/entry_waiting_in_jsbz_operation/<int:entry_id>', methods=['GET', 'POST'])
@@ -219,7 +230,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
                 rec_in_ppdd.zt = 2
             else:
-                filename = secure_filename(form.graph.data.filename)
+                filename = secure_filename(form.graph.data.filename) + get_time_random_str()
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 print 'file_path:', file_path
                 form.graph.data.save(file_path)
@@ -237,10 +248,10 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
             return redirect(url_for('show_entries'))
         else:
-            pass
+            flash_errors(form)
 
     certificate_path = rec_in_ppdd.pic
-
+    print 'certificate_path:', certificate_path
     ses.close()
     return render_template('entry_waiting_in_jsbz_operation.html', error=error_str, form=form, entry_id=entry_id, certificate_path=certificate_path)
 
@@ -490,7 +501,7 @@ def test_upload():
     if request.method == 'POST':
         print '*' * 10, ' here'
         if form.validate_on_submit():
-            filename = secure_filename(form.fileName.data.filename)
+            filename = secure_filename(form.fileName.data.filename) + get_time_random_str()
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print 'file_path:', file_path
             form.fileName.data.save(file_path)
