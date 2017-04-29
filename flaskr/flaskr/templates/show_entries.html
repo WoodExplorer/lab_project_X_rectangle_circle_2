@@ -118,4 +118,50 @@
     <em>目前尚无“待办理-jsbz”类型的记录</em>
   {% endif %}
   
+  <h4>已完成</h4>
+  <h5>已完成的提供帮助</h5>
+  {% if 0 < entries_closed_in_tgbz.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_closed_in_tgbz %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无“已完成的提供帮助”类型的记录</em>
+  {% endif %}
+  
+  <h5>已完成的接受帮助</h5>
+  {% if 0 < entries_closed_in_jsbz.count() %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_closed_in_jsbz %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无“已完成的接收帮助”类型的记录</em>
+  {% endif %}
 {% endblock %}

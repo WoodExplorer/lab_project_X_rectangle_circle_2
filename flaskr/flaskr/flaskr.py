@@ -124,10 +124,15 @@ def show_entries():
     entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1)
     entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
 
+    entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1)
+    entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1)
+
     ses.close()
     return render_template('show_entries.html', 
             entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, entries_waiting=entries_waiting,
-            entries_waiting_in_jsbz=entries_waiting_in_jsbz,
+            entries_waiting_in_jsbz=entries_waiting_in_jsbz, 
+            entries_closed_in_tgbz=entries_closed_in_tgbz,
+            entries_closed_in_jsbz=entries_closed_in_jsbz,
         )
 
 @app.route('/entry_waiting_detail/<entry_id>')
