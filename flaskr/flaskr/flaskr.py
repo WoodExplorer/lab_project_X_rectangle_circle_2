@@ -45,6 +45,11 @@ class OT_Userget(Base):
     __tablename__ = 'ot_userget'
     __table_args__ = {'autoload':True}
 
+class OT_Ppdd(Base):
+    """"""
+    __tablename__ = 'ot_ppdd'
+    __table_args__ = {'autoload':True}
+
 ###
 
 app = Flask(__name__) # create the application instance :)
@@ -99,7 +104,7 @@ def initdb_command():
 @app.route('/')
 def show_entries():
     if not session.get('logged_in'):
-        abort(401)
+        return redirect(url_for('login'))
     UE_account = session.get('logged_in_account')
 
     Ses = sessionmaker(bind=engine)
@@ -107,9 +112,36 @@ def show_entries():
 
     entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0)
     entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
+    entries_waiting = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1)
     
     ses.close()
-    return render_template('show_entries.html', entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days)
+    return render_template('show_entries.html', 
+            entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, entries_waiting=entries_waiting,
+        )
+
+@app.route('/entry_waiting_operation/<entry_id>')
+def entry_waiting_operation(entry_id):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    #print '*' * 10, 'got it, entry_id:', entry_id
+    # 查询ppdd表中p_id 等于当前订单号的记录
+    rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
+    assert(1 == rec_in_ppdd.count())
+    rec_in_ppdd = rec_in_ppdd[0]
+
+    g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
+    p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
+
+    ses.close()
+    return render_template('entry_waiting_operation.html', 
+            g_user=g_user, p_user=p_user,
+        )
+
 
 @app.route('/add', methods=['POST'])
 def add_entry():

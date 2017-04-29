@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+  
+  <h2>详细信息</h2>
+  
+  <h4>受益人姓名：{{ g_user.UE_truename }}</h4>
+  <h4>受益人银行名称：{{ g_user.yhmc }}</h4>
+  <h4>受益人微信号：{{ g_user.weixin }}</h4>
+  <h4>受益人支付宝账号：{{ g_user.zfb }}</h4>
+  
+  <h4>提供帮助人姓名：{{ p_user.UE_truename }}</h4>
+  <h4>提供帮助人电话号码：{{ p_user.UE_phone }}</h4>
+  <h4>提供帮助人微信号：{{ p_user.weixin }}</h4>
+  <h4>提供帮助人的推荐人：{{ p_user.UE_theme }}</h4>
+  <h4>提供帮助人的电话：{{ p_user.UE_phone }}</h4>
+ 
+{% endblock %}
