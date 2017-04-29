@@ -70,7 +70,7 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 random.seed(2)
 def get_time_random_str():
-    return time.strftime('%Y-%m-%d_%H_%M_%S',time.localtime(time.time())) + '_' + str(random.randint(0, 99999999))
+    return time.strftime('%Y-%m-%d_%H_%M_%S',time.localtime(time.time())) + '_' + str(random.randint(0, 99999999)) + '_'
 
 def connect_db():
     """Connects to the specific database."""
@@ -163,7 +163,7 @@ def entry_waiting_operation(entry_id):
 
     if ('POST' == request.method):
         if form.validate_on_submit():
-            filename = secure_filename(form.certificate.data.filename) + get_time_random_str()
+            filename = get_time_random_str() + secure_filename(form.certificate.data.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print 'file_path:', file_path
             form.certificate.data.save(file_path)
@@ -230,7 +230,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
                 rec_in_ppdd.zt = 2
             else:
-                filename = secure_filename(form.graph.data.filename) + get_time_random_str()
+                filename = get_time_random_str() + secure_filename(form.graph.data.filename)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 print 'file_path:', file_path
                 form.graph.data.save(file_path)
