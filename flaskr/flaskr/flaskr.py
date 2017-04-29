@@ -207,6 +207,52 @@ def view_certificate(certificate_path):
     certificate_path = certificate_path.replace('\\', '/')
     return send_from_directory('', certificate_path)
 
+level_level_dict = {
+    1: {1: 0.01},
+    2: {1: 0.02, 2: 0.01},
+    3: {1: 0.02, 2: 0.02, 3: 0.01},
+}
+def get_ratio_by_level_level(user_level, desc_level):
+    global level_level_dict
+    return level_level_dict[user_level][desc_level]
+
+def calc_level_users(user, max_level, find_next_level_ge):
+    """Para@find_next_level_ge should be a generator which produce a one-para function."""
+    next_queue = [user]
+    queue = []
+    ret = []
+    for _ in xrange(0, max_level):
+        queue = next_queue
+        next_queue = []
+        for q in queue:
+            next_queue += find_next_level_ge()(q)
+        ret.append(next_queue[:])
+    return ret
+
+def find_next_level(ses, tareget_account):
+    """This serves a reference(?)."""
+    return [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)]
+
+def determin_user_level(ses, tareget_account):
+    """Currently, this function can only determine up to level 3 users."""
+    ret = calc_level_users(ses, 3, lambda: lambda tareget_account: [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)])
+
+    group_size = sum([sum(len(x)) for x in ret])
+    print 'group_size:', group_size
+    direct_descendant_num = len(ret[0])
+    print 'direct_descendant_num:', direct_descendant_num
+
+    user_level = 0
+    if direct_descendant_num >= 20 and group_size >= 50:
+        user_level = 3
+    elif direct_descendant_num >= 5 and group_size >= 10:
+        user_level = 2
+    elif direct_descendant_num >= 1:
+        user_level = 1
+
+    print 'determined user_level:', user_level
+    return user_level
+
 @app.route('/entry_waiting_in_jsbz_operation/<int:entry_id>', methods=['GET', 'POST'])
 def entry_waiting_in_jsbz_operation(entry_id):
     if not session.get('logged_in'):
@@ -234,6 +280,25 @@ def entry_waiting_in_jsbz_operation(entry_id):
                 target_rec.qr_zt = 1
 
                 rec_in_ppdd.zt = 2
+
+
+                # 更新上级奖励
+                cur_money = target_rec.jb
+                target_user_account = UE_account
+                # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
+                for distance in [1, 2, 3]:
+                    cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
+
+                    recommendor_account = cur_user.UE_accName
+                    if recommendor_account is not None:
+                        user_level = determin_user_level(ses, recommendor_account)
+                        recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)[0]
+                        recommendor_rec.tj_he += (cur_money * get_ratio_by_level_level(user_level, distance))
+
+                        target_user_account = recommendor_rec.UE_account
+                    else:
+                        break
+
             else:
                 filename = get_time_random_str() + secure_filename(form.graph.data.filename)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
