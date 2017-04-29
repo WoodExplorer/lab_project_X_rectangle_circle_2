@@ -93,4 +93,29 @@
     <em>目前尚无“待办理”类型的记录</em>
   {% endif %}
   
+  <h5>文档中是这么写的：1、查询jsbz中zt为1的订单，有以下集中可能</h5>
+  {% if 0 < entries_waiting_in_jsbz|length %}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <thead>
+		<tr>
+		  <th>金额</th>
+		  <th>日期</th>
+		  <th>我要操作</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		{% for entry in entries_waiting_in_jsbz %}
+		<tr>
+		  <td>{{ entry.jb }}</td>
+		  <td>{{ entry.date }}</td>
+		  <td><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry.id) }}">我要操作</a></td>
+		</tr>
+		{% endfor %}
+	  </tbody>
+	</table>
+  {% else %}
+    <em>目前尚无“待办理-jsbz”类型的记录</em>
+  {% endif %}
+  
 {% endblock %}

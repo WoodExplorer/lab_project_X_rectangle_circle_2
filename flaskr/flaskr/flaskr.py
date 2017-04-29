@@ -6,7 +6,7 @@ import sqlite3
 import math
 from datetime import datetime
 import decimal
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, send_from_directory
 from flask_wtf import FlaskForm
 from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField 
 from wtforms.validators import DataRequired, ValidationError
@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm
 
 decimal.getcontext().prec = 2
 
@@ -113,10 +113,14 @@ def show_entries():
     entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0)
     entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
     entries_waiting = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1)
-    
+
+    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1)
+    entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
+
     ses.close()
     return render_template('show_entries.html', 
             entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, entries_waiting=entries_waiting,
+            entries_waiting_in_jsbz=entries_waiting_in_jsbz,
         )
 
 @app.route('/entry_waiting_detail/<entry_id>')
@@ -160,8 +164,6 @@ def entry_waiting_operation(entry_id):
             Ses = sessionmaker(bind=engine)
             ses = Ses()
 
-            #print '*' * 10, 'got it, entry_id:', entry_id
-            # 查询ppdd表中p_id 等于当前订单号的记录
             target_rec = ses.query(OT_Tgbz).filter_by(id=entry_id)
             assert(1 == target_rec.count())
             target_rec = target_rec[0]
@@ -171,6 +173,7 @@ def entry_waiting_operation(entry_id):
             assert(1 == rec_in_ppdd.count())
             rec_in_ppdd = rec_in_ppdd[0]
             rec_in_ppdd.zt = 1
+            rec_in_ppdd.pic = file_path
 
             ses.commit()
             ses.close()
@@ -179,6 +182,67 @@ def entry_waiting_operation(entry_id):
         else:
             pass
     return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
+
+@app.route('/view_certificate/<certificate_path>', methods=['GET'])
+def view_certificate(certificate_path):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    return send_from_directory('', certificate_path)
+
+@app.route('/entry_waiting_in_jsbz_operation/<int:entry_id>', methods=['GET', 'POST'])
+def entry_waiting_in_jsbz_operation(entry_id):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    error_str = None
+    form = ConfirmationForm()
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    rec_in_ppdd = ses.query(OT_Ppdd).filter_by(g_id=entry_id)
+    assert(1 == rec_in_ppdd.count())
+    rec_in_ppdd = rec_in_ppdd[0]
+
+    if ('POST' == request.method):
+        if form.validate_on_submit():
+            feedback = request.form.getlist("feedback")[0]
+            assert('confirm' == feedback or 'fraud' == feedback)
+            if 'confirm' == feedback:
+                target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
+                assert(1 == target_rec.count())
+                target_rec = target_rec[0]
+                target_rec.qr_zt = 1
+
+                rec_in_ppdd.zt = 2
+            else:
+                filename = secure_filename(form.graph.data.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                print 'file_path:', file_path
+                form.graph.data.save(file_path)
+
+                target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
+                assert(1 == target_rec.count())
+                target_rec = target_rec[0]
+                target_rec.qr_zt = 1
+
+                rec_in_ppdd.zt = 3
+                rec_in_ppdd.pic2 = file_path
+
+            ses.commit()
+            ses.close()
+
+            return redirect(url_for('show_entries'))
+        else:
+            pass
+
+    certificate_path = rec_in_ppdd.pic
+
+    ses.close()
+    return render_template('entry_waiting_in_jsbz_operation.html', error=error_str, form=form, entry_id=entry_id, certificate_path=certificate_path)
 
 
 @app.route('/add', methods=['POST'])
