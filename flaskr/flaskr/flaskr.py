@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 import random
 import decimal
+import traceback
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, send_from_directory
 from flask_wtf import FlaskForm
 from wtforms import TextField, TextAreaField, PasswordField, RadioField, SubmitField, FileField 
@@ -235,9 +236,9 @@ def find_next_level(ses, tareget_account):
 
 def determin_user_level(ses, tareget_account):
     """Currently, this function can only determine up to level 3 users."""
-    ret = calc_level_users(ses, 3, lambda: lambda tareget_account: [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)])
+    ret = calc_level_users(tareget_account, 3, lambda: lambda tareget_account: [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)])
 
-    group_size = sum([sum(len(x)) for x in ret])
+    group_size = sum([len(x) for x in ret])
     print 'group_size:', group_size
     direct_descendant_num = len(ret[0])
     print 'direct_descendant_num:', direct_descendant_num
@@ -274,30 +275,39 @@ def entry_waiting_in_jsbz_operation(entry_id):
             feedback = request.form.getlist("feedback")[0]
             assert('confirm' == feedback or 'fraud' == feedback)
             if 'confirm' == feedback:
-                target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
-                assert(1 == target_rec.count())
-                target_rec = target_rec[0]
-                target_rec.qr_zt = 1
+                try:
+                    with ses.begin_nested():
+                        target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
+                        assert(1 == target_rec.count())
+                        target_rec = target_rec[0]
+                        
+                        # 更新上级奖励
+                        cur_money = target_rec.jb
+                        target_user_account = UE_account
+                        # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
+                        for distance in [1, 2, 3]:
+                            cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
 
-                rec_in_ppdd.zt = 2
+                            recommendor_account = cur_user.UE_accName
+                            if recommendor_account is not None:
+                                user_level = determin_user_level(ses, recommendor_account)
+                                recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)[0]
+                                recommendor_rec.tj_he += decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
 
+                                target_user_account = recommendor_rec.UE_account
+                            else:
+                                break
 
-                # 更新上级奖励
-                cur_money = target_rec.jb
-                target_user_account = UE_account
-                # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
-                for distance in [1, 2, 3]:
-                    cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
-
-                    recommendor_account = cur_user.UE_accName
-                    if recommendor_account is not None:
-                        user_level = determin_user_level(ses, recommendor_account)
-                        recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)[0]
-                        recommendor_rec.tj_he += (cur_money * get_ratio_by_level_level(user_level, distance))
-
-                        target_user_account = recommendor_rec.UE_account
-                    else:
-                        break
+                        target_rec.qr_zt = 1
+                        rec_in_ppdd.zt = 2
+                        #ses.commit()
+                except:
+                    ses.rollback()
+                    traceback.print_exc()
+                    raise
+                finally:
+                    #ses.close()
+                    pass
 
             else:
                 filename = get_time_random_str() + secure_filename(form.graph.data.filename)
@@ -313,8 +323,8 @@ def entry_waiting_in_jsbz_operation(entry_id):
                 rec_in_ppdd.zt = 3
                 rec_in_ppdd.pic2 = file_path
 
-            ses.commit()
-            ses.close()
+            #ses.commit()
+            #ses.close()
 
             return redirect(url_for('show_entries'))
         else:
@@ -579,19 +589,6 @@ def test_upload():
         return redirect(url_for('show_entries'))
     else:
         return render_template('test_upload.html', error=error_str, form=form)
-
-
-def calc_level_users(user, max_level, find_next_level):
-    next_queue = [user]
-    queue = []
-    ret = []
-    for _ in xrange(0, max_level):
-        queue = next_queue
-        next_queue = []
-        for q in queue:
-            next_queue += find_next_level(q)
-        ret.append(next_queue[:])
-    return ret
 
 
 @app.route('/dynamic_purse', methods=['GET', 'POST'])

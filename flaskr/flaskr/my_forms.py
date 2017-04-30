@@ -57,7 +57,7 @@ class UploadCertificateForm(FlaskForm):
     #    self.entry_id.data = entry_id
 
 class ConfirmationForm(FlaskForm):
-    feedback = RadioField(u'', choices=[('confirm', u'确认收款'), ('fraud', u'未收到款投诉')], validators=[DataRequired(message=u'请选择')])
+    feedback = RadioField(u'请选择', choices=[('confirm', u'确认收款'), ('fraud', u'未收到款投诉')], validators=[DataRequired(message=u'请选择')])
     
     graph = FileField(u'上传截图', validators=[])
     submit = SubmitField(u'提交')
