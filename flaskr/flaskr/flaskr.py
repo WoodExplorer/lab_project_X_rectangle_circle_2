@@ -291,7 +291,10 @@ def entry_waiting_in_jsbz_operation(entry_id):
                             recommendor_account = cur_user.UE_accName
                             if recommendor_account is not None:
                                 user_level = determin_user_level(ses, recommendor_account)
-                                recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)[0]
+                                recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)
+                                if 0 == recommendor_rec.count():
+                                    break
+                                recommendor_rec = recommendor_rec[0]
                                 recommendor_rec.tj_he += decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
 
                                 target_user_account = recommendor_rec.UE_account
@@ -648,6 +651,20 @@ def group_management():
     return render_template('group_management.html', error=error_str, form=form, pai=cur_user.pai, jhma=cur_user.jhma,
                             pai_history=pai_history, jhma_history=jhma_history,
                             level_1_group=level_1_group, level_2_group=level_2_group, level_3_group=level_3_group)
+
+
+@app.route('/personal_information', methods=['GET', 'POST'])
+def personal_information():
+    pass
+
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+
+    return 'Ok'
 
 @app.route('/post/<int:post_id>', methods=['GET'])
 def show_post(post_id):
