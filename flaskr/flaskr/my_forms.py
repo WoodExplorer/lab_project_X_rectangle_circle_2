@@ -27,7 +27,7 @@ class InvestmentForm(FlaskForm):
         try:
             investment_int = int(field.data)
         except Exception, e:
-            raise ValidationError(u'请输入合法数字')
+            raise ValidationError(u'请输入合法正数数')
         if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
             raise ValidationError(u'请输入(0,5000]之间的100的倍数')
 
@@ -43,7 +43,7 @@ class ExtractFromStaticPurseForm(FlaskForm):
         try:
             amount_int = int(field.data)
         except Exception, e:
-            raise ValidationError(u'请输入合法数字')
+            raise ValidationError(u'请输入合法正数数')
         if amount_int < 100 or 0 != amount_int % 100:
             raise ValidationError(u'请输入大于等于100的100的倍数')
 
@@ -61,6 +61,24 @@ class ConfirmationForm(FlaskForm):
     
     graph = FileField(u'上传截图', validators=[])
     submit = SubmitField(u'提交')
+
+
+
+class SendPaiOrJhmaForm(FlaskForm):
+    UE_phone = TextField(u'电话号码', validators=[DataRequired(message=u'请填写电话号码')])
+    object_type = RadioField(u'发送对象', choices=[('pai', u'排单币'), ('jhma', u'激活码')], validators=[DataRequired(message=u'请选择发送对象')])
+    amount = TextField(u'发送数量', validators=[DataRequired(message=u'请填写发送数量')])
+    submit = SubmitField(u'提交')
+
+    def validate_amount(form, field):
+        amount_int = None
+        try:
+            amount_int = int(field.data)
+        except Exception, e:
+            raise ValidationError(u'请输入合法正数数')
+        if amount_int <= 0:
+            raise ValidationError(u'请输入正数数')
+
 
 class myForm(FlaskForm):
     fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])

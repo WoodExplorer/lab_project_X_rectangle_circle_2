@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm
 
 decimal.getcontext().prec = 2
 
@@ -561,6 +561,93 @@ def investment():
         return redirect(url_for('show_entries'))
     else:
         return render_template('investment.html', error=error_str, form=form)
+
+
+@app.route('/group_management', methods=['GET', 'POST'])
+def group_management():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    error_str = None
+    flag = False
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+    tareget_account = UE_account
+    ret = calc_level_users(tareget_account, 3, lambda: lambda tareget_account: [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)])
+    level_1_group, level_2_group, level_3_group = [ses.query(OT_User).filter(OT_User.UE_account.in_(x)) for x in ret]
+    
+    jhma_history = ses.query(OT_User).filter_by(UE_accName=UE_account)
+    pai_history = ses.query(OT_Tgbz).filter_by(user=UE_account)
+    form = SendPaiOrJhmaForm()
+
+
+    if 'POST' == request.method:
+        form = SendPaiOrJhmaForm()
+        if form.validate_on_submit():
+            while True:
+                ses = None
+                try:
+                    object_type = request.form.getlist("object_type")[0]
+                    assert('pai' == object_type or 'jhma' == object_type)
+                    object_type_desc = u'排单币' if 'pai' == object_type else u'激活码'
+                    
+                    UE_phone = int(form.UE_phone.data)
+                    amount = int(form.amount.data)
+
+                    Session = sessionmaker(bind=engine)
+                    ses = Session()
+
+                    target_user = ses.query(OT_User).filter_by(UE_phone=UE_phone)
+                    if 0 == target_user.count():
+                        error_str = u'不存在电话为%s的用户' % UE_phone
+                        ses.close()
+                        break#return render_template('group_management.html', error=error_str, form=form)
+                    if 1 < target_user.count():
+                        error_str = u'电话为%s的用户的个数大于1，请与系统管理员联系' % UE_phone
+                        ses.close()
+                        break#return render_template('group_management.html', error=error_str, form=form)
+                    target_user = target_user[0]
+
+                    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+                    cur_user_pai = cur_user.pai
+                    cur_user_jhma = cur_user.jhma
+                    cur_object_amount = cur_user_pai if 'pai' == object_type else cur_user_jhma
+                    if amount > cur_object_amount:
+                        error_str = u'%s不足，当前%s为：%d' % (object_type_desc, object_type_desc, cur_user.pai)
+                        ses.close()
+                        break#return render_template('group_management.html', error=error_str, form=form)
+
+                    with ses.begin_nested():
+                        if 'pai' == object_type:
+                            target_user.pai += amount
+                            cur_user.pai -= amount
+                        else:
+                            target_user.jhma += amout
+                            cur_user.jhma -= amount
+
+                        #ses.commit()
+                except:
+                    #ses.rollback()
+                    traceback.print_exc()
+                    raise
+                finally:
+                    #ses.close()
+                    pass
+
+                flash(u'发送成功')
+                break
+        else:
+            flash_errors(form)
+
+
+    ses.close()
+    return render_template('group_management.html', error=error_str, form=form, pai=cur_user.pai, jhma=cur_user.jhma,
+                            pai_history=pai_history, jhma_history=jhma_history,
+                            level_1_group=level_1_group, level_2_group=level_2_group, level_3_group=level_3_group)
 
 @app.route('/post/<int:post_id>', methods=['GET'])
 def show_post(post_id):
