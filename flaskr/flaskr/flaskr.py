@@ -629,10 +629,16 @@ def group_management():
                             target_user.pai += amount
                             cur_user.pai -= amount
                         else:
-                            target_user.jhma += amout
+                            if 1 == target_user.not_help: # If target user has not been activated, then, activating it would cost 1 jhma.
+                                target_user.jhma += amount
+                            else:
+                                target_user.jhma += (amount - 1)
+                                target_user.not_help = 1
                             cur_user.jhma -= amount
 
+
                         #ses.commit()
+                    form = SendPaiOrJhmaForm()
                 except:
                     #ses.rollback()
                     traceback.print_exc()
@@ -643,8 +649,7 @@ def group_management():
 
                 flash(u'发送成功')
                 break
-        else:
-            flash_errors(form)
+    flash_errors(form)
 
 
     ses.close()
@@ -862,10 +867,13 @@ def login():
         Session = sessionmaker(bind=engine)
         ses = Session()
 
-        if ses.query(OT_User).filter_by(UE_account=user_name).count() == 0:
+        cur_user = ses.query(OT_User).filter_by(UE_account=user_name)
+        if cur_user.count() == 0:
             error_str = u'用户名错误'
-        elif md5(password) != ses.query(OT_User).filter_by(UE_account=user_name)[0].UE_password:
+        elif md5(password) != cur_user[0].UE_password:
             error_str = u'密码错误'
+        elif 0 == cur_user[0].not_help:
+            error_str = u'帐号未激活，请联系推荐人'
         else:
             flag = True
             session['logged_in'] = True
