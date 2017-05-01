@@ -655,7 +655,18 @@ def group_management():
 
 @app.route('/personal_information', methods=['GET', 'POST'])
 def personal_information():
-    pass
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    error_str = None
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+    ses.close()
+
+    return render_template('personal_information.html', error=error_str, cur_user=cur_user)
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
@@ -663,8 +674,32 @@ def sign_in():
         abort(401)
     UE_account = session.get('logged_in_account')
 
+    Session = sessionmaker(bind=engine)
+    ses = Session()
 
-    return 'Ok'
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+    cur_time = datetime.now() 
+    cur_time_to_date = str(cur_time.year) + str(cur_time.month) + str(cur_time.day)
+
+    to_increase = True
+    if (cur_user.last_sign_in is not None):
+        last_sign_in = cur_user.last_sign_in 
+        last_sign_in_to_date = str(last_sign_in.year) + str(last_sign_in.month) + str(last_sign_in.day)
+        if cur_time_to_date == last_sign_in_to_date:
+            to_increase = False
+
+    if to_increase:
+        cur_user.last_sign_in = cur_time
+
+        if 2 == cur_user.loginNum:
+            cur_user.pai += 1
+            cur_user.loginNum = 0
+        else:
+            cur_user.loginNum += 1
+    ses.commit()
+    ses.close()
+
+    return '{"ret": "Ok"}'
 
 @app.route('/post/<int:post_id>', methods=['GET'])
 def show_post(post_id):

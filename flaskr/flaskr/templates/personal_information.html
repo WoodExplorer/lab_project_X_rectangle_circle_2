@@ -1,40 +1,74 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>正投资</h2>
+  <h2>个人信息</h2>
   {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
   
-  <form role="form" action="{{ url_for('investment') }}" method=post>
-    {{ form.csrf_token }}
-    {{ form.hidden_tag() }}
+  <table class="table table-striped">
+	  <caption></caption>
+	  <!-- <thead>
+		<tr>
+		  <th>{{ cur_user.UE_truename }}</th>
+		  <th>日期</th>
+		</tr>
+	  </thead>
+	  <tbody> -->
+		<tr>
+			<td>{{ cur_user.UE_truename }}</td>
+			<td>
+				{% if 1 == cur_user.UE_status %}
+					禁用
+				{% else %}
+					{% if 0 == cur_user.not_help %}
+						未激活
+					{% else %}
+						已激活
+					{% endif %}
+				{% endif %}
+			</td>
+			
+		</tr>
+		<tr>
+			<td>手机</td>
+			<td>{{ cur_user.UE_phone }}</td>
+		</tr>
+		<tr>
+			<td>推荐人</td>
+			<td>{{ cur_user.UE_accName }}</td>
+		</tr>
+		<tr>
+			<td>加入时间</td>
+			<td>{{ cur_user.UE_regTime }}</td>
+		</tr>
+	  </tbody>
+	</table>
 	
-	<div class="form-group">
-		{{ form.time_span.label }}
-		<!--{{ form.time_span(class_='a') }} -->
-		
-		{% for subfield in form.time_span %}
-		<div class="radio">
+	<h3><a href="{{ url_for('change_password') }}">设置</a></h3>
+	
+	<h3><a id="sign_in">签到</h3>
+	
+	<h3>账户设定</h3>
+	
+	
+  
+	<script>
+	
+		$(document).ready(function(){
+		  $("#sign_in").click(function(){
+				console.log("here");
+				$.ajax({
+						type: "POST",
+						url: "{{ url_for('sign_in') }}",
+						data: { data: 'placeholder' },
+						dataType: "json",
+						success: function(resp){
+							
+							console.log("here2");
+							console.log(resp);
+						}});
 		  
-			{{ subfield }}
-			{{ subfield.label }}
-		  
-		</div>
-		{% endfor %}
-	</div>
-	
-	
-	<div class="form-group">
-		{{ form.investment.label }}
-		{{ form.investment }}
-	</div>
-	
-	<div class="form-group">
-		<p>本人正式申明：我已完全了解所有投资可能的风险。我决定参与聚方圆平台,愿意对自己认可的聚方圆正投资，并愿意为项目的市场营销推广贡献力量。</p>
-	</div>
-	
-	<div class="form-group">
-		{{ form.submit(class_='btn btn-default') }}
-	</div>
-	
-  </form>
+				})
+		}
+		);
+	</script>
 	
 {% endblock %}
