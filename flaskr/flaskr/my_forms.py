@@ -81,8 +81,12 @@ class SendPaiOrJhmaForm(FlaskForm):
 
 
 class AccountSettingForm(FlaskForm):
-    object_type = RadioField(u'发送对象', choices=[('weixin', u'微信号'), ('alipay', u'支付宝帐号'), ('bank', u'银行卡号')], validators=[DataRequired(message=u'请选择')])
-    submit = SubmitField(u'提交')
+    
+    weixin = TextField(u'微信号', validators=[])
+    zfb = TextField(u'支付宝帐号', validators=[])
+    yhmc = TextField(u'银行卡号', validators=[])
+    
+    submit = SubmitField(u'提交', id='submit')
 
 
 class myForm(FlaskForm):

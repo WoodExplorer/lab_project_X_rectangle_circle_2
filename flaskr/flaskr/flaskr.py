@@ -29,6 +29,7 @@ Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
 
+
 class OT_User(Base):
     """"""
     __tablename__ = 'ot_user'
@@ -56,6 +57,8 @@ class OT_Ppdd(Base):
 
 ###
 
+
+
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , flaskr.py
 
@@ -68,6 +71,19 @@ app.config.update(dict(
     UPLOAD_FOLDER='./upload',
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+###
+result = engine.execute("SELECT @@event_scheduler")
+print 'event_scheduler:', result
+for rec in result:
+    print rec
+if u'ON' != rec[0]:
+    print '\n' * 10
+    print "Error: mysql event_scheduler is turned off."
+    #assert(u'ON' == rec[0])
+    print '\n' * 10
+result = None
+
 
 random.seed(2)
 def get_time_random_str():
@@ -846,12 +862,33 @@ def account_setting():
     ses = Session()
     cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
 
+    
+        
     if request.method == 'POST':
-        print 'ToDo! ' * 10        
+        if form.validate_on_submit():
+            weixin, zfb, yhmc = form.weixin.data, form.zfb.data, form.yhmc.data
+            print '!' * 20
+            print 'form.weixin.data, form.zfb.data, form.yhmc.data:', form.weixin.data, form.zfb.data, form.yhmc.data
+            print 'weixin, zfb, yhmc:', weixin, zfb, yhmc 
+            if (weixin is not None) and ('' != weixin.strip()):
+                cur_user.weixin = weixin
+            if (zfb is not None) and ('' != zfb.strip()):
+                cur_user.zfb = zfb
+            if (yhmc is not None) and ('' != yhmc.strip()):
+                cur_user.yhmc = yhmc
 
-    print 'ToDo! ' * 10
+            ses.commit()
+            ses.close()
+            return redirect(url_for('account_setting'))
 
     ses.close()
+    
+    #if cur_user.weixin is not None:
+    form.weixin.data = cur_user.weixin
+    #if cur_user.zfb is not None:
+    form.zfb.data = cur_user.zfb
+    #if cur_user.yhmc is not None:
+    form.yhmc.data = cur_user.yhmc
     
     return render_template('account_setting.html', error=error_str, form=form)
 

@@ -8,17 +8,16 @@
     {{ form.hidden_tag() }}
 	
 	<div class="form-group">
-		{{ form.object_type.label }}
-		<!--{{ form.object_type(class_='a') }} -->
-		
-		{% for subfield in form.object_type %}
-		<div class="radio">
-		  
-			{{ subfield }}
-			{{ subfield.label }}
-		  
-		</div>
-		{% endfor %}
+		{{ form.weixin.label }}
+		{{ form.weixin }}
+	</div>
+	<div class="form-group">
+		{{ form.zfb.label }}
+		{{ form.zfb }}
+	</div>
+	<div class="form-group">
+		{{ form.yhmc.label }}
+		{{ form.yhmc }}
 	</div>
 	
 	<div class="form-group">
@@ -26,5 +25,26 @@
 	</div>
 	
   </form>
-	
+		  
+	<script>
+		$(document).ready(function(){
+			var flag = 0;
+			if ('' != $("#weixin").val()) {
+              $("#weixin").attr("disabled", "disabled");
+			  flag++;
+			}
+			if ('' != $("#zfb").val()) {
+              $("#zfb").attr("disabled", "disabled");
+			  flag++;
+			}
+			if ('' != $("#yhmc").val()) {
+              $("#yhmc").attr("disabled", "disabled");
+			  flag++;
+			}
+			  
+			if (3 == flag) {
+			  $('#submit').attr("disabled", "disabled");
+			}
+		});
+	</script>
 {% endblock %}
