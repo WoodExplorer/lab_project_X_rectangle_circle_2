@@ -46,29 +46,28 @@
 	
 	<h3><a id="sign_in">签到</h3>
 	
-	<h3>账户设定</h3>
+	<h3><a href="{{ url_for('account_setting') }}">账户设定</a></h3>
 	
 	
   
 	<script>
 	
 		$(document).ready(function(){
-		  $("#sign_in").click(function(){
-				console.log("here");
+			$("#sign_in").click(function(){
+				//console.log("here");
 				$.ajax({
-						type: "POST",
-						url: "{{ url_for('sign_in') }}",
-						data: { data: 'placeholder' },
-						dataType: "json",
-						success: function(resp){
-							
-							console.log("here2");
-							console.log(resp);
-						}});
+							type: "POST",
+							url: "{{ url_for('sign_in') }}",
+							data: { data: 'placeholder' },
+							dataType: "json",
+							success: function(resp){
+								//console.log("here2");
+								console.log(resp);
+							}
+						});
 		  
-				})
-		}
-		);
+			})
+		});
 	</script>
 	
 {% endblock %}

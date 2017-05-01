@@ -80,5 +80,10 @@ class SendPaiOrJhmaForm(FlaskForm):
             raise ValidationError(u'请输入正数数')
 
 
+class AccountSettingForm(FlaskForm):
+    object_type = RadioField(u'发送对象', choices=[('weixin', u'微信号'), ('alipay', u'支付宝帐号'), ('bank', u'银行卡号')], validators=[DataRequired(message=u'请选择')])
+    submit = SubmitField(u'提交')
+
+
 class myForm(FlaskForm):
     fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])

@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm
 
 decimal.getcontext().prec = 2
 
@@ -825,6 +825,30 @@ def receive_help():
     else:
         return render_template('receive_help.html', error=error_str, form=form)
 
+
+
+@app.route('/account_setting', methods=['GET', 'POST'])
+def account_setting():
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    error_str = None
+    flag = False
+    form = AccountSettingForm()
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+
+    if request.method == 'POST':
+        print 'ToDo! ' * 10        
+
+    print 'ToDo! ' * 10
+
+    ses.close()
+    
+    return render_template('account_setting.html', error=error_str, form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
