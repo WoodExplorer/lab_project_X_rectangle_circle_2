@@ -648,9 +648,9 @@ def group_management():
                     pass
 
                 flash(u'发送成功')
+                return redirect(url_for('group_management'))
                 break
     flash_errors(form)
-
 
     ses.close()
     return render_template('group_management.html', error=error_str, form=form, pai=cur_user.pai, jhma=cur_user.jhma,
