@@ -477,13 +477,13 @@ def static_purse():
     Session = sessionmaker(bind=engine)
     ses = Session()
 
-    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1)
+    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1)
     total_sum_for_15_days = sum(map(lambda x: x.jb, entries_for_15_days))
     total_pai_for_15_days = sum([calc_pai(x.jb) for x in entries_for_15_days])
     #print 'total_sum_for_15_days:', total_sum_for_15_days
     total_profit_for_15_days = float(total_sum_for_15_days) + float(total_sum_for_15_days) * G_INTEREST_RATE_FOR_15_DAYS + float(total_pai_for_15_days) * G_MONEY_PER_PAI
 
-    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1)
+    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1)
     total_sum_for_30_days = sum(map(lambda x: x.jb, entries_for_30_days))
     total_pai_for_30_days = sum([calc_pai(x.jb) for x in entries_for_30_days])
     total_profit_for_30_days = float(total_sum_for_30_days) + float(total_sum_for_30_days) * G_INTEREST_RATE_FOR_30_DAYS + float(total_pai_for_30_days) * G_MONEY_PER_PAI
@@ -493,7 +493,8 @@ def static_purse():
         total_profit_for_15_days=total_profit_for_15_days, 
         entries_for_15_days=entries_for_15_days,
         total_profit_for_30_days=total_profit_for_30_days, 
-        entries_for_30_days=entries_for_30_days,)
+        entries_for_30_days=entries_for_30_days,
+        cur_user=cur_user)
 
 @app.route('/investment', methods=['GET', 'POST'])
 def investment():
@@ -538,7 +539,7 @@ def investment():
                 time_span_days = 15
 
             # check for repeated investment in too short a period
-            previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account).order_by(OT_Tgbz.id.desc())
+            previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
             if 0 == previous_investments.count():
                 pass
             else:
@@ -794,48 +795,89 @@ def receive_help():
                 ses.close()
                 return render_template('show_entries.html', error=error_str, form=form)
 
-            # check: 输入的金额不得高于静态钱包的总额
-            amount = decimal.Decimal(form.amount.data)
-            cur_UE_money = decimal.Decimal(cur_user.UE_money)
-            if cur_UE_money <= amount:
-                error_str = u'输入的金额不得高于静态钱包的总额'
+            
+            purse_type = request.form.getlist("purse_type")[0]
+            assert('static_purse' == purse_type or 'dynamic_purse' == purse_type)
+
+            if 'static_purse' == purse_type:
+                # check: 输入的金额不得高于静态钱包的总额
+                amount = decimal.Decimal(form.amount.data)
+                cur_UE_money = decimal.Decimal(cur_user.UE_money)
+                if cur_UE_money <= amount:
+                    error_str = u'输入的金额不得高于静态钱包的总额'
+                    ses.close()
+                    return render_template('receive_help.html', error=error_str, form=form)
+
+                # 更新ot_user表中的UE_money字段
+                cur_user.UE_money = str(cur_UE_money - amount)
+
+                # 在jsbz表中添加记录
+                entry = OT_Jsbz()
+                entry.user = cur_user.UE_account
+                entry.jb = amount
+                entry.user_nc = cur_user.UE_truename
+                entry.user_tjr = cur_user.UE_accName
+                entry.date = cur_time
+                entry.zt = 0
+                entry.qr_zt = 0
+                entry.qb = 1
+                ses.add(entry)
+
+                # 往userget表中添加记录
+                entry = OT_Userget()
+                entry.UG_account = cur_user.UE_account
+                entry.UG_type = 'jb'
+                entry.UG_allGet = amount
+                entry.UG_money = '-' + str(amount)
+                entry.UG_balance = cur_user.UE_money
+                entry.UG_dataType = 'jsbz'
+                entry.UG_note = u'静态钱包提现'
+                entry.UG_getTime = cur_time
+                entry.jiang_zt = 0  # database not-null constraint
+                ses.add(entry)
+
+                ses.commit()
                 ses.close()
-                return render_template('receive_help.html', error=error_str, form=form)
 
-            # 更新ot_user表中的UE_money字段
-            cur_user.UE_money = str(cur_UE_money - amount)
+                flash(u'操作成功')
+                return redirect(url_for('show_entries'))
+            else: # dynamic purse
+                # check for repeated investment in too short a period
+                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
+                if 0 == previous_investments.count():
+                    pass
+                else:
+                    time_span_days = 15
+                    last_investment = previous_investments[0]
+                    last_investment_datetime = last_investment.date
+                    if (cur_time - last_investment_datetime ).total_seconds() < time_span_days * 24 * 3600:
+                        error_str = u'您在%d天内已经发起一次投资，不能重复投资' % time_span_days
+                        ses.close()
+                        return render_template('receive_help.html', error=error_str, form=form)
 
-            # 在jsbz表中添加记录
-            entry = OT_Jsbz()
-            entry.user = cur_user.UE_account
-            entry.jb = amount
-            entry.user_nc = cur_user.UE_truename
-            entry.user_tjr = cur_user.UE_accName
-            entry.date = cur_time
-            entry.zt = 0
-            entry.qr_zt = 0
-            entry.qb = 1
-            ses.add(entry)
+                #
+                amount = decimal.Decimal(form.amount.data)
+                cur_tj_he = decimal.Decimal(cur_user.tj_he)
+                if cur_tj_he < amount:
+                    error_str = u'输入的金额不得高于动态钱包的总额'
+                    ses.close()
+                    return render_template('receive_help.html', error=error_str, form=form)
 
-            # 往userget表中添加记录
-            entry = OT_Userget()
-            entry.UG_account = cur_user.UE_account
-            entry.UG_type = 'jb'
-            entry.UG_allGet = amount
-            entry.UG_money = '-' + str(amount)
-            entry.UG_balance = cur_user.UE_money
-            entry.UG_dataType = 'jsbz'
-            entry.UG_note = u'静态钱包提现'
-            entry.UG_getTime = cur_time
-            entry.jiang_zt = 0  # database not-null constraint
-            ses.add(entry)
+                #
+                entry = OT_Tgbz()
+                investment = int(form.amount.data)
+                entry.jb = investment
+                entry.user = UE_account
+                entry.user_tjr = cur_user.UE_account
+                entry.date = cur_time
+                entry.user_nc = cur_user.UE_truename
 
-            ses.commit()
-            ses.close()
+                ses.add(entry)
+                ses.commit()
+                ses.close()
 
-            flash(u'操作成功')
-            return redirect(url_for('show_entries'))
-
+                flash(u'投资成功')
+                return redirect(url_for('show_entries'))
         else:
             #flash(u'请确保您正确填写了表单')
             flash_errors(form)

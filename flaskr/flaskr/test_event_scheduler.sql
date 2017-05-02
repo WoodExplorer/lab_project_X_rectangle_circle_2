@@ -108,11 +108,13 @@ BEGIN
 		IF 1 = v_zffs1 and datediff(v_now, v_date) >= 15 THEN
 			update ot_tgbz set counted = 1 where id = v_id;
 			update ot_user set ue_money = ue_money + v_jb * (1 + 0.12) + floor(v_jb / 1000) where UE_account = v_user;
+			--update ot_user set ue_money = ue_money + v_jb where UE_account = v_user;
 		END IF;
 		
 		IF 1 = v_zffs2 and datediff(v_now, v_date) >= 30 THEN
 			update ot_tgbz set counted = 1 where id = v_id;
 			update ot_user set ue_money = ue_money + v_jb * (1 + 0.40) + floor(v_jb / 1000)  where UE_account = v_user;
+			--update ot_user set ue_money = ue_money + v_jb  where UE_account = v_user;
 		END IF;
 		
 		SET s1 = s1 + 1;
