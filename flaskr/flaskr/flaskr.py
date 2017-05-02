@@ -480,25 +480,28 @@ def static_purse():
 
     Session = sessionmaker(bind=engine)
     ses = Session()
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
 
-    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1)
-    total_sum_for_15_days = sum(map(lambda x: x.jb, entries_for_15_days))
-    total_pai_for_15_days = sum([calc_pai(x.jb) for x in entries_for_15_days])
-    #print 'total_sum_for_15_days:', total_sum_for_15_days
-    total_profit_for_15_days = float(total_sum_for_15_days) + float(total_sum_for_15_days) * G_INTEREST_RATE_FOR_15_DAYS + float(total_pai_for_15_days) * G_MONEY_PER_PAI
-
-    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1)
-    total_sum_for_30_days = sum(map(lambda x: x.jb, entries_for_30_days))
-    total_pai_for_30_days = sum([calc_pai(x.jb) for x in entries_for_30_days])
-    total_profit_for_30_days = float(total_sum_for_30_days) + float(total_sum_for_30_days) * G_INTEREST_RATE_FOR_30_DAYS + float(total_pai_for_30_days) * G_MONEY_PER_PAI
-
+#    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1)
+#    total_sum_for_15_days = sum(map(lambda x: x.jb, entries_for_15_days))
+#    total_pai_for_15_days = sum([calc_pai(x.jb) for x in entries_for_15_days])
+#    #print 'total_sum_for_15_days:', total_sum_for_15_days
+#    total_profit_for_15_days = float(total_sum_for_15_days) + float(total_sum_for_15_days) * G_INTEREST_RATE_FOR_15_DAYS + float(total_pai_for_15_days) * G_MONEY_PER_PAI
+#
+#    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1)
+#    total_sum_for_30_days = sum(map(lambda x: x.jb, entries_for_30_days))
+#    total_pai_for_30_days = sum([calc_pai(x.jb) for x in entries_for_30_days])
+#    total_profit_for_30_days = float(total_sum_for_30_days) + float(total_sum_for_30_days) * G_INTEREST_RATE_FOR_30_DAYS + float(total_pai_for_30_days) * G_MONEY_PER_PAI
+    
+    
     ses.close()
-    return render_template('static_purse.html', 
-        total_profit_for_15_days=total_profit_for_15_days, 
-        entries_for_15_days=entries_for_15_days,
-        total_profit_for_30_days=total_profit_for_30_days, 
-        entries_for_30_days=entries_for_30_days,
-        cur_user=cur_user)
+    return render_template('static_purse.html', cur_user=cur_user)
+#    return render_template('static_purse.html', 
+#        total_profit_for_15_days=total_profit_for_15_days, 
+#        entries_for_15_days=entries_for_15_days,
+#        total_profit_for_30_days=total_profit_for_30_days, 
+#        entries_for_30_days=entries_for_30_days,
+#        cur_user=cur_user)
 
 @app.route('/investment', methods=['GET', 'POST'])
 def investment():

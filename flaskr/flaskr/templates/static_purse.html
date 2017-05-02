@@ -3,62 +3,6 @@
   
   <h2>静态钱包</h2>
   
-  {% if 1 == cur_user.UE_status %}
-	<h3>您的帐号已被禁用，请联系管理员。</h3>
-  {% else %}
-  
-	  <h3>15天投资</h3>
-	  <h4>总额：{{ total_profit_for_15_days }}</h4>
-	  <h4>明细</h4>
-	  
-	  
-	  {% if 0 < entries_for_15_days.count() %}
-	  <table class="table table-striped">
-		  <caption></caption>
-		  <thead>
-			<tr>
-			  <th>金额</th>
-			  <th>日期</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			{% for entry in entries_for_15_days %}
-			<tr>
-			  <td>{{ entry.jb }}</td>
-			  <td>{{ entry.date }}</td>
-			</tr>
-			{% endfor %}
-		  </tbody>
-		</table>
-	  {% else %}
-		<em>目前尚无投资</em>
-	  {% endif %}
-	  
-	  <h3>30天投资</h3>
-	  <h4>总额：{{ total_profit_for_30_days }}</h4>
-	  
-	  <h4>明细</h4>
-	  
-	  {% if 0 < entries_for_30_days.count() %}
-	  <table class="table table-striped">
-		  <caption></caption>
-		  <thead>
-			<tr>
-			  <th>金额</th>
-			  <th>日期</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			{% for entry in entries_for_30_days %}
-			<tr>
-			  <td>{{ entry.jb }}</td>
-			  <td>{{ entry.date }}</td>
-			</tr>
-			{% endfor %}
-		  </tbody>
-		</table>
-	  {% else %}
-		<em>目前尚无投资</em>
-	  {% endif %}
-  {% endif %}
+  <h4>总额：{{ cur_user.UE_money }}</h4>
+
 {% endblock %}
