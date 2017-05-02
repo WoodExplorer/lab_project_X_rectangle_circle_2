@@ -73,6 +73,7 @@
   
   
   <h4>待办理</h4>
+  <h5>提供帮助</h5>
   {% if 0 < entries_waiting.count() %}
   <table class="table table-striped">
 	  <caption></caption>
@@ -96,10 +97,10 @@
 	  </tbody>
 	</table>
   {% else %}
-    <em>目前尚无“待办理”类型的记录</em>
+    <em>目前尚无“待办理-提供帮助”类型的记录</em>
   {% endif %}
   
-  <h5>文档中是这么写的：1、查询jsbz中zt为1的订单，有以下集中可能</h5>
+  <h5>接受帮助</h5>
   {% if 0 < entries_waiting_in_jsbz|length %}
   <table class="table table-striped">
 	  <caption></caption>
@@ -121,7 +122,7 @@
 	  </tbody>
 	</table>
   {% else %}
-    <em>目前尚无“待办理-jsbz”类型的记录</em>
+    <em>目前尚无“待办理-接受帮助”类型的记录</em>
   {% endif %}
   
   <h4>已完成</h4>

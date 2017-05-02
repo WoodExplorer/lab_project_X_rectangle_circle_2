@@ -134,13 +134,17 @@ def show_entries():
     Ses = sessionmaker(bind=engine)
     ses = Ses()
 
+    ###
     entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0)
     entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
-    entries_waiting = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1)
 
-    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1)
+    ###
+    entries_waiting = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0)
+
+    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0)
     entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
 
+    ###
     entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1)
     entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1)
 
@@ -185,6 +189,9 @@ def entry_waiting_operation(entry_id):
 
     if ('POST' == request.method):
         if form.validate_on_submit():
+            feedback = request.form.getlist("feedback")[0]
+            assert('yes' == feedback or 'no' == feedback)
+            
             filename = get_time_random_str() + secure_filename(form.certificate.data.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             print 'file_path:', file_path
@@ -197,6 +204,10 @@ def entry_waiting_operation(entry_id):
             assert(1 == target_rec.count())
             target_rec = target_rec[0]
             target_rec.qr_zt = 1
+            if 'yes' == feedback:   
+                target_rec.jujue = 0
+            else:
+                target_rec.jujue = 1
 
             rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
             assert(1 == rec_in_ppdd.count())
@@ -319,6 +330,8 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
                         target_rec.qr_zt = 1
                         rec_in_ppdd.zt = 2
+                        cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+                        cur_user.tz_leiji += cur_money
                         #ses.commit()
                 except:
                     ses.rollback()
@@ -548,6 +561,7 @@ def investment():
             entry.user_tjr = cur_user.UE_account
             entry.date = cur_time
             entry.user_nc = cur_user.UE_truename
+            entry.type = 0 # normal investment
 
             # check for enough pai
             charge = calc_pai(investment)
@@ -732,12 +746,6 @@ def dynamic_purse():
         if form.validate_on_submit():
             while True:
                 try:
-                    #
-                    if 1 == cur_user.jujue:
-                        error_str = u'由于您拒绝过打款，您不能从动态钱包中提现'
-                        ses.close()
-                        return render_template('dynamic_purse.html', error=error_str, form=form)
-
                     amount = decimal.Decimal(form.amount.data)
                     cur_tj_he = decimal.Decimal(cur_user.tj_he)
                     if cur_tj_he < amount:
@@ -837,6 +845,12 @@ def receive_help():
                 flash(u'操作成功')
                 return redirect(url_for('show_entries'))
             else: # dynamic purse
+                #
+                if 0 != ses.query(OT_Tgbz).filter_by(user=UE_account, jujue=1).count():
+                    error_str = u'由于您拒绝过打款，您不能从动态钱包中提现'
+                    ses.close()
+                    return render_template('receive_help.html', error=error_str, form=form)
+
                 # check for repeated investment in too short a period
                 previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
                 if 0 == previous_investments.count():
@@ -868,6 +882,7 @@ def receive_help():
                 entry.user_tjr = cur_user.UE_account
                 entry.date = cur_time
                 entry.user_nc = cur_user.UE_truename
+                entry.type = 1 # investment from dynamic purse
 
                 ses.add(entry)
                 ses.commit()

@@ -56,7 +56,8 @@ class ExtractFromStaticPurseForm(FlaskForm):
 
 class UploadCertificateForm(FlaskForm):
     #entry_id = HiddenField(u"Field1")
-    certificate = FileField(u'上传凭证', validators=[DataRequired(message=u'请选择文件')])
+    feedback = RadioField(u'请选择', choices=[('yes', u'已打款'), ('no', u'拒绝打款')], validators=[DataRequired(message=u'请选择')])
+    certificate = FileField(u'上传文件', validators=[DataRequired(message=u'请选择文件')])
     submit = SubmitField(u'提交')
 
     #def set_entry_id(self, entry_id):
