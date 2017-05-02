@@ -82,8 +82,8 @@ if u'ON' != rec[0]:
     print "Error: mysql event_scheduler is turned off."
     #assert(u'ON' == rec[0])
     print '\n' * 10
+event_scheduler_on = u'ON' == rec[0]
 result = None
-
 
 random.seed(2)
 def get_time_random_str():
@@ -952,7 +952,7 @@ def account_setting():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error_str = None
+    error_str = ''
     flag = False
     if request.method == 'POST':
         user_name = request.form['username']
@@ -978,6 +978,8 @@ def login():
     if flag:
         return redirect(url_for('show_entries'))
     else:
+        if not event_scheduler_on:
+            error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
         return render_template('login.html', error=error_str)
 
 @app.route('/logout')
