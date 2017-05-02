@@ -803,7 +803,7 @@ def receive_help():
                 # check: 输入的金额不得高于静态钱包的总额
                 amount = decimal.Decimal(form.amount.data)
                 cur_UE_money = decimal.Decimal(cur_user.UE_money)
-                if cur_UE_money <= amount:
+                if cur_UE_money < amount:
                     error_str = u'输入的金额不得高于静态钱包的总额'
                     ses.close()
                     return render_template('receive_help.html', error=error_str, form=form)
@@ -863,9 +863,11 @@ def receive_help():
                     ses.close()
                     return render_template('receive_help.html', error=error_str, form=form)
 
-                #
+                amout = int(form.amount.data)
+                cur_user.tj_he -= amount
+
                 entry = OT_Tgbz()
-                investment = int(form.amount.data)
+                investment = amount
                 entry.jb = investment
                 entry.user = UE_account
                 entry.user_tjr = cur_user.UE_account
