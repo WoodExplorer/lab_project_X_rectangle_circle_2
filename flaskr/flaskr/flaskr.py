@@ -496,13 +496,13 @@ def investment():
     error_str = None
     flag = False
 
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
     form = InvestmentForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            Session = sessionmaker(bind=engine)
-            ses = Session()
-
-            cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
             cur_time = datetime.now() 
 
             if 1 == cur_user.UE_status:
@@ -539,7 +539,7 @@ def investment():
                 if (cur_time - last_investment_datetime ).total_seconds() < time_span_days * 24 * 3600:
                     error_str = u'您在%d天内已经发起一次投资，不能重复投资' % time_span_days
                     ses.close()
-                    return render_template('investment.html', error=error_str, form=form)
+                    return render_template('investment.html', error=error_str, form=form, cur_user=cur_user)
 
             #
             investment = int(form.investment.data)
@@ -554,7 +554,7 @@ def investment():
             if cur_user.pai < charge:
                 error_str = u'排单币不足，当前排单币为：%d' % cur_user.pai
                 ses.close()
-                return render_template('investment.html', error=error_str, form=form)
+                return render_template('investment.html', error=error_str, form=form, cur_user=cur_user)
             cur_user.pai -= charge
 
             ses.add(entry)
@@ -568,10 +568,11 @@ def investment():
             #flash(u'请确保您正确填写了表单')
             flash_errors(form)
 
+    ses.close()
     if flag:
         return redirect(url_for('show_entries'))
     else:
-        return render_template('investment.html', error=error_str, form=form)
+        return render_template('investment.html', error=error_str, form=form, cur_user=cur_user)
 
 
 @app.route('/group_management', methods=['GET', 'POST'])
@@ -732,6 +733,11 @@ def dynamic_purse():
             while True:
                 try:
                     #
+                    if 1 == cur_user.jujue:
+                        error_str = u'由于您拒绝过打款，您不能从动态钱包中提现'
+                        ses.close()
+                        return render_template('dynamic_purse.html', error=error_str, form=form)
+
                     amount = decimal.Decimal(form.amount.data)
                     cur_tj_he = decimal.Decimal(cur_user.tj_he)
                     if cur_tj_he < amount:

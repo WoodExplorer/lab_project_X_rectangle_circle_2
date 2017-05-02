@@ -25,6 +25,8 @@
 	<div class="form-group">
 		{{ form.investment.label }}
 		{{ form.investment }}
+		
+		<em>当前排单币：{{ cur_user.pai }}<span id="cur_pai"></span></em>
 	</div>
 	
 	<div class="form-group">
@@ -36,5 +38,51 @@
 	</div>
 	
   </form>
-	
+		
+	<script>
+		$.event.special.valuechange = {
+		  teardown: function (namespaces) {
+			$(this).unbind('.valuechange');
+		  },
+
+		  handler: function (e) {
+			$.event.special.valuechange.triggerChanged($(this));
+		  },
+
+		  add: function (obj) {
+			$(this).on('keyup.valuechange cut.valuechange paste.valuechange input.valuechange', obj.selector, $.event.special.valuechange.handler)
+		  },
+
+		  triggerChanged: function (element) {
+			var current = element[0].contentEditable === 'true' ? element.html() : element.val()
+			  , previous = typeof element.data('previous') === 'undefined' ? element[0].defaultValue : element.data('previous')
+			if (current !== previous) {
+			  element.trigger('valuechange', [element.data('previous')])
+			  element.data('previous', current)
+			}
+		  }
+		};
+
+		$(document).ready(function(){
+		
+			$('#investment').on('valuechange', function (e, previous) {
+				var cur_investment = $(this).val();
+				cur_investment = Number(cur_investment);
+				if (isNaN(cur_investment)) {
+					$('#cur_pai').text('');
+					return;
+				}
+				var pai_cost = Math.floor(Number(cur_investment)/1000);
+				if (pai_cost < 0) {
+					$('#cur_pai').text('');
+					return;
+				}
+				//if ("undefined" == typeof(cur_investment) || null == cur_investment || '' == cur_investment)
+				//	;
+				else {
+					$('#cur_pai').text('，当前投资金额需要消耗 ' + pai_cost +'个排单币')
+				}
+			});
+		});
+	</script>
 {% endblock %}
