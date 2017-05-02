@@ -355,23 +355,14 @@ def entry_waiting_in_jsbz_operation(entry_id):
     return render_template('entry_waiting_in_jsbz_operation.html', error=error_str, form=form, entry_id=entry_id, certificate_path=certificate_path)
 
 
-@app.route('/add', methods=['POST'])
-def add_entry():
-    if not session.get('logged_in'):
-        abort(401)
-    db = get_db()
-    db.execute('insert into entries (title, text) values (?, ?)',
-                 [request.form['title'], request.form['text']])
-    db.commit()
-    flash('New entry was successfully posted')
-    return redirect(url_for('show_entries'))
-
 def flash_and_close_session(error_str, session):
     flash(error_str)
     session.close()
 
 @app.route('/change_password')
 def change_password():
+    if not session.get('logged_in'):
+        abort(401)
     return render_template('change_password.html')
 
 @app.route('/change_password_backend', methods=['POST'])
@@ -721,34 +712,6 @@ def sign_in():
 
     return '{"ret": "Ok"}'
 
-@app.route('/post/<int:post_id>', methods=['GET'])
-def show_post(post_id):
-    # show the post with the given id, the id is an integer
-    return 'Post %d' % post_id
-
-@app.route('/test_upload/', methods=['GET'])
-def test_upload():
-    if not session.get('logged_in'):
-        abort(401)
-    UE_account = session.get('logged_in_account')
-
-    print 'test_para:', post_id
-
-    error_str = None
-    flag = False
-    form = myForm()
-    if request.method == 'POST':
-        print '*' * 10, ' here'
-        if form.validate_on_submit():
-            filename = secure_filename(form.fileName.data.filename) + get_time_random_str()
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print 'file_path:', file_path
-            form.fileName.data.save(file_path)
-    if flag:
-        return redirect(url_for('show_entries'))
-    else:
-        return render_template('test_upload.html', error=error_str, form=form)
-
 @app.route('/dynamic_purse', methods=['GET', 'POST'])
 def dynamic_purse():
     if not session.get('logged_in'):
@@ -995,6 +958,8 @@ def login():
 
 @app.route('/logout')
 def logout():
+    if not session.get('logged_in'):
+        abort(401)
     session.pop('logged_in', None)
     session.pop('logged_in_account', None)
     flash(u'登出成功')
