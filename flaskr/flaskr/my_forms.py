@@ -27,7 +27,7 @@ class InvestmentForm(FlaskForm):
         try:
             investment_int = int(field.data)
         except Exception, e:
-            raise ValidationError(u'请输入合法正数数')
+            raise ValidationError(u'请输入合法数字')
         if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
             raise ValidationError(u'请输入(0,5000]之间的100的倍数')
 
@@ -43,7 +43,7 @@ class ExtractFromStaticPurseForm(FlaskForm):
         try:
             amount_int = int(field.data)
         except Exception, e:
-            raise ValidationError(u'请输入合法正数数')
+            raise ValidationError(u'请输入合法数字')
         if amount_int < 100 or 0 != amount_int % 100:
             raise ValidationError(u'请输入大于等于100的100的倍数')
 
@@ -75,9 +75,24 @@ class SendPaiOrJhmaForm(FlaskForm):
         try:
             amount_int = int(field.data)
         except Exception, e:
-            raise ValidationError(u'请输入合法正数数')
+            raise ValidationError(u'请输入合法数字')
         if amount_int <= 0:
-            raise ValidationError(u'请输入正数数')
+            raise ValidationError(u'请输入正整数')
+
+
+
+class DynamicPurseForm(FlaskForm):
+    amount = TextField(u'转化金额', validators=[DataRequired(message=u'请填写转化金额')])
+    submit = SubmitField(u'提交')
+
+    def validate_amount(form, field):
+        amount_int = None
+        try:
+            amount_int = int(field.data)
+        except Exception, e:
+            raise ValidationError(u'请输入合法数字')
+        if amount_int <= 0 or 0 != amount_int % 200:
+            raise ValidationError(u'请输入大于0、200的倍数')
 
 
 class AccountSettingForm(FlaskForm):

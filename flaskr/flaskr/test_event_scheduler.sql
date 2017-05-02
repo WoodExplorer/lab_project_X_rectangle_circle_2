@@ -1,3 +1,8 @@
+-- 如何打开事件调度器： 
+---或我们可以在配置my.cnf文件 中加上 event_scheduler = 1
+
+
+
 CREATE TABLE aaa (timeline TIMESTAMP);
 
 CREATE EVENT e_test_insert

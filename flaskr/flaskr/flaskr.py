@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm
+from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
 
 decimal.getcontext().prec = 2
 
@@ -604,9 +604,7 @@ def group_management():
     pai_history = ses.query(OT_Tgbz).filter_by(user=UE_account)
     form = SendPaiOrJhmaForm()
 
-
     if 'POST' == request.method:
-        form = SendPaiOrJhmaForm()
         if form.validate_on_submit():
             while True:
                 ses = None
@@ -751,25 +749,53 @@ def test_upload():
     else:
         return render_template('test_upload.html', error=error_str, form=form)
 
-
 @app.route('/dynamic_purse', methods=['GET', 'POST'])
 def dynamic_purse():
-    assert(False)
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
 
     error_str = None
     flag = False
-    form = myForm()
-    if request.method == 'POST':
-        print '*' * 10, ' here'
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+    
+    form = DynamicPurseForm()
+    if 'POST' == request.method:
         if form.validate_on_submit():
-            filename = secure_filename(form.fileName.data.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print 'file_path:', file_path
-            form.fileName.data.save(file_path)
-    if flag:
-        return redirect(url_for('show_entries'))
-    else:
-        return render_template('dynamic_purse.html', error=error_str, form=form)
+            while True:
+                try:
+                    #
+                    amount = decimal.Decimal(form.amount.data)
+                    cur_tj_he = decimal.Decimal(cur_user.tj_he)
+                    if cur_tj_he < amount:
+                        error_str = u'输入的金额不得高于动态钱包的总额'
+                        ses.close()
+                        return render_template('dynamic_purse.html', error=error_str, form=form)
+
+                    amout = int(form.amount.data)
+                    cur_user.tj_he -= amount
+                    cur_user.jhma += (amount / 200)
+
+                    ses.commit()
+                except:
+                    #ses.rollback()
+                    traceback.print_exc()
+                    raise
+                finally:
+                    #ses.close()
+                    pass
+
+                flash(u'转换成功')
+                return redirect(url_for('show_entries'))
+                break
+    flash_errors(form)
+
+    ses.close()
+    return render_template('dynamic_purse.html', error=error_str, form=form, cur_user=cur_user)
 
 
 @app.route('/receive_help', methods=['GET', 'POST'])
