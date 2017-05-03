@@ -11,13 +11,13 @@
                 <div class="col-lg-3 col-md-3 col-sm-3  text-center">
                     <a href="{{ url_for('investment') }}">
                         <div class="alert alert-danger">
-                            <i class="fa fa-user fa-4x"></i>
+                            <i class="fa fa-space-shuttle fa-4x"></i>
                             <br>
                             <span class="label label-info" style="font-size:16px">参与正投资</span>                           
-                           
                         </div>
                     </a>
                 </div>
+				
                 <div class="col-lg-3 col-md-3 col-sm-3  text-center">
                     <a href="{{ url_for('static_purse') }}">
                         <div class="alert alert-success">
@@ -28,15 +28,13 @@
                         </div>
                     </a>
                 </div>
-
                 
                 <div class="col-lg-3 col-md-3 col-sm-3  text-center">
                     <a href="{{ url_for('dynamic_purse') }}">
                         <div class="alert alert-warning">
                             <i class="fa fa-recycle fa-4x"></i>
                             <br>
-                            <span class="label label-success" style="font-size:16px">动态钱包</span>
-                                                     
+                            <span class="label label-success" style="font-size:16px">动态钱包</span>                         
                         </div>
                     </a>
                 </div>
@@ -46,7 +44,24 @@
                             <i class="fa fa-cloud-upload fa-4x"></i>
 							<br>
                             <span class="label label-danger" style="font-size:16px">得到帮助</span>
-                           
+                        </div>
+                    </a>
+                </div>
+				<div class="col-lg-3 col-md-3 col-sm-3 text-center">
+                    <a href="{{ url_for('group_management') }}">
+                        <div class="alert alert-info">
+                            <i class="fa fa-group fa-4x"></i>
+							<br>
+                            <span class="label label-danger" style="font-size:16px">团队管理</span>
+                        </div>
+                    </a>
+                </div>
+				<div class="col-lg-3 col-md-3 col-sm-3  text-center">
+                    <a href="{{ url_for('personal_information') }}">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-user fa-4x"></i>
+                            <br>
+                            <span class="label label-info" style="font-size:16px">个人信息</span>                           
                         </div>
                     </a>
                 </div>
@@ -59,173 +74,196 @@
  
   <div class="hr-div"> <hr /></div>  
 
-  <h2>
-	<a href="{{ url_for('investment') }}">参与正投资</a>
-  </h2>
-  <h2>
-	<a href="{{ url_for('static_purse') }}">静态钱包</a>
-  </h2>
-  <h2>
-	<a href="{{ url_for('dynamic_purse') }}">动态钱包</a>
-  </h2>
-  <h2>
-	<a href="{{ url_for('receive_help') }}">得到帮助</a>
-  </h2>
-  <h2>
-	<a href="{{ url_for('group_management') }}">团队管理</a>
-  </h2>
-  <h2>
-	<a href="{{ url_for('personal_information') }}">个人信息</a>
-  </h2>
-  
-  <hr />
-  <h4>等待中</h4>
-  <h5>15天</h5>
-  {% if 0 < entries_for_15_days.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_for_15_days %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“等待中-15天”类型的记录</em>
-  {% endif %}
-  
-  <h5>30天</h5>
-  {% if 0 < entries_for_30_days.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_for_30_days %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“等待中-30天”类型的记录</em>
-  {% endif %}
+
+<div class="container">
+	<div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>等待中&nbsp;<span class="label label-danger">15天</span></h4>
+			
+				{% if 0 < entries_for_15_days.count() %}
+				<div class="table-responsive">  
+					<table class="table table-striped table-bordered table-hover">
+						<caption></caption>
+						<thead>
+							<tr>
+								<th>金额</th>
+								<th>日期</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for entry in entries_for_15_days %}
+						<tr>
+							<td><span class="label label-success">{{ entry.jb }}</span></td>
+							<td><span class="label label-info">{{ entry.date }}</span></td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% else %}
+					<em>目前尚无“等待中-15天”类型的记录</em>
+				{% endif %}
+			    
+    	</div>
+	</div>
+	
+	<div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>等待中&nbsp;<span class="label label-danger">30天</span></h4>
+			
+				{% if 0 < entries_for_30_days.count() %}
+				<div class="table-responsive">  
+					<table class="table table-striped table-bordered table-hover">
+						<caption></caption>
+						<thead>
+							<tr>
+								<th>金额</th>
+								<th>日期</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for entry in entries_for_30_days %}
+						<tr>
+							<td><span class="label label-success">{{ entry.jb }}</span></td>
+							<td><span class="label label-info">{{ entry.date }}</span></td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% else %}
+					<em>目前尚无“等待中-30天”类型的记录</em>
+				{% endif %}
+			    
+    	</div>
+	</div>
+</div>
   
   
+<div class="container">
+	<div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>待办理&nbsp;<span class="label label-danger">提供帮助</span></h4>
+			{% if entries_waiting != None and 0 < entries_waiting.count() %}
+			<div class="table-responsive">  
+				<table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <th>金额</th>
+                          <th>日期</th>
+						  <th>详细信息</th>
+                          <th>我要操作</th>
+                        </tr>
+                      </thead>
+	  				  <tbody>
+						{% for entry in entries_waiting %}					  
+                        <tr>
+                          <td><span class="label label-success">{{ entry.jb }}</span></td>
+                          <td><span class="label label-important">{{ entry.date }}</span></td>
+						  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></span></td>
+                          <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_operation', entry_id=entry.id) }}">我要操作</a></span></td>
+                        </tr>
+						{% endfor %}
+	  				  </tbody>
+				</table>
+			</div>
+			{% else %}
+				<em>目前尚无“待办理-提供帮助”类型的记录</em>
+			{% endif %}			
+    	</div>
+	</div>
+	
+	<div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>待办理&nbsp;<span class="label label-danger">接受帮助</span></h4>
+			{% if 0 < entries_waiting_in_jsbz|length %}
+			<div class="table-responsive">  
+				<table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <th>金额</th>
+                          <th>日期</th>
+                          <th>我要操作</th>
+                        </tr>
+                      </thead>
+	  				  <tbody>
+						{% for entry in entries_waiting_in_jsbz %}					  
+                        <tr>
+                          <td><span class="label label-success">{{ entry.jb }}</span></td>
+                          <td><span class="label label-important">{{ entry.date }}</span></td>
+						  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry.id) }}">我要操作</a></span></td>
+                        </tr>
+						{% endfor %}
+	  				  </tbody>
+				</table>
+			</div>
+			{% else %}
+				<em>目前尚无“待办理-接受帮助”类型的记录</em>
+			{% endif %}			
+    	</div>
+	</div>
+</div> 
+
+   
+
+<div class="container">
+	<div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>已完成&nbsp;<span class="label label-danger">提供帮助</span></h4>
+			{% if 0 < entries_closed_in_tgbz.count() %}
+			<div class="table-responsive">  
+				<table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <th>金额</th>
+                          <th>日期</th>
+                        </tr>
+                      </thead>
+	  				  <tbody>		
+                        {% for entry in entries_closed_in_tgbz %}				  
+                        <tr>
+                          <td><span class="label label-success">{{ entry.jb }}</span></td>
+                          <td><span class="label label-info">{{ entry.date }}</span></td>
+                        </tr>
+						{% endfor %}	
+		
+	  				  </tbody>
+				</table>
+			</div>
+			{% else %}
+				<em>目前尚无“已完成的提供帮助”类型的记录</em>
+			{% endif %}
+    	</div>
+	</div>
+    
+    <div class="row">
+    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
+        	<h4>已完成&nbsp;<span class="label label-danger">接受帮助</span></h4>
+			{% if 0 < entries_closed_in_jsbz.count() %}
+			<div class="table-responsive">  
+				<table class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <th>金额</th>
+                          <th>日期</th>
+                        </tr>
+                      </thead>
+	  				  <tbody>		
+                        {% for entry in entries_closed_in_jsbz %}				  
+                        <tr>
+                          <td><span class="label label-success">{{ entry.jb }}</span></td>
+                          <td><span class="label label-info">{{ entry.date }}</span></td>
+                        </tr>
+						{% endfor %}	
+		
+	  				  </tbody>
+				</table>
+			</div>
+			{% else %}
+				<em>目前尚无“已完成的接收帮助”类型的记录</em>
+			{% endif %}
+    	</div>
+	</div>
+</div> 
   
-  
-  <h4>待办理</h4>
-  <h5>提供帮助</h5>
-  {% if 0 < entries_waiting.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		  <th>详细信息</th>
-		  <th>我要操作</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_waiting %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		  <td><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></td>
-		  <td><a href="{{ url_for('entry_waiting_operation', entry_id=entry.id) }}">我要操作</a></td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“待办理-提供帮助”类型的记录</em>
-  {% endif %}
-  
-  <h5>接受帮助</h5>
-  {% if 0 < entries_waiting_in_jsbz|length %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		  <th>我要操作</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_waiting_in_jsbz %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		  <td><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry.id) }}">我要操作</a></td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“待办理-接受帮助”类型的记录</em>
-  {% endif %}
-  
-  <h4>已完成</h4>
-  <h5>已完成的提供帮助</h5>
-  {% if 0 < entries_closed_in_tgbz.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_closed_in_tgbz %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“已完成的提供帮助”类型的记录</em>
-  {% endif %}
-  
-  <h5>已完成的接受帮助</h5>
-  {% if 0 < entries_closed_in_jsbz.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>日期</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in entries_closed_in_jsbz %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ entry.date }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“已完成的接收帮助”类型的记录</em>
-  {% endif %}
 {% endblock %}
