@@ -16,6 +16,13 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
 
+
+class LoginForm(FlaskForm):
+    #entry_id = HiddenField(u"Field1")
+    username = TextField(u'账户名', validators=[DataRequired(message=u'请输入密码')])
+    password = PasswordField(u'密码', validators=[DataRequired(message=u'请输入密码')])
+    submit = SubmitField(u'提交')
+
 class InvestmentForm(FlaskForm):
     time_span = RadioField(u'投资时间', choices=[('15_days', u'15天'), ('30_days', u'30天')], validators=[DataRequired(message=u'请选择投资时间')])
     #charge = TextField(u'排单币', validators=[DataRequired(message=u'请填写排单币')])
