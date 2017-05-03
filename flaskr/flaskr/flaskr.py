@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import LoginForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
+from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
 
 decimal.getcontext().prec = 2
 
@@ -376,7 +376,8 @@ def flash_and_close_session(error_str, session):
 def change_password():
     if not session.get('logged_in'):
         abort(401)
-    return render_template('change_password.html')
+    form = ChangePasswordForm()
+    return render_template('change_password.html', form=form)
 
 @app.route('/change_password_backend', methods=['POST'])
 def change_password_backend():
@@ -981,7 +982,7 @@ def login():
         return redirect(url_for('show_entries'))
     else:
         if not event_scheduler_on:
-            error_str += "Error: event_scheduler is off, which will cause tremendous loses."
+            error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
         return render_template('login.html', error=error_str, form=form)
 
 @app.route('/logout')
