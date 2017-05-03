@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import InvestmentForm, myForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
+from my_forms import LoginForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
 
 decimal.getcontext().prec = 2
 
@@ -954,6 +954,8 @@ def account_setting():
 def login():
     error_str = ''
     flag = False
+
+    form = LoginForm()
     if request.method == 'POST':
         user_name = request.form['username']
         password = request.form['password']
@@ -979,8 +981,8 @@ def login():
         return redirect(url_for('show_entries'))
     else:
         if not event_scheduler_on:
-            error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
-        return render_template('login.html', error=error_str)
+            error_str += "Error: event_scheduler is off, which will cause tremendous loses."
+        return render_template('login.html', error=error_str, form=form)
 
 @app.route('/logout')
 def logout():
