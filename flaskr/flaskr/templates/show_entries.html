@@ -1,7 +1,64 @@
 {% extends "layout.html" %}
 {% block body %}
   
-  
+
+    <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet" />
+	
+	<br />
+<section>
+        <div class="container">
+            <div class="row noti-div">
+                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
+                    <a href="{{ url_for('investment') }}">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-user fa-4x"></i>
+                            <br>
+                            <span class="label label-info" style="font-size:16px">参与正投资</span>                           
+                           
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
+                    <a href="{{ url_for('static_purse') }}">
+                        <div class="alert alert-success">
+                            <i class="fa fa-money fa-4x"></i>
+                            <br>
+                            <span class="label label-warning" style="font-size:16px">静态钱包</span>
+                                                       
+                        </div>
+                    </a>
+                </div>
+
+                
+                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
+                    <a href="{{ url_for('dynamic_purse') }}">
+                        <div class="alert alert-warning">
+                            <i class="fa fa-recycle fa-4x"></i>
+                            <br>
+                            <span class="label label-success" style="font-size:16px">动态钱包</span>
+                                                     
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 text-center">
+                    <a href="{{ url_for('receive_help') }}">
+                        <div class="alert alert-info">
+                            <i class="fa fa-cloud-upload fa-4x"></i>
+							<br>
+                            <span class="label label-danger" style="font-size:16px">得到帮助</span>
+                           
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+
+        </div>
+
+    </section>
+ 
+  <div class="hr-div"> <hr /></div>  
+
   <h2>
 	<a href="{{ url_for('investment') }}">参与正投资</a>
   </h2>
