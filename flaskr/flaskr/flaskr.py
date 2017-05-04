@@ -570,7 +570,11 @@ def investment():
                 time_span_days = 15
 
             # check for repeated investment in too short a period
-            previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
+            previous_investments = None
+            if '30_days' == time_span:
+                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs2=1).order_by(OT_Tgbz.id.desc())
+            else:
+                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs1=1).order_by(OT_Tgbz.id.desc())
             if 0 == previous_investments.count():
                 pass
             else:
