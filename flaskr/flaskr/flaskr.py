@@ -222,8 +222,9 @@ def entry_waiting_operation(entry_id):
 
             flash(u'操作成功')
             return redirect(url_for('show_entries'))
+
         else:
-            pass
+            flash_errors(form)
     return render_template('entry_waiting_operation.html', error=error_str, form=form, entry_id=entry_id)
 
 @app.route('/view_certificate/<path:certificate_path>', methods=['GET'])

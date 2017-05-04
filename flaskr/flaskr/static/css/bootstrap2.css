@@ -2361,13 +2361,7 @@ input[type="button"].btn-block {
   opacity: 1;
 }
 .collapse {
-  position:relative;
-  height:0;
-  overflow:hidden;
-  -webkit-transition:height .35s ease;
-  -moz-transition:height .35s ease;
-  -o-transition:height .35s ease;
-  transition:height .35s ease;
+  display: none;
 }
 .collapse.in {
   display: block;
@@ -4308,9 +4302,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 	
 }
 .label-success[href]:hover,
-.label-success[href]:focus,
-.label-success[href]:visited
- {
+.label-success[href]:focus {
   background-color: #449d44;
 }
 .label-info {
