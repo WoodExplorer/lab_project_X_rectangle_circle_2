@@ -743,11 +743,11 @@ def sign_in():
     if to_increase:
         cur_user.last_sign_in = cur_time
 
-        if 2 == cur_user.loginNum:
+        if 2 == cur_user.UE_logNum:
             cur_user.pai += 1
-            cur_user.loginNum = 0
+            cur_user.UE_logNum = 0
         else:
-            cur_user.loginNum += 1
+            cur_user.UE_logNum += 1
     ses.commit()
     ses.close()
 
