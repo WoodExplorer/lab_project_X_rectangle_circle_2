@@ -135,19 +135,19 @@ def show_entries():
     ses = Ses()
 
     ###
-    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0)
-    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
+    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
+    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
 
     ###
-    entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0)
+    entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
     entries_waiting_in_tgbz_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz]
 
-    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0)
+    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
     entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
     entries_waiting_in_jsbz_date_hk = [ses.query(OT_Ppdd).filter_by(g_id=x.id)[0] for x in entries_waiting_in_jsbz]
     ###
-    entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1)
-    entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1)
+    entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+    entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Jsbz.date.desc())
 
     ses.close()
     return render_template('show_entries.html', 

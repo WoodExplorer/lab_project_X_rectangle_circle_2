@@ -4,15 +4,19 @@
   
   <h2>详细信息</h2>
   
-  <h4>受益人姓名：{{ g_user.UE_truename }}</h4>
-  <h4>受益人银行名称：{{ g_user.yhmc }}</h4>
-  <h4>受益人微信号：{{ g_user.weixin }}</h4>
-  <h4>受益人支付宝账号：{{ g_user.zfb }}</h4>
-  
-  <h4>提供帮助人姓名：{{ p_user.UE_truename }}</h4>
-  <h4>提供帮助人电话号码：{{ p_user.UE_phone }}</h4>
-  <h4>提供帮助人微信号：{{ p_user.weixin }}</h4>
-  <h4>提供帮助人的推荐人：{{ p_user.UE_theme }}</h4>
-  <h4>提供帮助人的电话：{{ p_user.UE_phone }}</h4>
- 
+  <div class="alert-info">
+  		<br>
+		<div class="container">
+			<span class="label label-success"><h5>受益人姓名</h5></span>          <span class="label label-info"><h5>{{ g_user.UE_truename }}</h5></span><br/>
+			<span class="label label-success"><h5>受益人银行名称</h5></span>          <span class="label label-info"><h5>{{ g_user.yhmc }}</h5></span><br/>
+			<span class="label label-success"><h5>受益人微信号</h5></span>         <span class="label label-info"><h5>{{ g_user.weixin }}</h5></span><br/>
+			<span class="label label-success"><h5>受益人支付宝账号</h5></span>         <span class="label label-info"><h5>{{ g_user.zfb }}</h5></span><br/>
+			<span class="label label-success"><h5>提供帮助人姓名</h5></span>          <span class="label label-info"><h5>{{ p_user.UE_truename }}</h5></span><br/>
+			<span class="label label-success"><h5>提供帮助人电话号码</h5></span>          <span class="label label-info"><h5>{{ p_user.UE_phone }}</h5></span><br/>
+			<span class="label label-success"><h5>提供帮助人微信号</h5></span>         <span class="label label-info"><h5>{{ p_user.weixin }}</h5></span><br/>
+			<span class="label label-success"><h5>提供帮助人的推荐人</h5></span>          <span class="label label-info"><h5>{{ p_user.UE_theme }}</h5></span><br/>
+			<span class="label label-success"><h5>提供帮助人的电话</h5></span>         <span class="label label-info"><h5>{{ p_user.UE_phone }}</h5></span><br/>
+		</div> 
+		<br>
+</div>
 {% endblock %}
