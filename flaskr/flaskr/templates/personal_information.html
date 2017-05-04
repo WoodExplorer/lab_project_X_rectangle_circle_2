@@ -63,6 +63,11 @@
 							success: function(resp){
 								//console.log("here2");
 								console.log(resp);
+								if ('Ok' == resp.ret) {
+									//console.log("here");
+									$(window).attr('location', "{{ url_for('personal_information') }}"); 
+								}
+									
 							}
 						});
 		  

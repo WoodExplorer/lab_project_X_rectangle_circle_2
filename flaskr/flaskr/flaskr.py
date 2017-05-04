@@ -732,19 +732,18 @@ def sign_in():
 
     cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
     cur_time = datetime.now() 
-    cur_time_to_date = str(cur_time.year) + str(cur_time.month) + str(cur_time.day)
+    cur_time_to_date = str(cur_time.year) + "%02d" % (cur_time.month) + "%02d" % (cur_time.day)
 
     to_increase = True
-    if (cur_user.last_sign_in is not None):
-        last_sign_in = cur_user.last_sign_in 
-        last_sign_in_to_date = str(last_sign_in.year) + str(last_sign_in.month) + str(last_sign_in.day)
-        if cur_time_to_date == last_sign_in_to_date:
+    if (cur_user.UE_lastTime is not None):
+        UE_lastTime = cur_user.UE_lastTime 
+        if cur_time_to_date == UE_lastTime:
             to_increase = False
 
     if to_increase:
-        cur_user.last_sign_in = cur_time
+        cur_user.UE_lastTime = cur_time_to_date
 
-        if 2 == cur_user.UE_logNum:
+        if 10 == cur_user.UE_logNum: # CAREFUL! 10 is hard-coded.
             cur_user.pai += 1
             cur_user.UE_logNum = 0
         else:
@@ -752,6 +751,7 @@ def sign_in():
     ses.commit()
     ses.close()
 
+    flash(u'签到成功')
     return '{"ret": "Ok"}'
 
 @app.route('/dynamic_purse', methods=['GET', 'POST'])
