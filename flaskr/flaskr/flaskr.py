@@ -24,7 +24,7 @@ from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromS
 
 decimal.getcontext().prec = 2
 
-engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
+engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=False)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
@@ -320,9 +320,12 @@ def entry_waiting_in_jsbz_operation(entry_id):
                                 user_level = determin_user_level(ses, recommendor_account)
                                 recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)
                                 if 0 == recommendor_rec.count():
+                                    print 'got no recommendor_rec'
                                     break
                                 recommendor_rec = recommendor_rec[0]
-                                recommendor_rec.tj_he += decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
+                                delta = decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
+                                print "delta:", delta
+                                recommendor_rec.tj_he += delta
 
                                 target_user_account = recommendor_rec.UE_account
                             else:
@@ -461,7 +464,7 @@ def register_backend():
     return redirect(url_for('show_entries'))
 
 def calc_pai(investment):
-    return int(math.ceil(investment / 1000))
+    return int(math.ceil(investment * 1. / 1000))
 
 def flash_errors(form):
     for field, errors in form.errors.items():
@@ -623,21 +626,21 @@ def group_management():
                     assert('pai' == object_type or 'jhma' == object_type)
                     object_type_desc = u'排单币' if 'pai' == object_type else u'激活码'
                     
-                    UE_phone = int(form.UE_phone.data)
+                    UE_target_account = form.UE_target_account.data
                     amount = int(form.amount.data)
 
                     Session = sessionmaker(bind=engine)
                     ses = Session()
 
-                    target_user = ses.query(OT_User).filter_by(UE_phone=UE_phone)
-                    if 0 == target_user.count():
-                        error_str = u'不存在电话为%s的用户' % UE_phone
-                        ses.close()
-                        break#return render_template('group_management.html', error=error_str, form=form)
-                    if 1 < target_user.count():
-                        error_str = u'电话为%s的用户的个数大于1，请与系统管理员联系' % UE_phone
-                        ses.close()
-                        break#return render_template('group_management.html', error=error_str, form=form)
+                    target_user = ses.query(OT_User).filter_by(UE_account=UE_target_account)
+                    #if 0 == target_user.count():
+                    #    error_str = u'不存在电话为%s的用户' % UE_target_account
+                    #    ses.close()
+                    #    break#return render_template('group_management.html', error=error_str, form=form)
+                    #if 1 < target_user.count():
+                    #    error_str = u'电话为%s的用户的个数大于1，请与系统管理员联系' % UE_target_account
+                    #    ses.close()
+                    #    break#return render_template('group_management.html', error=error_str, form=form)
                     target_user = target_user[0]
 
                     cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]

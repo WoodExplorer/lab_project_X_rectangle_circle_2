@@ -91,7 +91,7 @@ class ConfirmationForm(FlaskForm):
 
 
 class SendPaiOrJhmaForm(FlaskForm):
-    UE_phone = TextField(u'电话号码', validators=[DataRequired(message=u'请填写电话号码')])
+    UE_target_account = TextField(u'用户名', validators=[DataRequired(message=u'请填写用户名')])
     object_type = RadioField(u'发送对象', choices=[('pai', u'排单币'), ('jhma', u'激活码')], validators=[DataRequired(message=u'')])
     amount = TextField(u'发送数量', validators=[DataRequired(message=u'请填写发送数量')])
     submit = SubmitField(u'提交')
