@@ -139,19 +139,21 @@ def show_entries():
     entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0)
 
     ###
-    entries_waiting = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0)
+    entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0)
+    entries_waiting_in_tgbz_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz]
 
     entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0)
     entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
-
+    entries_waiting_in_jsbz_date_hk = [ses.query(OT_Ppdd).filter_by(g_id=x.id)[0] for x in entries_waiting_in_jsbz]
     ###
     entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1)
     entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1)
 
     ses.close()
     return render_template('show_entries.html', 
-            entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, entries_waiting=entries_waiting,
-            entries_waiting_in_jsbz=entries_waiting_in_jsbz, 
+            entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, 
+            entries_waiting_in_tgbz_obj=zip(entries_waiting_in_tgbz, entries_waiting_in_tgbz_date),
+            entries_waiting_in_jsbz_obj=zip(entries_waiting_in_jsbz, entries_waiting_in_jsbz_date_hk), 
             entries_closed_in_tgbz=entries_closed_in_tgbz,
             entries_closed_in_jsbz=entries_closed_in_jsbz,
         )
@@ -236,8 +238,8 @@ def view_certificate(certificate_path):
     return send_from_directory('', certificate_path)
 
 level_level_dict = {
-    1: {1: 0.01},
-    2: {1: 0.02, 2: 0.01},
+    1: {1: 0.01, 2: 0.00, 3: 0.00},
+    2: {1: 0.02, 2: 0.01, 3: 0.00},
     3: {1: 0.02, 2: 0.02, 3: 0.01},
 }
 def get_ratio_by_level_level(user_level, desc_level):
@@ -287,6 +289,8 @@ def entry_waiting_in_jsbz_operation(entry_id):
         abort(401)
     UE_account = session.get('logged_in_account')
 
+    cur_time = datetime.now() 
+
     error_str = None
     form = ConfirmationForm()
 
@@ -310,7 +314,8 @@ def entry_waiting_in_jsbz_operation(entry_id):
                         
                         # 更新上级奖励
                         cur_money = target_rec.jb
-                        target_user_account = UE_account
+                        assert(rec_in_ppdd.g_user == UE_account)
+                        target_user_account = rec_in_ppdd.p_user
                         # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
                         for distance in [1, 2, 3]:
                             cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
@@ -333,6 +338,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
                         target_rec.qr_zt = 1
                         rec_in_ppdd.zt = 2
+                        rec_in_ppdd.date_hk = cur_time
                         cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
                         cur_user.tz_leiji += cur_money
                         #ses.commit()
@@ -995,5 +1001,5 @@ def logout():
     session.pop('logged_in', None)
     session.pop('logged_in_account', None)
     flash(u'登出成功')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('login'))
 
