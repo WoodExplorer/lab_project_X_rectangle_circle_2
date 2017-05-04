@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
 from MD5 import md5
-from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm
+from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm
 
 decimal.getcontext().prec = 2
 
@@ -220,6 +220,7 @@ def entry_waiting_operation(entry_id):
             ses.commit()
             ses.close()
 
+            flash(u'操作成功')
             return redirect(url_for('show_entries'))
         else:
             pass
@@ -342,6 +343,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
                         cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
                         cur_user.tz_leiji += cur_money
                         #ses.commit()
+                        flash(u'操作成功')
                 except:
                     ses.rollback()
                     traceback.print_exc()
@@ -424,50 +426,61 @@ def change_password_backend():
     flash(u'修改密码成功')
     return redirect(url_for('show_entries'))
 
-@app.route('/register')
-def register():
-    return render_template('register.html')
+@app.route('/register', methods=['GET', 'POST'])
+def register():  
+    error_str = ''
 
-@app.route('/register_backend', methods=['POST'])
-def register_backend():  
-    UE_account, UE_password, UE_password_again, UE_truename, UE_accName, = request.form['UE_account'], request.form['UE_password'], request.form['UE_password_again'], request.form['UE_truename'], request.form['UE_accName']
+    form = RegisterForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            UE_account, UE_password, UE_password_again, UE_truename, UE_accName, = request.form['UE_account'], request.form['UE_password'], request.form['UE_password_again'], request.form['UE_truename'], request.form['UE_accName']
 
-    if UE_password != UE_password_again:
-        flash(u'两次输入的密码不一致')
-        return redirect(url_for('register'))
+            if UE_password != UE_password_again:
+                flash(u'两次输入的密码不一致')
+                return redirect(url_for('register'))
 
-    #
-    Session = sessionmaker(bind=engine)
-    ses = Session()
+            #
+            Session = sessionmaker(bind=engine)
+            ses = Session()
 
-    # insert
-    entry = OT_User()
-    #entry.ue_id = current_ue_id
-    #current_ue_id += 1
-    
-    # populate fields with information supplied by users
-    entry.UE_account = UE_account
-    entry.UE_password = md5(UE_password)
-    entry.UE_truename = UE_truename
-    entry.UE_accName = UE_accName
-    
-    # populate other fields with not-null constraint
-    entry.jihuouser = 'None'
-    entry.tx_leiji = 0
-    entry.UE_verMail = 'None'
-    entry.zcr = UE_account
-    entry.UE_regTime = datetime.now()
-    
-    ses.add(entry)
-    ses.commit()
-    ses.close()
+            if 0 != ses.query(OT_User).filter_by(UE_account=UE_account).count():
+                flash(u'已经存在同名用户')
+                return redirect(url_for('register'))
 
-    #db = get_db()
-    #db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
-    #             [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
-    #db.commit()
-    flash(u'注册成功')
-    return redirect(url_for('show_entries'))
+            # insert
+            entry = OT_User()
+            #entry.ue_id = current_ue_id
+            #current_ue_id += 1
+            
+            # populate fields with information supplied by users
+            entry.UE_account = UE_account
+            entry.UE_password = md5(UE_password)
+            entry.UE_truename = UE_truename
+            entry.UE_accName = UE_accName
+            
+            # populate other fields with not-null constraint
+            entry.jihuouser = 'None'
+            entry.tx_leiji = 0
+            entry.UE_verMail = 'None'
+            entry.zcr = UE_account
+            entry.UE_regTime = datetime.now()
+            
+            ses.add(entry)
+            ses.commit()
+            ses.close()
+
+            #db = get_db()
+            #db.execute('insert into ot_user (UE_account, UE_password, UE_truename, UE_accName, UE_nowTime) values (?, ?, ?, ?, ?)',
+            #             [UE_account, UE_password, UE_truename, UE_accName, datetime.now()])
+            #db.commit()
+            flash(u'注册成功')
+            return redirect(url_for('login'))    
+        else:
+            #flash(u'请确保您正确填写了表单')
+            flash_errors(form)
+
+    return render_template('register.html', error=error_str, form=form)
+
 
 def calc_pai(investment):
     return int(math.ceil(investment * 1. / 1000))
