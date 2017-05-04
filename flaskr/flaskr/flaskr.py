@@ -366,9 +366,9 @@ def entry_waiting_in_jsbz_operation(entry_id):
                 rec_in_ppdd.zt = 3
                 rec_in_ppdd.pic2 = file_path
 
-            #ses.commit()
-            #ses.close()
-
+                ses.commit()
+                ses.close()
+                flash(u'已投诉')
             return redirect(url_for('show_entries'))
         else:
             flash_errors(form)
