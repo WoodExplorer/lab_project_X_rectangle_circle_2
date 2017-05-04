@@ -1,21 +1,48 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>注册</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('register_backend') }}" method=post>
-    <dl>
-      <dt>邮箱账号:
-      <dd><input type=text name=UE_account>
-      <dt>密码:
-      <dd><input type=password name=UE_password>
-	  <dt>再次输入密码:
-      <dd><input type=password name=UE_password_again>
-	  <dt>真实姓名:
-      <dd><input type=text name=UE_truename>
-	  <dt>邀请人号码:
-      <dd><input type=text name=UE_accName>
-	
-      <dd><input type=submit value='注册'>
-    </dl>
-  </form>
+  
+  <div class="col-lg-12 text-center">	  
+    <h2>注册</h2>
+  </div>
+  <div align="center"><img src="{{ url_for('static', filename='img/login-logo.png') }}" alt=""/> </div> 
+  
+  <div class="login-wrap">
+	<form role="form" action="{{ url_for('register') }}" method=post>
+		{{ form.csrf_token }}
+		{{ form.hidden_tag() }}
+			
+		<br />
+		<div class="form-group">
+			<!--{{ form.UE_account.label }}-->
+			{{ form.UE_account(placeholder="手机号") }}
+		</div>
+		
+		<div class="form-group">
+			<!--{{ form.UE_password.label }}-->
+			{{ form.UE_password(placeholder="密码")  }}
+		</div>
+		
+		<div class="form-group">
+			<!--{{ form.UE_password_again.label }}-->
+			{{ form.UE_password_again(placeholder="再次输入密码")  }}
+		</div>
+		
+		<div class="form-group">
+			<!--{{ form.UE_truename.label }}-->
+			{{ form.UE_truename(placeholder="真实姓名")  }}
+		</div>
+		
+		<div class="form-group">
+			<!--{{ form.UE_accName.label }}-->
+			{{ form.UE_accName(placeholder="邀请人号码")  }}
+		</div>
+		
+		<br />
+		<div class="form-group">
+			{{ form.submit(class_='btn btn-default') }}
+		</div>
+	</form>
+  </div>
+  
 {% endblock %}

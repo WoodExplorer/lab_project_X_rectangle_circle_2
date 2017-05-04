@@ -54,7 +54,7 @@
 		{% for entry in pai_history %}
 		<tr>
 		  <td>{{ entry.jb }}</td>
-		  <td>{{ ((entry.jb|round(0, 'common')) / 1000) |round(0, 'common')|int }}</td>
+		  <td>{{ (((entry.jb|float)*1.0/ 1000)|round(0, 'ceil')) |round(0, 'common')|int }}</td>
 		  <td>{{ entry.date }}</td>
 		</tr>
 		{% endfor %}

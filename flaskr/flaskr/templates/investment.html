@@ -77,7 +77,7 @@
 					$('#cur_pai').text('');
 					return;
 				}
-				var pai_cost = Math.floor(Number(cur_investment)/1000);
+				var pai_cost = Math.ceil(Number(cur_investment) * 1.0 / 1000);
 				if (pai_cost < 0) {
 					$('#cur_pai').text('');
 					return;

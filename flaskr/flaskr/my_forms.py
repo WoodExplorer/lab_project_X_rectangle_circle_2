@@ -19,9 +19,17 @@ from MD5 import md5
 
 class LoginForm(FlaskForm):
     #entry_id = HiddenField(u"Field1")
-    username = TextField(u'账户名', validators=[DataRequired(message=u'请输入密码')])
+    username = TextField(u'用户名', validators=[DataRequired(message=u'请输入用户名')])
     password = PasswordField(u'密码', validators=[DataRequired(message=u'请输入密码')])
     submit = SubmitField(u'登陆')
+
+class RegisterForm(FlaskForm):
+    UE_account = TextField(u'用户名', validators=[DataRequired(message=u'请输入用户名')])
+    UE_password = PasswordField(u'密码', validators=[DataRequired(message=u'请输入密码')])
+    UE_password_again = PasswordField(u'密码', validators=[DataRequired(message=u'请再次输入密码')])
+    UE_truename = TextField(u'真实姓名', validators=[DataRequired(message=u'请输入真实姓名')])
+    UE_accName = TextField(u'邀请人用户名', validators=[DataRequired(message=u'请输入邀请人用户名')])
+    submit = SubmitField(u'注册')
 
 
 class ChangePasswordForm(FlaskForm):
