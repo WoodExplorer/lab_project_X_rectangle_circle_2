@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
   
-  <h2>静态钱包</h2>
+	<h3>静态钱包</h3>
   
-  <h4>总额：{{ cur_user.UE_money }}</h4>
-
+	<div class="hr-div"> <hr /></div> 
+	<span class="label label-success"><h4>总额</h4></span>
+	<span class="label label-inverse"><h4>{{ cur_user.UE_money }}</h4></span>
+	   
 {% endblock %}
