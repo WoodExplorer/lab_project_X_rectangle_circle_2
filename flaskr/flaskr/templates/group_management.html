@@ -1,207 +1,248 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>团队管理</h2>
   {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
   
-  <h3>激活码数量：{{ jhma }}</h3>
-  <h3>排单币数量：{{ pai }}</h3>
-  <h3>发放记录</h3>
-  <h4>激活码发放记录</h4>
-  {% if 0 < jhma_history.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>用户ID</th>
-		  <th>激活状态</th>
-		  <th>用户账号</th>
-		  <th>用户姓名</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in jhma_history %}
-		<tr>
-		  <td>{{ entry.UE_ID }}</td>
-		  <td>
-			{% if 0 == entry.not_help %}
-				未激活
-			{% else %}
-				已激活
-			{% endif %}
-		  </td>
-		  <td>{{ entry.UE_account }}</td>
-		  <td>{{ entry.UE_truename }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“激活码发放记录”类型的记录</em>
-  {% endif %}
+  <h3>团队管理</h3>
+  <div class="hr-div"> <hr /></div>
   
-  <h4>排单币使用记录</h4>
-  {% if 0 < pai_history.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>金额</th>
-		  <th>排单币数</th>
-		  <th>日期</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in pai_history %}
-		<tr>
-		  <td>{{ entry.jb }}</td>
-		  <td>{{ (((entry.jb|float)*1.0/ 1000)|round(0, 'ceil')) |round(0, 'common')|int }}</td>
-		  <td>{{ entry.date }}</td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“排单币使用记录”类型的记录</em>
-  {% endif %}
-  
-  <h4>一级团队人数：{{ level_1_group.count() }}</h4>
-  {% if 0 < level_1_group.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>用户ID</th>
-		  <th>用户姓名</th>
-		  <th>电话</th>
-		  <th>注册时间</th>
-		  <th>激活状态</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in level_1_group %}
-		<tr>
-		  <td>{{ entry.UE_ID }}</td>
-		  <td>{{ entry.UE_truename }}</td>
-		  <td>{{ entry.UE_phone }}</td>
-		  <td>{{ entry.UE_regTime }}</td>
-		  <td>
-			{% if 0 == entry.not_help %}
-				未激活
-			{% else %}
-				已激活
-			{% endif %}
-		  </td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“一级团队”类型的记录</em>
-  {% endif %}
-  
-  <h4>二级团队人数：{{ level_2_group.count() }}</h4>
-  {% if 0 < level_2_group.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>用户ID</th>
-		  <th>用户姓名</th>
-		  <th>电话</th>
-		  <th>注册时间</th>
-		  <th>激活状态</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in level_2_group %}
-		<tr>
-		  <td>{{ entry.UE_ID }}</td>
-		  <td>{{ entry.UE_truename }}</td>
-		  <td>{{ entry.UE_phone }}</td>
-		  <td>{{ entry.UE_regTime }}</td>
-		  <td>
-			{% if 0 == entry.not_help %}
-				未激活
-			{% else %}
-				已激活
-			{% endif %}
-		  </td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“二级团队”类型的记录</em>
-  {% endif %}
-  
-  <h4>三级团队人数：{{ level_3_group.count() }}</h4>
-  {% if 0 < level_3_group.count() %}
-  <table class="table table-striped">
-	  <caption></caption>
-	  <thead>
-		<tr>
-		  <th>用户ID</th>
-		  <th>用户姓名</th>
-		  <th>电话</th>
-		  <th>注册时间</th>
-		  <th>激活状态</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		{% for entry in level_3_group %}
-		<tr>
-		  <td>{{ entry.UE_ID }}</td>
-		  <td>{{ entry.UE_truename }}</td>
-		  <td>{{ entry.UE_phone }}</td>
-		  <td>{{ entry.UE_regTime }}</td>
-		  <td>
-			{% if 0 == entry.not_help %}
-				未激活
-			{% else %}
-				已激活
-			{% endif %}
-		  </td>
-		</tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-  {% else %}
-    <em>目前尚无“三级团队”类型的记录</em>
-  {% endif %}
-  
-  
-  <h3>发送排单币或激活码</h3>
-  <form role="form" action="{{ url_for('group_management') }}" method=post>
-    {{ form.csrf_token }}
-    {{ form.hidden_tag() }}
-	
-	<div class="form-group">
-		{{ form.UE_target_account.label }}
-		{{ form.UE_target_account }}
-	</div>
-	
-	<div class="form-group">
-		{{ form.object_type.label }}
+  <div class="container">	
+		<div class="row noti-div">
+   			<div class="col-md-6  alert alert-success"><h5>激活码数量<div class="badge" style="position:absolute;right: 5px">{{ jhma }}</div></h5></div> 
+   			<div class="col-md-6 alert alert-link"><h5>排单币数量<div class="badge" style="position:absolute;right: 5px">{{ pai }}</div></h5></div> 
+   		</div>
 		
-		{% for subfield in form.object_type %}
-		<div class="radio">
-		  
-			{{ subfield }}
-			{{ subfield.label }}
-		  
+		<h4>发放记录</h4>
+		<div class="hr-div"> <hr /></div>
+	  
+		<div class=" alert alert-info">激活码发放记录</div>
+		{% if 0 < jhma_history.count() %}
+		<div class="table-responsive">  
+			<table class="table table-striped table-bordered table-hover">
+				<caption></caption>
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>激活状态</th>
+						<th>用户账号</th>
+						<th>用户姓名</th>				  		
+					</tr>
+				</thead>
+				<tbody>	
+					{% for entry in jhma_history %}
+					<tr>
+					  <td><span class="label label-warning">{{ entry.UE_ID }}</span></td>
+					  <td>
+						<span class="label label-info">{% if 0 == entry.not_help %}
+							未激活
+						{% else %}
+							已激活
+						{% endif %}</span>
+					  </td>
+					  <td><span class="label label-important">{{ entry.UE_account }}</span></td>
+					  <td><span class="label label-primary">{{ entry.UE_truename }}</span></td>
+					</tr>
+					{% endfor %}				
+			  </tbody>
+			</table>
+		{% else %}
+			<em>目前尚无“激活码发放记录”类型的记录</em>
+		{% endif %}
 		</div>
-		{% endfor %}
-	</div>
-	
-	<div class="form-group">
-		{{ form.amount.label }}
-		{{ form.amount }}
-	</div>
 		
-	<div class="form-group">
-		{{ form.submit(class_='btn btn-default') }}
-	</div>
-	
-  </form>
+		<div class="alert alert-danger">排单币使用记录</div>
+		{% if 0 < pai_history.count() %}
+		<div class="table-responsive">  
+		  	<table class="table table-striped table-bordered table-hover">
+			  	<caption></caption>
+			  	<thead>
+					<tr>
+				  		<th>金额</th>
+				  		<th>排单币数</th>
+				  		<th>日期</th>				  		
+					</tr>
+			  	</thead>
+			  	<tbody>	
+					{% for entry in pai_history %}
+					<tr>
+					  <td><span class="label label-warning">{{ entry.jb }}</span></td>
+					  <td><span class="label label-info">{{ (((entry.jb|float)*1.0/ 1000)|round(0, 'ceil')) |round(0, 'common')|int }}</span></td>
+					  <td><span class="label label-important">{{ entry.date }}</span></td>
+					</tr>
+					{% endfor %}				
+			  </tbody>
+			</table>
+		</div>
+		{% else %}
+		<em>目前尚无“排单币使用记录”类型的记录</em>
+		{% endif %}
+  
+		<div class="alert alert-dismissable">一级团队人数：<span class="badge">{{ level_1_group.count() }}</span></div>
+		{% if 0 < level_1_group.count() %}
+		<div class="table-responsive">  
+			<table class="table table-striped table-bordered table-hover">
+				<caption></caption>
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>用户姓名</th>
+						<th>电话</th>	
+						<th>注册时间</th>
+						<th>激活状态</th>					  		
+					</tr>
+				</thead>
+				<tbody>	
+					{% for entry in level_1_group %}
+					<tr>
+					  <td><span class="label label-warning">{{ entry.UE_ID }}</span></td>
+					  <td><span class="label label-info">{{ entry.UE_truename }}</span></td>
+					  <td><span class="label label-important">{{ entry.UE_phone }}</span></td>
+					  <td><span class="label label-inverse">{{ entry.UE_regTime }}</span></td>
+					  <td>
+					      <span class="label label-success">
+						  {% if 0 == entry.not_help %}
+							未激活
+						  {% else %}
+							已激活
+						  {% endif %}</span>
+					  </td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+		<em>目前尚无“一级团队”类型的记录</em>
+		{% endif %}
+  
+		
+		<div class="alert alert-dismissable">二级团队人数：<span class="badge">{{ level_2_group.count() }}</span></div>
+		{% if 0 < level_2_group.count() %}
+		<div class="table-responsive">  
+			<table class="table table-striped table-bordered table-hover">
+				<caption></caption>
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>用户姓名</th>
+						<th>电话</th>	
+						<th>注册时间</th>
+						<th>激活状态</th>					  		
+					</tr>
+				</thead>
+				<tbody>	
+					{% for entry in level_2_group %}
+					<tr>
+					  <td><span class="label label-warning">{{ entry.UE_ID }}</span></td>
+					  <td><span class="label label-info">{{ entry.UE_truename }}</span></td>
+					  <td><span class="label label-important">{{ entry.UE_phone }}</span></td>
+					  <td><span class="label label-inverse">{{ entry.UE_regTime }}</span></td>
+					  <td>
+					      <span class="label label-success">
+						  {% if 0 == entry.not_help %}
+							未激活
+						  {% else %}
+							已激活
+						  {% endif %}</span>
+					  </td>
+					</tr>
+					{% endfor %}
+				
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+		<em>目前尚无“二级团队”类型的记录</em>
+		{% endif %}
+  
+  
+		<div class="alert alert-dismissable">三级团队人数：<span class="badge">{{ level_3_group.count() }}</span></div>
+		{% if 0 < level_3_group.count() %}
+		<div class="table-responsive">  
+			<table class="table table-striped table-bordered table-hover">
+				<caption></caption>
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>用户姓名</th>
+						<th>电话</th>	
+						<th>注册时间</th>
+						<th>激活状态</th>					  		
+					</tr>
+				</thead>
+				<tbody>	
+					{% for entry in level_3_group %}
+					<tr>
+					  <td><span class="label label-warning">{{ entry.UE_ID }}</span></td>
+					  <td><span class="label label-info">{{ entry.UE_truename }}</span></td>
+					  <td><span class="label label-important">{{ entry.UE_phone }}</span></td>
+					  <td><span class="label label-inverse">{{ entry.UE_regTime }}</span></td>
+					  <td>
+					      <span class="label label-success">
+						  {% if 0 == entry.not_help %}
+							未激活
+						  {% else %}
+							已激活
+						  {% endif %}</span>
+					  </td>
+					</tr>
+					{% endfor %}
+				
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+		<em>目前尚无“三级团队”类型的记录</em>
+		{% endif %}
+  
+		
+		<hr />
+		<h4>发送排单币或激活码</h4>
+		<form action="{{ url_for('group_management') }}" method="post" role="form">
+			{{ form.csrf_token }}
+			{{ form.hidden_tag() }}
+			
+			<div class="alert alert-info">	
+				<div class="form-group">
+					{{ form.UE_target_account.label }}
+					{{ form.UE_target_account(placeholder='请输入用户名') }}
+				</div>
+			</div>
+			
+        	<div class="form-group">
+                    <div class="panel panel-success">
+					
+						
+		
+						
+						
+					
+                        <div for="feedback" class="panel-heading">{{ form.object_type.label }}
+                    	</div>		
+                    	<div class="panel-body">
+							{% for subfield in form.object_type %}
+							<div class="radio">
+							  
+								{{ subfield }}
+								{{ subfield.label }}
+							  
+							</div>
+							{% endfor %}
+							
+                    	</div>
+                	</div>	                    
+                </div>
+          	  
+ 			<div class="alert alert-warning">	
+				<div class="form-group">
+					{{ form.amount.label }}
+					{{ form.amount(placeholder='请输入发送数量') }}
+				</div>
+			</div>
+			
+        	<div class="form-group">          
+				{{ form.submit(class_='btn btn-primary') }}
+            </div>
+    	
+		</form>
 	
 {% endblock %}
