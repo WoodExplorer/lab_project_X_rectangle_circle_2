@@ -185,6 +185,8 @@ def entry_waiting_operation(entry_id):
         abort(401)
     UE_account = session.get('logged_in_account')
 
+    cur_time = datetime.now()
+    
     error_str = None
     form = UploadCertificateForm()
     #print '*' * 10, 'entry_id:', entry_id
@@ -216,6 +218,7 @@ def entry_waiting_operation(entry_id):
             rec_in_ppdd = rec_in_ppdd[0]
             rec_in_ppdd.zt = 1
             rec_in_ppdd.pic = file_path
+            rec_in_ppdd.date_hk = cur_time
 
             ses.commit()
             ses.close()
@@ -340,7 +343,6 @@ def entry_waiting_in_jsbz_operation(entry_id):
 
                         target_rec.qr_zt = 1
                         rec_in_ppdd.zt = 2
-                        rec_in_ppdd.date_hk = cur_time
                         cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
                         cur_user.tz_leiji += cur_money
                         #ses.commit()
