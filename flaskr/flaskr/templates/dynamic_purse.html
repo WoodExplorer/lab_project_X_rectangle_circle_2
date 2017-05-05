@@ -1,24 +1,27 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>动态钱包</h2>
-  {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
-  
-  <h3>动态钱包余额：{{ cur_user.tj_he }}</h3>
-  
-  <h3>转换为激活码</h3>
-  <form role="form" action="{{ url_for('dynamic_purse') }}" method=post>
-    {{ form.csrf_token }}
-    {{ form.hidden_tag() }}
 	
-	<div class="form-group">
-		{{ form.amount.label }}
-		{{ form.amount }}
-	</div>
-	
-	<div class="form-group">
-		{{ form.submit(class_='btn btn-default') }}
-	</div>
-	
-  </form>
-	
+  <div class='container'>
+	  <h2>动态钱包</h2>
+	  {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
+	  
+	  <h3>动态钱包余额：{{ cur_user.tj_he }}</h3>
+	  
+	  <h3>转换为激活码</h3>
+	  <form role="form" action="{{ url_for('dynamic_purse') }}" method=post>
+		{{ form.csrf_token }}
+		{{ form.hidden_tag() }}
+		
+		<div class="form-group">
+			{{ form.amount.label }}
+			{{ form.amount }}
+		</div>
+		
+		<div class="form-group">
+			{{ form.submit(class_='btn btn-default') }}
+		</div>
+		
+	  </form>
+
+  </div>
 {% endblock %}

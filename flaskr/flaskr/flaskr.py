@@ -1002,7 +1002,7 @@ def login():
             flag = True
             session['logged_in'] = True
             session['logged_in_account'] = user_name
-            flash(u'登陆成功')
+            #flash(u'登陆成功')
         ses.close()
 
     if flag:

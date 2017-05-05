@@ -4,279 +4,252 @@
 
     <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet" />
 	
-	<br />
-<section>
-        <div class="container">
-            <div class="row noti-div">
-                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
-                    <a href="{{ url_for('investment') }}">
-                        <div class="alert alert-danger">
-                            <i class="fa fa-space-shuttle fa-4x"></i>
-                            <br>
-                            <span class="label label-info" style="font-size:16px">参与正投资</span>                           
-                        </div>
-                    </a>
-                </div>
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/mui.min.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}"/>
+	
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">个人信息管理</h1>
+	</header>
+	<p></p>
+	<nav class="mui-bar mui-bar-tab">
+		<a class="mui-tab-item mui-active" href="#tabbar">
+			<span class="mui-icon mui-icon-home"></span>
+			<span class="mui-tab-label">首页</span>
+		</a>
+		<a class="mui-tab-item" href="#tabbar-with-waiting">
+			<span class="mui-icon mui-icon-bars"><span class="mui-badge">{{ entries_for_15_days.count() + entries_for_30_days.count() }}</span></span>
+			<span class="mui-tab-label">等待中</span>
+		</a>
+		<a class="mui-tab-item" href="#tabbar-with-handle">
+			<span class="mui-icon mui-icon-gear"><span class="mui-badge">{{ entries_waiting_in_tgbz_obj|length }}</span></span>
+			<span class="mui-tab-label">待办理</span>
+		</a>
+		<a class="mui-tab-item" href="#tabbar-with-Inprogress">
+			<span class="mui-icon mui-icon-contact"><span class="mui-badge">{{ entries_waiting_in_jsbz_obj|length }}</span></span>
+			<span class="mui-tab-label">进行中</span>
+		</a>
+		<a class="mui-tab-item" href="#tabbar-with-done">
+			<span class="mui-icon mui-icon-info"><span class="mui-badge">{{ entries_closed_in_tgbz.count() + entries_closed_in_jsbz.count() }}</span></span>
+			<span class="mui-tab-label">已完成</span>
+		</a>			
+	</nav>
+	
+	
+	<div class="mui-content ">
+			<div id="tabbar" class="mui-control-content mui-active" >
+		    	<div class="row noti-div">
+	    		    <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-left:2px;">
+	                    <a href="{{ url_for('investment') }}">
+	                        <div class="alert alert-info">
+	                            <i class="fa fa-cloud-upload fa-4x"></i><br>
+	                            <span class="label btn-primary" style="font-size:16px;">提供帮助</span>                           
+	                        </div>
+	                    </a>
+	                </div>
+	                <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-right:2px;">
+	                    <a href="{{ url_for('receive_help') }}">
+	                        <div class="alert alert-danger">
+	                            <i class="fa fa-user fa-4x"></i>
+	                            <br>
+	                            <span class="label label-info" style="font-size:16px;">得到帮助</span>                           
+	                           
+	                        </div>
+	                    </a>
+	                </div>
+		    	</div>
+		    	<p></p>
+		    	<div class="row noti-div text-center">
+	                    <a href="{{ url_for('static_purse') }}">
+	                            <button type="button" class="btn btn-lg btn-success" style="" >静态钱包</button>                           
+	                    </a>
+	            </div>
+				 <p></p><br>
+	            <div class="row noti-div text-center" >
+	                    <a href="{{ url_for('group_management') }}">
+	                            <button type="button" class="btn btn-lg btn-info" style="">团队管理</button>                           
+	                    </a>
+	                    <span>&nbsp;&nbsp;</span>
+	                    <a href="{{ url_for('personal_information') }}">
+	                            <button type="button" class="btn btn-lg btn-info" style="">个人信息</button>                           
+	                    </a>
+	            </div>
+	            <p></p><br>
+		    	<div class="row noti-div text-center">
+	                    <a href="{{ url_for('dynamic_purse') }}">
+	                            <button type="button" class="btn btn-lg btn-danger" style="">动态钱包</button>                           
+	                    </a>
+	            </div>	  
+			</div>
+			
+			<div id="tabbar-with-waiting" class="mui-control-content" style="font-family: '微软雅黑';">
+	            <div class="row noti-div text-center" >
+		        	<h4>等待中&nbsp;<span class="label label-warning">15天</span></h4>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover" >
+		                      <thead>
+		                        <tr>
+		                          <th style="text-align: center;">金额</th>
+		                          <th style="text-align: center;">日期</th>
+		                        </tr>
+		                      </thead>
+			  				  <tbody>
+								{% for entry in entries_for_15_days %}
+								<tr>
+									<td><span class="label label-success">{{ entry.jb }}</span></td>
+									<td><span class="label label-info">{{ entry.date }}</span></td>
+								</tr>
+								{% endfor %}
+			  				  </tbody>
+						</table>
+					</div>  	            
+	            
+	            </div>
+				<div class="row noti-div text-center" >
+		        	<h4>等待中&nbsp;<span class="label label-warning">30天</span></h4>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover" >
+		                      <thead>
+		                        <tr>
+		                          <th style="text-align: center;">金额</th>
+		                          <th style="text-align: center;">日期</th>
+		                        </tr>
+		                      </thead>
+			  				  <tbody>		
+		                        {% for entry in entries_for_30_days %}
+								<tr>
+									<td><span class="label label-success">{{ entry.jb }}</span></td>
+									<td><span class="label label-info">{{ entry.date }}</span></td>
+								</tr>
+								{% endfor %}
 				
-                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
-                    <a href="{{ url_for('static_purse') }}">
-                        <div class="alert alert-success">
-                            <i class="fa fa-money fa-4x"></i>
-                            <br>
-                            <span class="label label-warning" style="font-size:16px">静态钱包</span>
-                                                       
-                        </div>
-                    </a>
-                </div>
-                
-                <div class="col-lg-3 col-md-3 col-sm-3  text-center">
-                    <a href="{{ url_for('dynamic_purse') }}">
-                        <div class="alert alert-warning">
-                            <i class="fa fa-recycle fa-4x"></i>
-                            <br>
-                            <span class="label label-success" style="font-size:16px">动态钱包</span>                         
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 text-center">
-                    <a href="{{ url_for('receive_help') }}">
-                        <div class="alert alert-info">
-                            <i class="fa fa-cloud-upload fa-4x"></i>
-							<br>
-                            <span class="label label-danger" style="font-size:16px">得到帮助</span>
-                        </div>
-                    </a>
-                </div>
-				<div class="col-lg-3 col-md-3 col-sm-3 text-center">
-                    <a href="{{ url_for('group_management') }}">
-                        <div class="alert alert-info">
-                            <i class="fa fa-group fa-4x"></i>
-							<br>
-                            <span class="label label-danger" style="font-size:16px">团队管理</span>
-                        </div>
-                    </a>
-                </div>
-				<div class="col-lg-3 col-md-3 col-sm-3  text-center">
-                    <a href="{{ url_for('personal_information') }}">
-                        <div class="alert alert-danger">
-                            <i class="fa fa-user fa-4x"></i>
-                            <br>
-                            <span class="label label-info" style="font-size:16px">个人信息</span>                           
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-
-        </div>
-
-    </section>
- 
-  <div class="hr-div"> <hr /></div>  
-
-
-<div class="container">
-	<div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>等待中&nbsp;<span class="label label-danger">15天</span></h4>
-			
-				{% if 0 < entries_for_15_days.count() %}
-				<div class="table-responsive">  
-					<table class="table table-striped table-bordered table-hover">
-						<caption></caption>
-						<thead>
-							<tr>
-								<th>金额</th>
-								<th>日期</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for entry in entries_for_15_days %}
-						<tr>
-							<td><span class="label label-success">{{ entry.jb }}</span></td>
-							<td><span class="label label-info">{{ entry.date }}</span></td>
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
+			  				  </tbody>
+						</table>
+					</div>  	            
+	            
 				</div>
-				{% else %}
-					<em>目前尚无“等待中-15天”类型的记录</em>
-				{% endif %}
-			    
-    	</div>
-	</div>
-	
-	<div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>等待中&nbsp;<span class="label label-danger">30天</span></h4>
-			
-				{% if 0 < entries_for_30_days.count() %}
-				<div class="table-responsive">  
-					<table class="table table-striped table-bordered table-hover">
-						<caption></caption>
-						<thead>
-							<tr>
-								<th>金额</th>
-								<th>日期</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% for entry in entries_for_30_days %}
-						<tr>
-							<td><span class="label label-success">{{ entry.jb }}</span></td>
-							<td><span class="label label-info">{{ entry.date }}</span></td>
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
+	            </div>
+				<div id="tabbar-with-handle" class="mui-control-content" style="font-family: '微软雅黑';">
+				<div class="row noti-div text-center" >
+		        	<h4>待办理</span></h4>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover">
+		                      <thead>
+		                        <tr>
+		                          <th style="text-align: center;">金额</th>
+		                          <th style="text-align: center;">日期</th>
+		                          <th style="text-align: center;">详细信息</th>
+		                          <th style="text-align: center;">我要操作</th>
+		                        </tr>
+		                      </thead>
+			  				  <tbody>
+								{% for entry in entries_waiting_in_tgbz_obj %}					  
+								<tr>
+								  <td><span class="label label-success">{{ entry[0].jb }}</span></td>
+								  <td>
+									<span class="label label-info">{{ entry[0].date }}</span>
+								  </td>
+								  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry[0].id) }}">详细信息</a></span></td>
+								  <td>
+									<span class="label label-warning"><a href="{{ url_for('entry_waiting_operation', entry_id=entry[0].id) }}">我要操作</a></span>
+									<span class="label label-important my_time" style="display:none">{{ entry[1].date }}</span>
+								  </td>
+								</tr>
+								{% endfor %}	
+			  				  </tbody>
+						</table>
+					</div> 
 				</div>
-				{% else %}
-					<em>目前尚无“等待中-30天”类型的记录</em>
-				{% endif %}
-			    
-    	</div>
-	</div>
-</div>
-  
-  
-<div class="container">
-	<div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>待办理&nbsp;<span class="label label-danger">提供帮助</span></h4>
-			{% if 0 < entries_waiting_in_tgbz_obj|length %}
-			<div class="table-responsive">  
-				<table class="table table-striped table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>金额</th>
-                          <th>日期</th>
-						  <th>详细信息</th>
-                          <th>我要操作</th>
-                        </tr>
-                      </thead>
-	  				  <tbody>
-						{% for entry in entries_waiting_in_tgbz_obj %}					  
-                        <tr>
-                          <td><span class="label label-success">{{ entry[0].jb }}</span></td>
-                          <td>
-							<span class="label label-important">{{ entry[0].date }}</span>
-						  </td>
-						  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry[0].id) }}">详细信息</a></span></td>
-                          <td>
-							<span class="label label-warning"><a href="{{ url_for('entry_waiting_operation', entry_id=entry[0].id) }}">我要操作</a></span>
-							<span class="label label-important my_time" style="display:none">{{ entry[1].date }}</span>
-						  </td>
-                        </tr>
-						{% endfor %}
-	  				  </tbody>
-				</table>
 			</div>
-			{% else %}
-				<em>目前尚无“待办理-提供帮助”类型的记录</em>
-			{% endif %}			
-    	</div>
-	</div>
+			
+			<div id="tabbar-with-Inprogress" class="mui-control-content" style="font-family: '微软雅黑';">
+				<div class="row noti-div text-center" >
+		        	<h4>进行中</span></h4>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover">
+		                    <thead>
+		                      	<tr>
+			                        <th style="text-align: center;">金额</th>
+			                        <th style="text-align: center;">日期</th>
+			                        <th style="text-align: center;">我要操作</th>
+		                      	</tr>
+		                    </thead>
+			  				<tbody>		
+		                        {% for entry in entries_waiting_in_jsbz_obj %}					  
+								<tr>
+								  <td><span class="label label-success">{{ entry[0].jb }}</span></td>
+								  <td>
+									<span class="label label-info">{{ entry[0].date }}</span>
+								  </td>
+								  <td>
+									<span class="label label-warning"><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry[0].id) }}">我要操作</a></span>
+									<span class="label label-important my_time" style="display:none">{{ entry[1].date_hk }}</span>
+								  </td>
+								</tr>
+								{% endfor %}
+			  				</tbody>
+						</table>
+					</div> 
+				</div>
+			</div>	
+			
+			<div id="tabbar-with-done" class="mui-control-content" style="font-family: '微软雅黑';">
+				<div class="row noti-div text-center" >
+		        	<h4>已完成</h4>
+					
+					<h5>已完成-提供帮助</h5>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover">
+							  <thead>
+								<tr>
+								  <th>金额</th>
+								  <th>日期</th>
+								</tr>
+							  </thead>
+							  <tbody>		
+								{% for entry in entries_closed_in_tgbz %}				  
+								<tr>
+								  <td><span class="label label-success">{{ entry.jb }}</span></td>
+								  <td><span class="label label-info">{{ entry.date }}</span></td>
+								</tr>
+								{% endfor %}	
+				
+							  </tbody>
+						</table>
+					</div>
+					
+					<h5>已完成-接受帮助</h5>
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover">
+							  <thead>
+								<tr>
+								  <th>金额</th>
+								  <th>日期</th>
+								</tr>
+							  </thead>
+							  <tbody>		
+								{% for entry in entries_closed_in_jsbz %}				  
+								<tr>
+								  <td><span class="label label-success">{{ entry.jb }}</span></td>
+								  <td><span class="label label-info">{{ entry.date }}</span></td>
+								</tr>
+								{% endfor %}	
+				
+							  </tbody>
+						</table>
+					</div>
+				</div>
+			</div>	
 	
-	<div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>待办理&nbsp;<span class="label label-danger">接受帮助</span></h4>
-			{% if 0 < entries_waiting_in_jsbz_obj|length %}
-			<div class="table-responsive">  
-				<table class="table table-striped table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>金额</th>
-                          <th>日期</th>
-                          <th>我要操作</th>
-                        </tr>
-                      </thead>
-	  				  <tbody>
-						{% for entry in entries_waiting_in_jsbz_obj %}					  
-                        <tr>
-                          <td><span class="label label-success">{{ entry[0].jb }}</span></td>
-                          <td>
-							<span class="label label-important">{{ entry[0].date }}</span>
-						  </td>
-						  <td>
-							<span class="label label-warning"><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry[0].id) }}">我要操作</a></span>
-							<span class="label label-important my_time" style="display:none">{{ entry[1].date_hk }}</span>
-						  </td>
-                        </tr>
-						{% endfor %}
-	  				  </tbody>
-				</table>
-			</div>
-			{% else %}
-				<em>目前尚无“待办理-接受帮助”类型的记录</em>
-			{% endif %}			
-    	</div>
-	</div>
-</div> 
-
-   
-
-<div class="container">
-	<div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>已完成&nbsp;<span class="label label-danger">提供帮助</span></h4>
-			{% if 0 < entries_closed_in_tgbz.count() %}
-			<div class="table-responsive">  
-				<table class="table table-striped table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>金额</th>
-                          <th>日期</th>
-                        </tr>
-                      </thead>
-	  				  <tbody>		
-                        {% for entry in entries_closed_in_tgbz %}				  
-                        <tr>
-                          <td><span class="label label-success">{{ entry.jb }}</span></td>
-                          <td><span class="label label-info">{{ entry.date }}</span></td>
-                        </tr>
-						{% endfor %}	
-		
-	  				  </tbody>
-				</table>
-			</div>
-			{% else %}
-				<em>目前尚无“已完成的提供帮助”类型的记录</em>
-			{% endif %}
-    	</div>
-	</div>
-    
-    <div class="row">
-    	<div class="col-lg-9 col-md-9 col-sm-9 ">  
-        	<h4>已完成&nbsp;<span class="label label-danger">接受帮助</span></h4>
-			{% if 0 < entries_closed_in_jsbz.count() %}
-			<div class="table-responsive">  
-				<table class="table table-striped table-bordered table-hover">
-                      <thead>
-                        <tr>
-                          <th>金额</th>
-                          <th>日期</th>
-                        </tr>
-                      </thead>
-	  				  <tbody>		
-                        {% for entry in entries_closed_in_jsbz %}				  
-                        <tr>
-                          <td><span class="label label-success">{{ entry.jb }}</span></td>
-                          <td><span class="label label-info">{{ entry.date }}</span></td>
-                        </tr>
-						{% endfor %}	
-		
-	  				  </tbody>
-				</table>
-			</div>
-			{% else %}
-				<em>目前尚无“已完成的接收帮助”类型的记录</em>
-			{% endif %}
-    	</div>
-	</div>
+	
 </div> 
   
-  
+<script src="{{ url_for('static', filename='js/mui.min.js') }}"></script>
+	
 
 <script type="text/javascript">
 
