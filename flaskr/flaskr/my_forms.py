@@ -52,8 +52,8 @@ class InvestmentForm(FlaskForm):
             investment_int = int(field.data)
         except Exception, e:
             raise ValidationError(u'请输入合法数字')
-        if investment_int <= 0 or investment_int > 5000 or 0 != investment_int % 100:
-            raise ValidationError(u'请输入(0,5000]之间的100的倍数')
+        if investment_int <= 0 or investment_int > 10000 or 0 != investment_int % 100:
+            raise ValidationError(u'请输入(0,10000]之间的100的倍数')
 
     def validate_time_span(form, field):
         if field.data is None or 'None' == field.data:

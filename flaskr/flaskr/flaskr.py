@@ -186,7 +186,7 @@ def entry_waiting_operation(entry_id):
     UE_account = session.get('logged_in_account')
 
     cur_time = datetime.now()
-    
+
     error_str = None
     form = UploadCertificateForm()
     #print '*' * 10, 'entry_id:', entry_id
@@ -788,7 +788,7 @@ def dynamic_purse():
 
                     amout = int(form.amount.data)
                     cur_user.tj_he -= amount
-                    cur_user.jhma += (amount / 200)
+                    cur_user.jhma += (amount / 100)
 
                     ses.commit()
                 except:
