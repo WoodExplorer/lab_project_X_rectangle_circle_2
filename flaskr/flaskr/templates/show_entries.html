@@ -30,7 +30,7 @@
 			<span class="mui-tab-label">待办理</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-Inprogress">
-			<span class="mui-icon mui-icon-contact"><span class="mui-badge">{{ entries_waiting_in_jsbz_obj|length }}</span></span>
+			<span class="mui-icon mui-icon-contact"><span class="mui-badge">{{ entries_waiting_in_jsbz_obj|length + entries_waiting_in_jsbz_zt_0|length }}</span></span>
 			<span class="mui-tab-label">进行中</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-done">
@@ -194,8 +194,34 @@
 			  				</tbody>
 						</table>
 					</div> 
+					
+					<div class="table-responsive">  
+						<table class="table table-striped table-bordered table-hover">
+		                    <thead>
+		                      	<tr>
+			                        <th style="text-align: center;">金额</th>
+			                        <th style="text-align: center;">日期</th>
+			                        <th style="text-align: center;">状态</th>
+		                      	</tr>
+		                    </thead>
+			  				<tbody>		
+		                        {% for entry in entries_waiting_in_jsbz_zt_0 %}					  
+								<tr>
+								  <td><span class="label label-success">{{ entry.jb }}</span></td>
+								  <td>
+									<span class="label label-info">{{ entry.date }}</span>
+								  </td>
+								  <td>
+									<span class="label label-warning">已匹配</span>
+								  </td>
+								</tr>
+								{% endfor %}
+			  				</tbody>
+						</table>
+					</div> 
 				</div>
 			</div>	
+			
 			
 			<div id="tabbar-with-done" class="mui-control-content" style="font-family: '微软雅黑';">
 				<div class="row noti-div text-center" >
