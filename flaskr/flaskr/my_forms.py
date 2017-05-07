@@ -135,7 +135,8 @@ class DynamicPurseForm(FlaskForm):
 class AccountSettingForm(FlaskForm):
     weixin = TextField(u'微信号', validators=[])
     zfb = TextField(u'支付宝帐号', validators=[])
-    yhmc = TextField(u'银行卡号', validators=[])
+    yhmc = TextField(u'开户名称', validators=[])
+    yhzh = TextField(u'银行卡号', validators=[])
     
     submit = SubmitField(u'提交', id='submit')
 

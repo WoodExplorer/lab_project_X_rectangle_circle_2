@@ -25,7 +25,11 @@
 		</div>
 		<div class="form-group">
 			{{ form.yhmc.label }}
-			{{ form.yhmc(placeholder="银行卡号") }}
+			{{ form.yhmc(placeholder="开户行") }}
+		</div>
+		<div class="form-group">
+			{{ form.yhzh.label }}
+			{{ form.yhzh(placeholder="银行卡号") }}
 		</div>
 		
 		<div class="form-group">
@@ -50,8 +54,12 @@
               $("#yhmc").attr("disabled", "disabled");
 			  flag++;
 			}
+			if ('' != $("#yhzh").val()) {
+              $("#yhzh").attr("disabled", "disabled");
+			  flag++;
+			}
 			  
-			if (3 == flag) {
+			if (4 == flag) {
 			  $('#submit').attr("disabled", "disabled");
 			}
 		});

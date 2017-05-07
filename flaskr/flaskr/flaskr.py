@@ -24,7 +24,7 @@ from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromS
 
 decimal.getcontext().prec = 2
 
-engine = create_engine('mysql://root:root@localhost/happykimi2?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
+engine = create_engine('mysql://root:root@localhost/happykimi2?charset=gbk', echo=False)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
@@ -956,16 +956,18 @@ def account_setting():
         
     if request.method == 'POST':
         if form.validate_on_submit():
-            weixin, zfb, yhmc = form.weixin.data, form.zfb.data, form.yhmc.data
+            weixin, zfb, yhmc, yhzh = form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data
             print '!' * 20
-            print 'form.weixin.data, form.zfb.data, form.yhmc.data:', form.weixin.data, form.zfb.data, form.yhmc.data
-            print 'weixin, zfb, yhmc:', weixin, zfb, yhmc 
+            print 'form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data:', form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data
+            print 'weixin, zfb, yhmc, yhzh:', weixin, zfb, yhmc, yhzh
             if (weixin is not None) and ('' != weixin.strip()):
                 cur_user.weixin = weixin
             if (zfb is not None) and ('' != zfb.strip()):
                 cur_user.zfb = zfb
             if (yhmc is not None) and ('' != yhmc.strip()):
                 cur_user.yhmc = yhmc
+            if (yhzh is not None) and ('' != yhzh.strip()):
+                cur_user.yhzh = yhzh
 
             ses.commit()
             ses.close()
@@ -979,6 +981,8 @@ def account_setting():
     form.zfb.data = cur_user.zfb
     #if cur_user.yhmc is not None:
     form.yhmc.data = cur_user.yhmc
+    #if cur_user.yhzh is not None:
+    form.yhzh.data = cur_user.yhzh
     
     return render_template('account_setting.html', error=error_str, form=form)
 
