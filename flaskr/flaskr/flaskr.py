@@ -856,7 +856,7 @@ def receive_help():
                 entry.date = cur_time
                 entry.zt = 0
                 entry.qr_zt = 0
-                entry.qb = 1
+                entry.qb = 0
                 ses.add(entry)
 
                 # 往userget表中添加记录
