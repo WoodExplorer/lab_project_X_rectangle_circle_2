@@ -135,6 +135,7 @@ def show_entries():
     ses = Ses()
 
     ###
+    entries_for_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=0, qr_zt=0).order_by(OT_Jsbz.date.desc())
     entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
     entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
 
@@ -153,6 +154,7 @@ def show_entries():
 
     ses.close()
     return render_template('show_entries.html', 
+            entries_for_jsbz_zt_0=entries_for_jsbz_zt_0,
             entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, 
             entries_waiting_in_tgbz_obj=zip(entries_waiting_in_tgbz, entries_waiting_in_tgbz_date),
             entries_waiting_in_jsbz_obj=zip(entries_waiting_in_jsbz, entries_waiting_in_jsbz_date_hk), 
