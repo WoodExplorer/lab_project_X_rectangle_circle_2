@@ -24,7 +24,7 @@ from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromS
 
 decimal.getcontext().prec = 2
 
-engine = create_engine('mysql://root:root@localhost/happykimi2?charset=gbk', echo=False)#convert_unicode=True, echo=True)#echo=False)
+engine = create_engine('mysql://root:root@localhost/happykimi2?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
