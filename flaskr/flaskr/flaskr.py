@@ -70,6 +70,7 @@ app.config.update(dict(
     PASSWORD='default',
     UPLOAD_FOLDER='./upload',
 ))
+print app.config["UPLOAD_FOLDER"]
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 ###
@@ -175,14 +176,17 @@ def entry_waiting_detail(entry_id):
     #print '*' * 10, 'got it, entry_id:', entry_id
     # 查询ppdd表中p_id 等于当前订单号的记录
     rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
-    assert(1 == rec_in_ppdd.count())
+    if 1 != rec_in_ppdd.count():
+        ses.close()
+        return u'rec_in_ppdd表中有%d条p_id为%d的记录，而非预期的1条' % (rec_in_ppdd.count(), entry_id)
     rec_in_ppdd = rec_in_ppdd[0]
 
     g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
     p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
+    recommendor_of_p_user = ses.query(OT_User).filter_by(UE_account=g_user.UE_account)[0]
 
     ses.close()
-    return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user,)
+    return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user, recommendor_of_p_user=recommendor_of_p_user)
 
 @app.route('/entry_waiting_operation/<int:entry_id>', methods=['GET', 'POST'])
 def entry_waiting_operation(entry_id):
@@ -210,6 +214,7 @@ def entry_waiting_operation(entry_id):
             ses = Ses()
 
             target_rec = ses.query(OT_Tgbz).filter_by(id=entry_id)
+
             assert(1 == target_rec.count())
             target_rec = target_rec[0]
             target_rec.qr_zt = 1
