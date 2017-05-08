@@ -183,7 +183,7 @@ def entry_waiting_detail(entry_id):
 
     g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
     p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
-    recommendor_of_p_user = ses.query(OT_User).filter_by(UE_account=g_user.UE_account)[0]
+    recommendor_of_p_user = ses.query(OT_User).filter_by(UE_account=p_user.UE_accName)[0]
 
     ses.close()
     return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user, recommendor_of_p_user=recommendor_of_p_user)
