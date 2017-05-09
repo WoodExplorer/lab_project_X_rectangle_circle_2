@@ -37,7 +37,7 @@ class ChangePasswordForm(FlaskForm):
     UE_password = PasswordField(u'当前密码', validators=[DataRequired(message=u'请输入当前密码')])
     new_UE_password = PasswordField(u'新密码', validators=[DataRequired(message=u'请输入新密码')])
     new_UE_password_again = PasswordField(u'再次输入新密码', validators=[DataRequired(message=u'请再次输入新密码')])
-    submit = SubmitField(u'提交')
+    submit = SubmitField(u'更改密码')
 
 
 class InvestmentForm(FlaskForm):
