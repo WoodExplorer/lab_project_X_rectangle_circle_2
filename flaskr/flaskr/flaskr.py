@@ -126,7 +126,7 @@ def initdb_command():
     print('Initialized the database.')
 
 #########################
-@app.route('/')
+@app.route('/show_entries')
 def show_entries():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
@@ -993,6 +993,11 @@ def account_setting():
     
     return render_template('account_setting.html', error=error_str, form=form)
 
+
+@app.route('/', methods=['GET'])
+def first_page():
+    error_str = ''
+    return render_template('first_page.html', error=error_str)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
