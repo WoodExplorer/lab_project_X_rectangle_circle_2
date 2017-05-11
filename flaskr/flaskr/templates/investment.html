@@ -1,50 +1,48 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class='container'>
-  <h2>正投资</h2>
+<div class=''>
+    {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
+  
+  <h4>提供帮助</h4>
   <div class="hr-div"> <hr /></div>
   
-  {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
-  
-  <form role="form" action="{{ url_for('investment') }}" method=post>
-    {{ form.csrf_token }}
-    {{ form.hidden_tag() }}
-	
-	
-	<div class="form-group">
-		{{ form.time_span.label(class_='label label-success') }}
-		<!--{{ form.time_span(class_='a') }} -->
+  <div class="container-fluid">
+	  <form role="form" action="{{ url_for('investment') }}" method=post>
+		{{ form.csrf_token }}
+		{{ form.hidden_tag() }}
 		
-		{% for subfield in form.time_span %}
-		<div class="radio">
-		  
-			{{ subfield }}
-			{{ subfield.label }}
-		  
-		</div>
-		{% endfor %}
-	</div>
-
-	<div class="col-lg-7 alert alert-info">	
+		
 		<div class="form-group">
-			{{ form.investment.label }}
-			{{ form.investment }}
+			<h5>{{ form.time_span.label(class_='label label-success') }}</h5>
+			<!--{{ form.time_span(class_='a') }} -->
 			
-			<em>当前排单币：{{ cur_user.pai }}<span id="cur_pai"></span></em>
+			{% for subfield in form.time_span %}
+			<div class="radio">
+			  
+				{{ subfield }}
+				{{ subfield.label }}
+			  
+			</div>
+			{% endfor %}
+		</div>
+
+		<div class="col-lg-7 alert alert-info">	
+			<div class="form-group">
+				<label for="investment">投资金额&nbsp;<span class="label label-inverse">当前排单币：{{ cur_user.pai }}</span><span id="cur_pai"></span></label>
+				{{ form.investment }}
+			</div>
+			
+			<div class="form-group">
+				<p>本人正式申明：我已完全了解所有投资可能的风险。我决定参与聚方圆平台,愿意对自己认可的聚方圆正投资，并愿意为项目的市场营销推广贡献力量。</p>
+			</div>
+		</div>	
+		
+		<div class="form-group" align="center">
+			{{ form.submit(class_='btn btn-primary') }}
 		</div>
 		
-		<div class="form-group">
-			<p>本人正式申明：我已完全了解所有投资可能的风险。我决定参与聚方圆平台,愿意对自己认可的聚方圆正投资，并愿意为项目的市场营销推广贡献力量。</p>
-		</div>
-	</div>	
-	
-	<div class="hr-div" style="clear:both"> <br /></div>
-	<div class="form-group">
-		{{ form.submit(class_='btn btn-primary') }}
+	  </form>
 	</div>
-	
-  </form>
-		
 
 	<script>
 		$.event.special.valuechange = {

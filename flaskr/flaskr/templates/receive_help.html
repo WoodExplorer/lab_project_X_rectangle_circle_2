@@ -1,15 +1,21 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class='container'>
-  <h2>得到帮助</h2>
+
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" media="screen">
+	
+<div class='container-fluid'>
   {% if error %}<p class=error><strong>错误：</strong> {{ error }}{% endif %}
+  <h4>得到帮助</h4>
+  <div class="hr-div"> <hr /></div>
   
   <form role="form" action="{{ url_for('receive_help') }}" method=post>
     {{ form.csrf_token }}
     {{ form.hidden_tag() }}
 	
 	<div class="form-group">
-		{{ form.purse_type.label }}
+		<h5>{{ form.purse_type.label(class_='label label-success') }}</h5>
 		<!--{{ form.purse_type(class_='a') }} -->
 		
 		{% for subfield in form.purse_type %}
@@ -22,18 +28,18 @@
 		{% endfor %}
 	</div>
 	
-	
-	<div class="form-group">
-		{{ form.amount.label }}
-		{{ form.amount }}
+	<div class="col-lg-7 alert alert-info">	
+		<div class="form-group">
+			{{ form.amount.label }}
+			{{ form.amount(placeholder="请输入金额(100整数倍）") }}
+		</div>
+		
+		<div class="form-group">
+			<p>本人正式申明：我已完全了解所有投资可能的风险。我决定参与聚方圆平台,愿意对自己认可的聚方圆正投资，并愿意为项目的市场营销推广贡献力量。</p>
+		</div>
 	</div>
-	
-	<div class="form-group">
-		<p>本人正式申明：我已完全了解所有投资可能的风险。我决定参与聚方圆平台,愿意对自己认可的聚方圆正投资，并愿意为项目的市场营销推广贡献力量。</p>
-	</div>
-	
-	<div class="form-group">
-		{{ form.submit(class_='btn btn-default') }}
+	<div class="form-group" align="center">
+		{{ form.submit(class_='btn btn-primary') }}
 	</div>
 	
   </form>

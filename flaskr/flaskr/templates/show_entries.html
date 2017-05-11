@@ -143,14 +143,14 @@
 
 		    	<div class="row noti-div text-center" >
 	                    <a href="{{ url_for('static_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>1000元</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>{{ cur_user.UE_money }}</font></button>                           
 	                    </a>
 	            </div>
 
 	            <p></p>
 		    	<div class="row noti-div text-center">
 	                    <a href="{{ url_for('dynamic_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>1000元</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}</font></button>                           
 	                    </a>
 	            </div>	
 				 <p></p>
@@ -236,7 +236,8 @@
 	            
 				</div>
 				
-				
+					<div><br></div>
+					<div><br></div>	
 	            </div>
 				<div id="tabbar-with-handle" class="mui-control-content" style="font-family: '微软雅黑';">
 				<div class="row noti-div text-center" >
@@ -270,6 +271,9 @@
 						</table>
 					</div> 
 				</div>
+				
+				<div><br></div>
+				<div><br></div>	
 			</div>
 			
 			<div id="tabbar-with-Inprogress" class="mui-control-content" style="font-family: '微软雅黑';">
@@ -327,6 +331,9 @@
 						</table>
 					</div> 
 				</div>
+				
+				<div><br></div>
+				<div><br></div>	
 			</div>	
 			
 			
@@ -376,6 +383,9 @@
 						</table>
 					</div>
 				</div>
+				
+				<div><br></div>
+				<div><br></div>	
 			</div>	
 	
 	
