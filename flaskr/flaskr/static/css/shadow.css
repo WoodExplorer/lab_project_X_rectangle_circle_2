@@ -1,0 +1,62 @@
+.box-shadow-1 {  
+  -webkit-box-shadow: 3px 3px 3px;  
+  -moz-box-shadow: 3px 3px 3px;  
+  box-shadow: 3px 3px 3px;  
+}  
+.box-shadow-2-green {  
+  -webkit-box-shadow:0 0 10px #0CC;  
+  -moz-box-shadow:0 0 10px #0CC;  
+  box-shadow:0 0 10px #0CC;  
+}  
+
+.box-shadow-2-red {  
+  -webkit-box-shadow:0 0 10px #dd524d;  
+  -moz-box-shadow:0 0 10px #dd524d;  
+  box-shadow:0 0 10px #dd524d;  
+}
+
+.box-shadow-2-blue {  
+  -webkit-box-shadow:0 0 10px #31708f;  
+  -moz-box-shadow:0 0 10px #31708f;  
+  box-shadow:0 0 10px #31708f;  
+}
+
+.box-shadow-2-yellow {  
+  -webkit-box-shadow:0 0 10px #c67605;  
+  -moz-box-shadow:0 0 10px #c67605;  
+  box-shadow:0 0 10px #c67605;  
+}
+
+.box-shadow-3 {  
+  -webkit-box-shadow:0 0 10px rgba(0, 204, 204, .5);  
+  -moz-box-shadow:0 0 10px rgba(0, 204, 204, .5);  
+  box-shadow:0 0 10px rgba(0, 204, 204, .5);  
+}  
+
+.box-shadow-4{  
+  -webkit-box-shadow:0 0 10px 15px #0CC;  
+  -moz-box-shadow:0 0 10px 15px #0CC;  
+  box-shadow:0 0 10px 15px #0CC;  
+}  
+.box-shadow-5{  
+  -webkit-box-shadow:inset 0 0 10px #0CC;  
+  -moz-box-shadow:inset 0 0 10px #0CC;  
+  box-shadow:inset 0 0 10px #0CC;  
+}  
+.box-shadow-6{  
+    box-shadow:-10px 0 10px red, /*左边阴影*/  
+    10px 0 10px yellow, /*右边阴影*/  
+    0 -10px 10px blue, /*顶部阴影*/  
+    0 10px 10px green; /*底边阴影*/  
+}  
+.box-shadow-7{  
+    box-shadow:0 0 10px 5px black,  
+    0 0 10px 20px red;  
+}  
+.box-shadow-8{  
+    box-shadow:0 0 10px 20px red,  
+    0 0 10px 5px black;  
+}  
+.box-shadow-9{  
+    box-shadow: 0 0 0 1px red;  
+}  

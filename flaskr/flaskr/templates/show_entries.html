@@ -9,79 +9,141 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/mui.min.css') }}" />
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}"/>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+	<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen" >		
+	<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" media="screen">
 	
-	<header class="mui-bar mui-bar-nav">
-		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		<h1 class="mui-title">个人信息管理</h1>
-	</header>
-	<p></p>
-	<nav class="mui-bar mui-bar-tab">
+	<!-- FONT AWESOME CSS -->
+	<link href="{{ url_for('static', filename='css/shadow.css') }}" rel="stylesheet"/>   
+	
+	
+		<style>
+			#circle1 {
+			    width: 100px;
+			    height: 100px;
+			    -moz-border-radius: 50px;
+			    -webkit-border-radius: 50px;
+			    border-radius: 50px;
+				font-family: "微软雅黑";
+				color: white;
+				font-weight: bolder;
+			}
+			
+			.grad-success {
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#2ac845,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#2ac845,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#2ac845; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #2ac845 rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#2ac845), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #2ac845, rgba(255, 255, 255, 0)); 
+			}
+			
+			.grad-danger {
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#dd524d,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#dd524d,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#dd524d; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #dd524d rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#dd524d), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #dd524d, rgba(255, 255, 255, 0)); 
+			}		
+
+			.grad-info {
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#31708f,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#31708f,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#31708f; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #31708f rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#31708f), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #31708f, rgba(255, 255, 255, 0)); 
+			}
+			
+			.grad-alert-info{
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#d9edf7,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#d9edf7,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#d9edf7; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #d9edf7 rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#d9edf7), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #d9edf7, rgba(255, 255, 255, 0)); 				
+			}
+			
+			
+			.grad-warning{
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#c67605,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#c67605,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#c67605; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #c67605 rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#c67605), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #c67605, rgba(255, 255, 255, 0)); 				
+			}			
+				
+		</style>
+	
+	
+	<nav class="mui-bar mui-bar-tab" style="background-color: #050505;">
 		<a class="mui-tab-item mui-active" href="#tabbar">
-			<span class="mui-icon mui-icon-home"></span>
+			<span class="mui-icon mui-icon-home-filled"></span>
 			<span class="mui-tab-label">首页</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-waiting">
-			<span class="mui-icon mui-icon-bars"><span class="mui-badge">{{ entries_for_15_days.count() + entries_for_30_days.count() + entries_for_jsbz_zt_0.count() }}</span></span>
+			<span class="mui-icon mui-icon-more-filled"><span class="mui-badge">{{ entries_for_15_days.count() + entries_for_30_days.count() + entries_for_jsbz_zt_0.count() }}</span></span>
 			<span class="mui-tab-label">等待中</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-handle">
-			<span class="mui-icon mui-icon-gear"><span class="mui-badge">{{ entries_waiting_in_tgbz_obj|length }}</span></span>
-			<span class="mui-tab-label">待办理</span>
+			<span class="mui-icon mui-icon-gear-filled"><span class="mui-badge">{{ entries_waiting_in_tgbz_obj|length }}</span></span>
+			<span class="mui-tab-label">代办理</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-Inprogress">
-			<span class="mui-icon mui-icon-contact"><span class="mui-badge">{{ entries_waiting_in_jsbz_obj|length + entries_waiting_in_jsbz_zt_0|length }}</span></span>
+			<span class="mui-icon mui-icon-contact-filled"><span class="mui-badge">{{ entries_waiting_in_jsbz_obj|length + entries_waiting_in_jsbz_zt_0|length }}</span></span>
 			<span class="mui-tab-label">进行中</span>
 		</a>
 		<a class="mui-tab-item" href="#tabbar-with-done">
-			<span class="mui-icon mui-icon-info"><span class="mui-badge">{{ entries_closed_in_tgbz.count() + entries_closed_in_jsbz.count() }}</span></span>
+			<span class="mui-icon mui-icon-checkbox-filled"><span class="mui-badge">{{ entries_closed_in_tgbz.count() + entries_closed_in_jsbz.count() }}</span></span>
 			<span class="mui-tab-label">已完成</span>
 		</a>			
 	</nav>
 	
 	
-	<div class="mui-content ">
+	<div class=" ">
 			<div id="tabbar" class="mui-control-content mui-active" >
 		    	<div class="row noti-div">
 	    		    <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-left:2px;">
 	                    <a href="{{ url_for('investment') }}">
-	                        <div class="alert alert-info">
+	                        <div class="alert alert-info box-shadow-2-blue grad-alert-info">
 	                            <i class="fa fa-cloud-upload fa-4x"></i><br>
-	                            <span class="label btn-primary" style="font-size:16px;">提供帮助</span>                           
+	                            <span class="label btn-primary grad-info" style="font-size:16px;">提供帮助</span>                           
 	                        </div>
 	                    </a>
 	                </div>
 	                <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-right:2px;">
 	                    <a href="{{ url_for('receive_help') }}">
-	                        <div class="alert alert-danger">
+	                        <div class="alert alert-warning box-shadow-2-yellow grad-warning">
 	                            <i class="fa fa-user fa-4x"></i>
 	                            <br>
-	                            <span class="label label-info" style="font-size:16px;">得到帮助</span>                           
+	                            <span class="label btn-warning grad-warning" style="font-size:16px;">得到帮助</span>                           
 	                           
 	                        </div>
 	                    </a>
 	                </div>
 		    	</div>
-		    	<p></p>
-		    	<div class="row noti-div text-center">
+
+		    	<div class="row noti-div text-center" >
 	                    <a href="{{ url_for('static_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-success" style="" >静态钱包</button>                           
+	                            <button type="button" class="btn btn-lg btn-success grad-success box-shadow-2-green" style="" id='circle1'>静态钱包<br><font size="2px">--------<br>{{ cur_user.UE_money }}元</font></button>                           
 	                    </a>
 	            </div>
-				 <p></p><br>
+				 <p></p>
 	            <div class="row noti-div text-center" >
 	                    <a href="{{ url_for('group_management') }}">
-	                            <button type="button" class="btn btn-lg btn-info" style="">团队管理</button>                           
+	                            <button type="button" class="btn btn-lg btn-info grad-info box-shadow-2-blue" style="">团队管理</button>                           
 	                    </a>
 	                    <span>&nbsp;&nbsp;</span>
 	                    <a href="{{ url_for('personal_information') }}">
-	                            <button type="button" class="btn btn-lg btn-info" style="">个人信息</button>                           
+	                            <button type="button" class="btn btn-lg btn-info grad-info box-shadow-2-blue" style="">个人信息</button>                           
 	                    </a>
 	            </div>
-	            <p></p><br>
+	            <p></p>
 		    	<div class="row noti-div text-center">
 	                    <a href="{{ url_for('dynamic_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-danger" style="">动态钱包</button>                           
+	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}元</font></button>                           
 	                    </a>
 	            </div>	  
 			</div>

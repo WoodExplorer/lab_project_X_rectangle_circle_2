@@ -135,6 +135,7 @@ def show_entries():
     Ses = sessionmaker(bind=engine)
     ses = Ses()
 
+    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
     ###
     entries_for_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=0, qr_zt=0).order_by(OT_Jsbz.date.desc())
     entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
@@ -162,6 +163,7 @@ def show_entries():
             entries_waiting_in_jsbz_zt_0=entries_waiting_in_jsbz_zt_0,
             entries_closed_in_tgbz=entries_closed_in_tgbz,
             entries_closed_in_jsbz=entries_closed_in_jsbz,
+            cur_user=cur_user,
         )
 
 @app.route('/entry_waiting_detail/<entry_id>')
