@@ -18,24 +18,12 @@
 
 	<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
-			    <div class="container">
-				      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				      </button>
-			      	  <a class="brand" href="{{ url_for('show_entries') }}"><img src="{{ url_for('static', filename='images/page1_img1.png') }}" style="width: 25px;"/>&nbsp;<img src="{{ url_for('static', filename='images/page1_img2.png') }}" style="width:65px"/></a>
-				      <div class="nav-collapse collapse">
-		            <ul class="nav">
-		              <li class="active">
-						<a href="{{ url_for('show_entries') }}">主页</a></li>
-					  <li>
-						<a href="{{ url_for('logout') }}">登出</a>
-					  </li>
-					  
-		            </ul>
-		      </div><!--/.nav-collapse -->
-		    	</div>
+			    <div class="container" style="" >
+			      	<a class="brand" href="{{ url_for('show_entries') }}"><img src="{{ url_for('static', filename='images/page1_img1.png') }}" style="width: 25px;"/>&nbsp;<img src="{{ url_for('static', filename='images/page1_img2.png') }}" style="width:65px"/></a>
+					<a href="{{ url_for('show_entries') }}"><div style="color: white;position: absolute; padding:15px; right: 40px; display: inline-block;">主页</div></a>         
+	         		<a href="{{ url_for('logout') }}"><div style="color: white;position: absolute; padding:15px; right: 0px; display: inline-block;">登出</div></a>         
+	            </div>
+			
 		  	</div>
 	    </div>
 	
