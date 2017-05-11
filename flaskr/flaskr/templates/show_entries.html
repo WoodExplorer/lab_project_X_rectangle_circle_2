@@ -107,18 +107,18 @@
 		    	<div class="row noti-div">
 	    		    <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-left:2px;">
 	                    <a href="{{ url_for('investment') }}">
-	                        <div class="alert alert-info box-shadow-2-blue grad-alert-info">
+	                        <div class="alert alert-success box-shadow-2-green grad-success">
 	                            <i class="fa fa-cloud-upload fa-4x"></i><br>
-	                            <span class="label btn-primary grad-info" style="font-size:16px;">提供帮助</span>                           
+	                            <span class="label btn-success grad-success" style="font-size:16px;">提供帮助</span>                           
 	                        </div>
 	                    </a>
 	                </div>
 	                <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-right:2px;">
 	                    <a href="{{ url_for('receive_help') }}">
-	                        <div class="alert alert-warning box-shadow-2-yellow grad-warning">
+	                        <div class="alert alert-success box-shadow-2-green grad-success">
 	                            <i class="fa fa-user fa-4x"></i>
 	                            <br>
-	                            <span class="label btn-warning grad-warning" style="font-size:16px;">得到帮助</span>                           
+	                            <span class="label btn-success grad-success" style="font-size:16px;">得到帮助</span>                           
 	                           
 	                        </div>
 	                    </a>
@@ -127,9 +127,16 @@
 
 		    	<div class="row noti-div text-center" >
 	                    <a href="{{ url_for('static_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-success grad-success box-shadow-2-green" style="" id='circle1'>静态钱包<br><font size="2px">--------<br>{{ cur_user.UE_money }}元</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>{{ cur_user.UE_money }}元</font></button>                           
 	                    </a>
 	            </div>
+
+	            <p></p>
+		    	<div class="row noti-div text-center">
+	                    <a href="{{ url_for('dynamic_purse') }}">
+	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}元</font></button>                           
+	                    </a>
+	            </div>	
 				 <p></p>
 	            <div class="row noti-div text-center" >
 	                    <a href="{{ url_for('group_management') }}">
@@ -139,13 +146,7 @@
 	                    <a href="{{ url_for('personal_information') }}">
 	                            <button type="button" class="btn btn-lg btn-info grad-info box-shadow-2-blue" style="">个人信息</button>                           
 	                    </a>
-	            </div>
-	            <p></p>
-		    	<div class="row noti-div text-center">
-	                    <a href="{{ url_for('dynamic_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}元</font></button>                           
-	                    </a>
-	            </div>	  
+	            </div>	            
 			</div>
 			
 			<div id="tabbar-with-waiting" class="mui-control-content" style="font-family: '微软雅黑';">
