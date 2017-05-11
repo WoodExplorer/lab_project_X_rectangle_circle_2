@@ -472,6 +472,7 @@ def register():
             entry.UE_password = md5(UE_password)
             entry.UE_truename = UE_truename
             entry.UE_accName = UE_accName
+            entry.UE_phone = UE_account
             
             # populate other fields with not-null constraint
             entry.jihuouser = 'None'
