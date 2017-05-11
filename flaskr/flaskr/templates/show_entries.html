@@ -30,12 +30,12 @@
 			}
 			
 			.grad-success {
-			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#2ac845,endcolorstr=white,gradientType=0);
-			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#2ac845,endcolorstr=white,gradientType=0);/*IE8*/	
-			    background:#2ac845; /* 一些不支持背景渐变的浏览器 */  
-			    background:-moz-linear-gradient(top, #2ac845 rgba(255, 255, 255, 0));  
-			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#2ac845), to(rgba(255, 255, 255, 0)));  
-			    background:-o-linear-gradient(top, #2ac845, rgba(255, 255, 255, 0)); 
+			    filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#5BB92F;,endcolorstr=white,gradientType=0);
+			    -ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#5BB92F;,endcolorstr=white,gradientType=0);/*IE8*/	
+			    background:#5BB92F; /* 一些不支持背景渐变的浏览器 */  
+			    background:-moz-linear-gradient(top, #5BB92F;rgba(255, 255, 255, 0));  
+			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#5BB92F), to(rgba(255, 255, 255, 0)));  
+			    background:-o-linear-gradient(top, #5BB92F, rgba(255, 255, 255, 0)); 
 			}
 			
 			.grad-danger {
@@ -73,7 +73,23 @@
 			    background:-moz-linear-gradient(top, #c67605 rgba(255, 255, 255, 0));  
 			    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#c67605), to(rgba(255, 255, 255, 0)));  
 			    background:-o-linear-gradient(top, #c67605, rgba(255, 255, 255, 0)); 				
-			}			
+			}
+						
+ 			.grad-round{  
+
+				background: -webkit-radial-gradient(white,white, #050505); /* Safari 5.1 - 6.0 */  background: -o-radial-gradient(red, green, blue); /* Opera 11.6 - 12.0 */  
+				
+				background: -moz-radial-gradient(white,white, #050505); /* Firefox 3.6 - 15 */ 
+				
+				background: radial-gradient(white,white, #050505); /* 标准的语法 */ 
+							
+			}
+			body{
+				
+				background-image: url({{ url_for('static', filename='images/bg44.png') }});
+				
+				background-repeat: round;	
+			}
 				
 		</style>
 	
@@ -104,18 +120,18 @@
 	
 	<div class=" ">
 			<div id="tabbar" class="mui-control-content mui-active" >
-		    	<div class="row noti-div">
+		    	<div class="row noti-div" style="height: 80px;">
 	    		    <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-left:2px;">
 	                    <a href="{{ url_for('investment') }}">
-	                        <div class="alert alert-success box-shadow-2-green grad-success">
+	                        <div class=" alert-success box-shadow-2-green grad-success" style="height:85px;">
 	                            <i class="fa fa-cloud-upload fa-4x"></i><br>
 	                            <span class="label btn-success grad-success" style="font-size:16px;">提供帮助</span>                           
 	                        </div>
 	                    </a>
 	                </div>
-	                <div class="col-lg-4 col-md-4 col-sm-4 text-center" style="width: 49%;float: left;margin-right:2px;">
+	                <div class="col-lg-4 col-md-4 col-sm-4 text-center" style=" width: 49%;float: left;margin-right:2px;">
 	                    <a href="{{ url_for('receive_help') }}">
-	                        <div class="alert alert-success box-shadow-2-green grad-success">
+	                        <div class=" alert-success box-shadow-2-green grad-success" style="height:85px;">
 	                            <i class="fa fa-user fa-4x"></i>
 	                            <br>
 	                            <span class="label btn-success grad-success" style="font-size:16px;">得到帮助</span>                           
@@ -127,14 +143,14 @@
 
 		    	<div class="row noti-div text-center" >
 	                    <a href="{{ url_for('static_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>{{ cur_user.UE_money }}元</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>1000元</font></button>                           
 	                    </a>
 	            </div>
 
 	            <p></p>
 		    	<div class="row noti-div text-center">
 	                    <a href="{{ url_for('dynamic_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}元</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>1000元</font></button>                           
 	                    </a>
 	            </div>	
 				 <p></p>
