@@ -499,6 +499,7 @@ def register():
             entry.UE_truename = UE_truename
             entry.UE_accName = UE_accName
             entry.UE_phone = UE_account
+            entry.UE_money = 0
             
             # populate other fields with not-null constraint
             entry.jihuouser = 'None'
