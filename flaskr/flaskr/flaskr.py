@@ -190,6 +190,32 @@ def entry_waiting_detail(entry_id):
     ses.close()
     return render_template('entry_waiting_detail.html', g_user=g_user, p_user=p_user, recommendor_of_p_user=recommendor_of_p_user)
 
+
+@app.route('/entry_ongoing_detail/<entry_id>')
+def entry_ongoing_detail(entry_id):
+    if not session.get('logged_in'):
+        abort(401)
+    UE_account = session.get('logged_in_account')
+
+    Ses = sessionmaker(bind=engine)
+    ses = Ses()
+
+    #print '*' * 10, 'got it, entry_id:', entry_id
+    # 查询ppdd表中p_id 等于当前订单号的记录
+    rec_in_ppdd = ses.query(OT_Ppdd).filter_by(g_id=entry_id)
+    if 1 != rec_in_ppdd.count():
+        ses.close()
+        return u'rec_in_ppdd表中有%d条p_id为%d的记录，而非预期的1条' % (rec_in_ppdd.count(), entry_id)
+    rec_in_ppdd = rec_in_ppdd[0]
+
+    g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
+    p_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.p_user)[0]
+    recommendor_of_p_user = ses.query(OT_User).filter_by(UE_account=p_user.UE_accName)[0]
+
+    ses.close()
+    return render_template('entry_ongoing_detail.html', g_user=g_user, p_user=p_user, recommendor_of_p_user=recommendor_of_p_user)
+
+
 @app.route('/entry_waiting_operation/<int:entry_id>', methods=['GET', 'POST'])
 def entry_waiting_operation(entry_id):
     if not session.get('logged_in'):
@@ -918,6 +944,12 @@ def receive_help():
                     ses.close()
                     return render_template('receive_help.html', error=error_str, form=form)
 
+                ret = ses.query(OT_Tgbz).filter_by(user=cur_user.UE_account, type=1, qr_zt=0)
+                if 0 < ret.count():
+                    error_str = u'已经存在一个未打款的动态钱包投资'
+                    ses.close()
+                    return render_template('receive_help.html', error=error_str, form=form) 
+
                 amout = int(form.amount.data)
                 cur_user.tj_he -= amount
 
@@ -929,8 +961,20 @@ def receive_help():
                 entry.date = cur_time
                 entry.user_nc = cur_user.UE_truename
                 entry.type = 1 # investment from dynamic purse
-
                 ses.add(entry)
+
+                # 在jsbz表中添加记录
+                entry = OT_Jsbz()
+                entry.user = cur_user.UE_account
+                entry.jb = amount
+                entry.user_nc = cur_user.UE_truename
+                entry.user_tjr = cur_user.UE_accName
+                entry.date = cur_time
+                entry.zt = 0
+                entry.qr_zt = 0
+                entry.qb = 0
+                ses.add(entry)
+
                 ses.commit()
                 ses.close()
 

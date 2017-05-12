@@ -143,14 +143,14 @@
 
 		    	<div class="row noti-div text-center" >
 	                    <a href="{{ url_for('static_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>{{ cur_user.UE_money }}</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-warning grad-warning box-shadow-2-yellow" style="" id='circle1'>静态钱包<br><font size="2px" c>--------<br>{{ cur_user.UE_money|string }}</font></button>                           
 	                    </a>
 	            </div>
 
 	            <p></p>
 		    	<div class="row noti-div text-center">
 	                    <a href="{{ url_for('dynamic_purse') }}">
-	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he }}</font></button>                           
+	                            <button type="button" class="btn btn-lg btn-danger grad-danger box-shadow-2-red" id='circle1'>动态钱包<br><font size="2px">--------<br>{{ cur_user.tj_he|string }}</font></button>                           
 	                    </a>
 	            </div>	
 				 <p></p>
@@ -305,7 +305,7 @@
 						</table>
 					</div> 
 					
-					<h4>进行中-待匹配</span></h4>
+					<h4>进行中-已匹配</span></h4>
 					<div class="table-responsive">  
 						<table class="table table-striped table-bordered table-hover">
 		                    <thead>
@@ -323,7 +323,7 @@
 									<span class="label label-info">{{ entry.date }}</span>
 								  </td>
 								  <td>
-									<span class="label label-warning">已匹配</span>
+									<span class="label label-warning"><span class="label label-warning"><a href="{{ url_for('entry_ongoing_detail', entry_id=entry.id) }}">详细信息</a></span></span>
 								  </td>
 								</tr>
 								{% endfor %}
