@@ -924,18 +924,18 @@ def receive_help():
                     ses.close()
                     return render_template('receive_help.html', error=error_str, form=form)
 
-                # check for repeated investment in too short a period
-                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
-                if 0 == previous_investments.count():
-                    pass
-                else:
-                    time_span_days = 15
-                    last_investment = previous_investments[0]
-                    last_investment_datetime = last_investment.date
-                    if (cur_time - last_investment_datetime ).total_seconds() < time_span_days * 24 * 3600:
-                        error_str = u'您在%d天内已经发起一次投资，不能重复投资' % time_span_days
-                        ses.close()
-                        return render_template('receive_help.html', error=error_str, form=form)
+                ## check for repeated investment in too short a period
+                #previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0).order_by(OT_Tgbz.id.desc())
+                #if 0 == previous_investments.count():
+                #    pass
+                #else:
+                #    time_span_days = 15
+                #    last_investment = previous_investments[0]
+                #    last_investment_datetime = last_investment.date
+                #    if (cur_time - last_investment_datetime ).total_seconds() < time_span_days * 24 * 3600:
+                #        error_str = u'您在%d天内已经发起一次投资，不能重复投资' % time_span_days
+                #        ses.close()
+                #        return render_template('receive_help.html', error=error_str, form=form)
 
                 #
                 amount = decimal.Decimal(form.amount.data)
