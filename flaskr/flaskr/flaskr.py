@@ -962,6 +962,7 @@ def receive_help():
                 entry.date = cur_time
                 entry.user_nc = cur_user.UE_truename
                 entry.type = 1 # investment from dynamic purse
+                entry.zffs1 = 1
                 ses.add(entry)
 
                 # 在jsbz表中添加记录
@@ -1012,9 +1013,9 @@ def account_setting():
     if request.method == 'POST':
         if form.validate_on_submit():
             weixin, zfb, yhmc, yhzh = form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data
-            print '!' * 20
-            print 'form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data:', form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data
-            print 'weixin, zfb, yhmc, yhzh:', weixin, zfb, yhmc, yhzh
+            #print '!' * 20
+            #print 'form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data:', form.weixin.data, form.zfb.data, form.yhmc.data, form.yhzh.data
+            #print 'weixin, zfb, yhmc, yhzh:', weixin, zfb, yhmc, yhzh
             if (weixin is not None) and ('' != weixin.strip()):
                 cur_user.weixin = weixin
             if (zfb is not None) and ('' != zfb.strip()):
@@ -1026,6 +1027,7 @@ def account_setting():
 
             ses.commit()
             ses.close()
+            flash(u'更新成功')
             return redirect(url_for('account_setting'))
 
     ses.close()

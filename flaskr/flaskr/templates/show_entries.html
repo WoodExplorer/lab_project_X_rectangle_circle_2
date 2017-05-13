@@ -348,6 +348,7 @@
 								<tr>
 								  <th>金额</th>
 								  <th>日期</th>
+								  <th>状态</th>
 								</tr>
 							  </thead>
 							  <tbody>		
@@ -355,6 +356,7 @@
 								<tr>
 								  <td><span class="label label-success">{{ entry.jb }}</span></td>
 								  <td><span class="label label-info">{{ entry.date }}</span></td>
+								  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></span></td>
 								</tr>
 								{% endfor %}	
 				
@@ -376,6 +378,9 @@
 								<tr>
 								  <td><span class="label label-success">{{ entry.jb }}</span></td>
 								  <td><span class="label label-info">{{ entry.date }}</span></td>
+								  <td>
+									<span class="label label-warning"><span class="label label-warning"><a href="{{ url_for('entry_ongoing_detail', entry_id=entry.id) }}">详细信息</a></span></span>
+								  </td>
 								</tr>
 								{% endfor %}	
 				
