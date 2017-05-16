@@ -296,6 +296,8 @@
 									<span class="label label-info">{{ entry[0].date }}</span>
 								  </td>
 								  <td>
+								  <td>
+								    <span class="label label-warning"><a href="{{ url_for('entry_ongoing_detail', entry_id=entry[0].id) }}">详细信息</a></span>
 									<span class="label label-warning"><a href="{{ url_for('entry_waiting_in_jsbz_operation', entry_id=entry[0].id) }}">我要操作</a></span>
 									<span class="label label-important my_time" style="display:none">{{ entry[1].date_hk }}</span>
 								  </td>
