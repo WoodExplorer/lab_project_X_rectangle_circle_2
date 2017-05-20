@@ -260,7 +260,15 @@
 								  <td>
 									<span class="label label-info">{{ entry[0].date }}</span>
 								  </td>
-								  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry[0].id) }}">详细信息</a></span></td>
+								  <td>
+									<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry[0].id) }}">详细信息</a></span>
+									{% if 1 == entry[0].zffs1 %}
+										<span class="label label-info">15天</span>
+									{% endif %}
+									{% if 1 == entry[0].zffs2 %}
+										<span class="label label-info">30天</span>
+									{% endif %}
+								  </td>
 								  <td>
 									<span class="label label-warning"><a href="{{ url_for('entry_waiting_operation', entry_id=entry[0].id) }}">我要操作</a></span>
 									<span class="label label-important my_time" style="display:none">{{ entry[1].date }}</span>
@@ -357,7 +365,15 @@
 								<tr>
 								  <td><span class="label label-success">{{ entry.jb }}</span></td>
 								  <td><span class="label label-info">{{ entry.date }}</span></td>
-								  <td><span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></span></td>
+								  <td>
+									<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">详细信息</a></span>
+									{% if 1 == entry.zffs1 %}
+										<span class="label label-info">15天</span>
+									{% endif %}
+									{% if 1 == entry.zffs2 %}
+										<span class="label label-info">30天</span>
+									{% endif %}
+								  </td>
 								</tr>
 								{% endfor %}	
 				
