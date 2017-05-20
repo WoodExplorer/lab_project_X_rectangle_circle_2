@@ -24,7 +24,7 @@ from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromS
 
 decimal.getcontext().prec = 2
 
-engine = create_engine('mysql://root:root@localhost/happykimi2?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
+engine = create_engine('mysql://root:root@localhost/happykimi?charset=gbk', echo=True)#convert_unicode=True, echo=True)#echo=False)
 Base = declarative_base(engine)
 
 from sqlalchemy.orm import relationship, backref
@@ -135,36 +135,41 @@ def show_entries():
     Ses = sessionmaker(bind=engine)
     ses = Ses()
 
-    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
-    ###
-    entries_for_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=0, qr_zt=0).order_by(OT_Jsbz.date.desc())
-    entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
-    entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
+    try:
+        cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+        ###
+        entries_for_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=0, qr_zt=0).order_by(OT_Jsbz.date.desc())
+        entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
+        entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
 
-    ###
-    entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
-    entries_waiting_in_tgbz_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz]
+        ###
+        entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
+        entries_waiting_in_tgbz_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz]
 
-    entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
-    entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
-    entries_waiting_in_jsbz_date_hk = [ses.query(OT_Ppdd).filter_by(g_id=x.id)[0] for x in entries_waiting_in_jsbz]
-    entries_waiting_in_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
-    entries_waiting_in_jsbz_zt_0 = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 0, entries_waiting_in_jsbz_zt_0)  
-    ###
-    entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
-    entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Jsbz.date.desc())
+        entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
+        entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
+        entries_waiting_in_jsbz_date_hk = [ses.query(OT_Ppdd).filter_by(g_id=x.id)[0] for x in entries_waiting_in_jsbz]
+        entries_waiting_in_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
+        entries_waiting_in_jsbz_zt_0 = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 0, entries_waiting_in_jsbz_zt_0)  
+        ###
+        entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Jsbz.date.desc())
 
-    ses.close()
-    return render_template('show_entries.html', 
-            entries_for_jsbz_zt_0=entries_for_jsbz_zt_0,
-            entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, 
-            entries_waiting_in_tgbz_obj=zip(entries_waiting_in_tgbz, entries_waiting_in_tgbz_date),
-            entries_waiting_in_jsbz_obj=zip(entries_waiting_in_jsbz, entries_waiting_in_jsbz_date_hk), 
-            entries_waiting_in_jsbz_zt_0=entries_waiting_in_jsbz_zt_0,
-            entries_closed_in_tgbz=entries_closed_in_tgbz,
-            entries_closed_in_jsbz=entries_closed_in_jsbz,
-            cur_user=cur_user,
-        )
+        ses.close()
+        return render_template('show_entries.html', 
+                entries_for_jsbz_zt_0=entries_for_jsbz_zt_0,
+                entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, 
+                entries_waiting_in_tgbz_obj=zip(entries_waiting_in_tgbz, entries_waiting_in_tgbz_date),
+                entries_waiting_in_jsbz_obj=zip(entries_waiting_in_jsbz, entries_waiting_in_jsbz_date_hk), 
+                entries_waiting_in_jsbz_zt_0=entries_waiting_in_jsbz_zt_0,
+                entries_closed_in_tgbz=entries_closed_in_tgbz,
+                entries_closed_in_jsbz=entries_closed_in_jsbz,
+                cur_user=cur_user,
+            )
+    except Exception, e:
+        ses.close()
+        print traceback.print_exc()
+        return traceback.format_exc()
 
 @app.route('/entry_waiting_detail/<entry_id>')
 def entry_waiting_detail(entry_id):
@@ -250,6 +255,7 @@ def entry_waiting_operation(entry_id):
                 target_rec.jujue = 0
             else:
                 target_rec.jujue = 1
+            ses.commit()
 
             rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
             assert(1 == rec_in_ppdd.count())
@@ -350,45 +356,46 @@ def entry_waiting_in_jsbz_operation(entry_id):
             assert('confirm' == feedback or 'fraud' == feedback)
             if 'confirm' == feedback:
                 try:
-                    with ses.begin_nested():
-                        target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
-                        assert(1 == target_rec.count())
-                        target_rec = target_rec[0]
+                    #with ses.begin_nested():
+                    target_rec = ses.query(OT_Jsbz).filter_by(id=entry_id)
+                    assert(1 == target_rec.count())
+                    target_rec = target_rec[0]
                         
-                        # 更新上级奖励
-                        cur_money = target_rec.jb
-                        assert(rec_in_ppdd.g_user == UE_account)
-                        target_user_account = rec_in_ppdd.p_user
-                        # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
-                        for distance in [1, 2, 3]:
-                            cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
+                    # 更新上级奖励
+                    cur_money = target_rec.jb
+                    assert(rec_in_ppdd.g_user == UE_account)
+                    target_user_account = rec_in_ppdd.p_user
+                    # distance is meant to embody the relationship between currently log-in user and the user whose tj_he would be updated
+                    for distance in [1, 2, 3]:
+                        cur_user = ses.query(OT_User).filter_by(UE_account=target_user_account)[0]
 
-                            recommendor_account = cur_user.UE_accName
-                            if recommendor_account is not None:
-                                user_level = determin_user_level(ses, recommendor_account)
-                                recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)
-                                if 0 == recommendor_rec.count():
-                                    print 'got no recommendor_rec'
-                                    break
-                                recommendor_rec = recommendor_rec[0]
-                                delta = decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
-                                print "delta:", delta
-                                recommendor_rec.tj_he += delta
-
-                                target_user_account = recommendor_rec.UE_account
-                            else:
+                        recommendor_account = cur_user.UE_accName
+                        if recommendor_account is not None:
+                            user_level = determin_user_level(ses, recommendor_account)
+                            recommendor_rec = ses.query(OT_User).filter_by(UE_account=recommendor_account)
+                            if 0 == recommendor_rec.count():
+                                print 'got no recommendor_rec'
                                 break
+                            recommendor_rec = recommendor_rec[0]
+                            delta = decimal.Decimal(cur_money * decimal.Decimal(get_ratio_by_level_level(user_level, distance)))
+                            print "delta:", delta
+                            recommendor_rec.tj_he += delta
 
-                        target_rec.qr_zt = 1
-                        rec_in_ppdd.zt = 2
-                        cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
-                        cur_user.tz_leiji += cur_money
-                        #ses.commit()
-                        flash(u'操作成功')
+                            target_user_account = recommendor_rec.UE_account
+                        else:
+                            break
+
+                    target_rec.qr_zt = 1
+                    rec_in_ppdd.zt = 2
+                    cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
+                    cur_user.tz_leiji += cur_money
+                    ses.commit()
+                    flash(u'操作成功')
                 except:
                     ses.rollback()
+                    ses.close()
                     traceback.print_exc()
-                    raise
+                    return traceback.format_exc()
                 finally:
                     #ses.close()
                     pass
@@ -718,20 +725,19 @@ def group_management():
                         ses.close()
                         break#return render_template('group_management.html', error=error_str, form=form)
 
-                    with ses.begin_nested():
-                        if 'pai' == object_type:
-                            target_user.pai += amount
-                            cur_user.pai -= amount
+                    #with ses.begin_nested():
+                    if 'pai' == object_type:
+                        target_user.pai += amount
+                        cur_user.pai -= amount
+                    else:
+                        if 1 == target_user.not_help: # If target user has not been activated, then, activating it would cost 1 jhma.
+                            target_user.jhma += amount
                         else:
-                            if 1 == target_user.not_help: # If target user has not been activated, then, activating it would cost 1 jhma.
-                                target_user.jhma += amount
-                            else:
-                                target_user.jhma += (amount - 1)
-                                target_user.not_help = 1
-                            cur_user.jhma -= amount
+                            target_user.jhma += (amount - 1)
+                            target_user.not_help = 1
+                        cur_user.jhma -= amount
+                    ses.commit()
 
-
-                        #ses.commit()
                     form = SendPaiOrJhmaForm()
                 except:
                     #ses.rollback()
