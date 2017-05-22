@@ -128,8 +128,8 @@ class DynamicPurseForm(FlaskForm):
             amount_int = int(field.data)
         except Exception, e:
             raise ValidationError(u'请输入合法数字')
-        if amount_int <= 0 or 0 != amount_int % 200:
-            raise ValidationError(u'请输入大于0、200的倍数')
+        if amount_int <= 0 or 0 != amount_int % 100:
+            raise ValidationError(u'请输入大于0、100的倍数')
 
 
 class AccountSettingForm(FlaskForm):

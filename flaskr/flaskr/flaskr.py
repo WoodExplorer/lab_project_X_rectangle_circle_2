@@ -825,18 +825,19 @@ def dynamic_purse():
         if form.validate_on_submit():
             while True:
                 try:
-                    amount = decimal.Decimal(form.amount.data)
-                    cur_tj_he = decimal.Decimal(cur_user.tj_he)
+                    amount = int(form.amount.data)
+                    cur_tj_he = int(cur_user.tj_he)
                     if cur_tj_he < amount:
                         error_str = u'输入的金额不得高于动态钱包的总额'
                         ses.close()
                         return render_template('dynamic_purse.html', error=error_str, form=form)
 
                     amout = int(form.amount.data)
-                    cur_user.tj_he -= amount
-                    cur_user.jhma += (amount / 100)
-
+                    cur_user.tj_he = cur_tj_he - amount
                     ses.commit()
+                    cur_user.jhma += (amount / 100)
+                    ses.commit()
+
                 except:
                     #ses.rollback()
                     traceback.print_exc()
