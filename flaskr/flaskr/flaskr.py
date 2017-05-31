@@ -18,7 +18,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from MD5 import md5
 from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm
 
@@ -344,7 +344,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
     error_str = None
     form = ConfirmationForm()
 
-    Ses = sessionmaker(bind=engine)
+    Ses = scoped_session(sessionmaker(bind=engine))
     ses = Ses()
 
     rec_in_ppdd = ses.query(OT_Ppdd).filter_by(g_id=entry_id)
@@ -396,6 +396,7 @@ def entry_waiting_in_jsbz_operation(entry_id):
                     ses.rollback()
                     ses.close()
                     traceback.print_exc()
+                    Ses.remove()
                     return traceback.format_exc()
                 finally:
                     #ses.close()
@@ -418,13 +419,15 @@ def entry_waiting_in_jsbz_operation(entry_id):
                 ses.commit()
                 ses.close()
                 flash(u'已投诉')
+            Ses.remove()
             return redirect(url_for('show_entries'))
         else:
             flash_errors(form)
 
     certificate_path = rec_in_ppdd.pic
-    print 'certificate_path:', certificate_path
+    #print 'certificate_path:', certificate_path
     ses.close()
+    Ses.remove()
     return render_template('entry_waiting_in_jsbz_operation.html', error=error_str, form=form, entry_id=entry_id, certificate_path=certificate_path)
 
 
