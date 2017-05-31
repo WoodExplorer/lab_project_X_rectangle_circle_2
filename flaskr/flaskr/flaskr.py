@@ -265,6 +265,7 @@ def entry_waiting_operation(entry_id):
             rec_in_ppdd.date_hk = cur_time
 
             ses.commit()
+			#ses.conn.commit();
             ses.close()
 
             flash(u'操作成功')
@@ -619,11 +620,12 @@ def investment():
                 time_span_days = 15
 
             # check for repeated investment in too short a period
+			#added type =0 by pt 
             previous_investments = None
             if '30_days' == time_span:
-                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs2=1).order_by(OT_Tgbz.id.desc())
+                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs2=1,type=0).order_by(OT_Tgbz.id.desc())
             else:
-                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs1=1).order_by(OT_Tgbz.id.desc())
+                previous_investments = ses.query(OT_Tgbz).filter_by(user=UE_account, qr_zt=0, zffs1=1,type=0).order_by(OT_Tgbz.id.desc())
             if 0 == previous_investments.count():
                 pass
             else:
@@ -638,7 +640,8 @@ def investment():
             investment = int(form.investment.data)
             entry.jb = investment
             entry.user = UE_account
-            entry.user_tjr = cur_user.UE_account
+			#entry.user_tjr = cur_user.UE_account
+            entry.user_tjr = cur_user.UE_accName # modified by pt
             entry.date = cur_time
             entry.user_nc = cur_user.UE_truename
             entry.type = 0 # normal investment
