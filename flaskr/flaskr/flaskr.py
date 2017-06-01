@@ -732,9 +732,22 @@ def group_management():
                         break#return render_template('group_management.html', error=error_str, form=form)
 
                     #with ses.begin_nested():
+                    cur_time = datetime.now()
                     if 'pai' == object_type:
                         target_user.pai += amount
                         cur_user.pai -= amount
+
+                        entry = OT_Userget()
+                        entry.UG_account = cur_user.UE_account
+                        entry.UG_type = 'pai'
+                        entry.UG_allGet = amount
+                        entry.UG_money = '+' + str(amount)
+                        entry.UG_balance = cur_user.pai
+                        entry.UG_dataType = 'pai'
+                        entry.UG_note = u'生成排单币'
+                        entry.UG_getTime = cur_time
+                        entry.jiang_zt = 0  # database not-null constraint
+                        ses.add(entry)
                     else:
                         if 1 == target_user.not_help: # If target user has not been activated, then, activating it would cost 1 jhma.
                             target_user.jhma += amount
@@ -742,6 +755,18 @@ def group_management():
                             target_user.jhma += (amount - 1)
                             target_user.not_help = 1
                         cur_user.jhma -= amount
+
+                        entry = OT_Userget()
+                        entry.UG_account = cur_user.UE_account
+                        entry.UG_type = 'jhma'
+                        entry.UG_allGet = amount
+                        entry.UG_money = '+' + str(amount)
+                        entry.UG_balance = cur_user.jhma
+                        entry.UG_dataType = 'jhma'
+                        entry.UG_note = u'生成激活码'
+                        entry.UG_getTime = cur_time
+                        entry.jiang_zt = 0  # database not-null constraint
+                        ses.add(entry)
                     ses.commit()
 
                     form = SendPaiOrJhmaForm()
