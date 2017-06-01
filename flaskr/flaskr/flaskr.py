@@ -138,33 +138,56 @@ def show_entries():
     try:
         cur_user = ses.query(OT_User).filter_by(UE_account=UE_account)[0]
         ###
+        # 'tab' for 'waiting'
         entries_for_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=0, qr_zt=0).order_by(OT_Jsbz.date.desc())
         entries_for_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
         entries_for_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=0, qr_zt=0).order_by(OT_Tgbz.date.desc())
 
-        ###
-        entries_waiting_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
-        entries_waiting_in_tgbz_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz]
+        # second 'tab'
+        entries_waiting_in_tgbz_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
+        entries_waiting_in_tgbz_15_days_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz_15_days]
+
+        entries_waiting_in_tgbz_15_days_ppdd = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        entries_waiting_in_tgbz_15_days_ppdd = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=1)[0] for x in entries_waiting_in_tgbz_15_days_ppdd]
+        
+        entries_waiting_in_tgbz_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=0).order_by(OT_Tgbz.date.desc())
+        entries_waiting_in_tgbz_30_days_date = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_waiting_in_tgbz_30_days]
+
+        entries_waiting_in_tgbz_30_days_ppdd = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        entries_waiting_in_tgbz_30_days_ppdd = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=1)[0] for x in entries_waiting_in_tgbz_30_days_ppdd]
+        
 
         entries_waiting_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
         entries_waiting_in_jsbz = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 1, entries_waiting_in_jsbz)  
         entries_waiting_in_jsbz_date_hk = [ses.query(OT_Ppdd).filter_by(g_id=x.id)[0] for x in entries_waiting_in_jsbz]
-        entries_waiting_in_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
-        entries_waiting_in_jsbz_zt_0 = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 0, entries_waiting_in_jsbz_zt_0)  
-        ###
-        entries_closed_in_tgbz = ses.query(OT_Tgbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        
+        #entries_waiting_in_jsbz_zt_0 = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=0).order_by(OT_Jsbz.date.desc())
+        #entries_waiting_in_jsbz_zt_0 = filter(lambda x: ses.query(OT_Ppdd).filter_by(g_id=x.id)[0].zt == 0, entries_waiting_in_jsbz_zt_0)  
+        
+        # third 'tab'
+        entries_closed_in_tgbz_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        entries_closed_in_tgbz_15_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=2)[0] for x in entries_closed_in_tgbz_15_days]
+        entries_closed_in_tgbz_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
+        entries_closed_in_tgbz_30_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=2)[0] for x in entries_closed_in_tgbz_30_days]
         entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Jsbz.date.desc())
 
         ses.close()
         return render_template('show_entries.html', 
+                cur_user=cur_user,
+                # first 'tab'
                 entries_for_jsbz_zt_0=entries_for_jsbz_zt_0,
                 entries_for_15_days=entries_for_15_days, entries_for_30_days=entries_for_30_days, 
-                entries_waiting_in_tgbz_obj=zip(entries_waiting_in_tgbz, entries_waiting_in_tgbz_date),
+                # second 'tab'
+                entries_waiting_in_tgbz_15_days_obj=zip(entries_waiting_in_tgbz_15_days, entries_waiting_in_tgbz_15_days_date),
+                entries_waiting_in_tgbz_15_days_ppdd=entries_waiting_in_tgbz_15_days_ppdd,
+                entries_waiting_in_tgbz_30_days_obj=zip(entries_waiting_in_tgbz_30_days, entries_waiting_in_tgbz_30_days_date),
+                entries_waiting_in_tgbz_30_days_ppdd=entries_waiting_in_tgbz_30_days_ppdd,
                 entries_waiting_in_jsbz_obj=zip(entries_waiting_in_jsbz, entries_waiting_in_jsbz_date_hk), 
-                entries_waiting_in_jsbz_zt_0=entries_waiting_in_jsbz_zt_0,
-                entries_closed_in_tgbz=entries_closed_in_tgbz,
+                #entries_waiting_in_jsbz_zt_0=entries_waiting_in_jsbz_zt_0,
+                # third 'tab'
+                entries_closed_in_tgbz_15_days=entries_closed_in_tgbz_15_days,
+                entries_closed_in_tgbz_30_days=entries_closed_in_tgbz_30_days,
                 entries_closed_in_jsbz=entries_closed_in_jsbz,
-                cur_user=cur_user,
             )
     except Exception, e:
         ses.close()
