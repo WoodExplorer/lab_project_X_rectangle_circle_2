@@ -692,6 +692,11 @@ def group_management():
     ret = calc_level_users(tareget_account, 3, lambda: lambda tareget_account: [y.UE_account for y in ses.query(OT_User).filter_by(UE_accName=tareget_account)])
     level_1_group, level_2_group, level_3_group = [ses.query(OT_User).filter(OT_User.UE_account.in_(x)) for x in ret]
     
+    dqtdddkyhxx = ses.query(OT_Tgbz).filter_by(user_tjr=UE_account, zt=1, qr_zt=0)
+    dqtdddkyhxx = zip([ses.query(OT_User).filter_by(UE_account=x.user)[0] for x in dqtdddkyhxx], 
+                        dqtdddkyhxx, 
+                        [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in dqtdddkyhxx])
+
     jhma_history = ses.query(OT_User).filter_by(UE_accName=UE_account)
     pai_history = ses.query(OT_Tgbz).filter_by(user=UE_account)
     form = SendPaiOrJhmaForm()
@@ -786,7 +791,8 @@ def group_management():
     ses.close()
     return render_template('group_management.html', error=error_str, form=form, pai=cur_user.pai, jhma=cur_user.jhma,
                             pai_history=pai_history, jhma_history=jhma_history,
-                            level_1_group=level_1_group, level_2_group=level_2_group, level_3_group=level_3_group)
+                            level_1_group=level_1_group, level_2_group=level_2_group, level_3_group=level_3_group,
+                            dqtdddkyhxx=dqtdddkyhxx,)
 
 
 @app.route('/personal_information', methods=['GET', 'POST'])

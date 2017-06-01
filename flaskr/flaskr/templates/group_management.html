@@ -244,7 +244,39 @@
 				
 		</div>
 
+		<a href="#dqtdddkyhxx"><div class=" alert" style="background-color: #500A6F;color: white;">当前用户团队的待打款用户信息：<span class="badge mui-badge-yellow mui-badge-inverted" style="position:absolute;right: 35px">></span></div></a>
+
+		<div id="dqtdddkyhxx" class="mui-modal " style="overflow-y:scroll;overflow-y: visible;">
+				<header class=" mui-bar-nav " ><br>										
+					<a class="mui-icon mui-icon-close   mui-pull-right " href="#dqtdddkyhxx" style="color: white;"></a>
+					<div class="alert alert-success" style="background-color: #500A6F;width: 100%;left:0;text-align: center;font-family: '微软雅黑';font-size: 17;color:white;">当前用户团队的待打款用户信息</div>
+				</header>
 		
+				<div class="table-responsive" >  
+					  	<table class="table table-striped table-bordered table-hover">
+						  	<caption></caption>
+						  	<thead>
+								<tr>
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">用户姓名</th>
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">联系方式</th>	
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">金额</th>
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">匹配时间</th>	
+								</tr>
+						  	</thead>
+						  	<tbody>				
+							{% for entry in dqtdddkyhxx %}
+							<tr>
+							  <td><span class="label label-warning">{{ entry[0].UE_truename }}</span></td>
+							  <td><span class="label label-info">{{ entry[0].UE_phone }}</span></td>
+							  <td><span class="label label-important">{{ entry[1].jb }}</span></td>
+							  <td><span class="label label-inverse">{{ entry[2].date_hk }}</span></td>
+							</tr>
+							{% endfor %}	
+						  </tbody>
+					</table>
+				</div>
+				
+		</div>
 		
 		<hr />
 		<h4>发送排单币或激活码</h4>
