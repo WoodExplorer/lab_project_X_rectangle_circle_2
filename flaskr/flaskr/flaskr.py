@@ -936,7 +936,7 @@ def receive_help():
             if 1 == cur_user.UE_status:
                 error_str = u'当前帐户已被封号'
                 ses.close()
-                return render_template('show_entries.html', error=error_str, form=form)
+                return render_template('receive_help.html', error=error_str, form=form)
 
             
             purse_type = request.form.getlist("purse_type")[0]
