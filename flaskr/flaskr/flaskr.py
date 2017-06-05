@@ -1158,8 +1158,8 @@ def login():
             error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
         return render_template('login.html', error=error_str, form=form, post_handler=url_for('login'))
 
-@app.route('/login_admin', methods=['GET', 'POST'])
-def login_admin():
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
     error_str = ''
     flag = False
 
@@ -1184,12 +1184,21 @@ def login_admin():
         ses.close()
 
     if flag:
-        return redirect(url_for('change_password'))
+        return redirect(url_for('admin_index'))
     else:
         if not event_scheduler_on:
             error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
-        return render_template('login_admin.html', error=error_str, form=form, post_handler=url_for('login_admin'))
+        return render_template('admin_login.html', error=error_str, form=form, post_handler=url_for('admin_login'))
 
+
+@app.route('/admin_index')
+def admin_index():
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    all_users = ses.query(OT_User).all()
+    ses.close()
+    return render_template('admin_index.html', all_users=all_users)
 
 @app.route('/logout')
 def logout():

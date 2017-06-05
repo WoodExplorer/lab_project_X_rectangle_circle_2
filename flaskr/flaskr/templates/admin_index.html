@@ -1,0 +1,165 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+
+    <link href="{{ url_for('static', filename='css/font-awesome.min.css') }}" rel="stylesheet" />
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/mui.min.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+	<link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen" >		
+	<link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" media="screen">
+	
+	<!-- FONT AWESOME CSS -->
+	<link href="{{ url_for('static', filename='css/shadow.css') }}" rel="stylesheet"/>   
+	
+	<nav class="mui-bar mui-bar-tab" style="background-color: #050505;">
+		<a class="mui-tab-item mui-active" href="#tabbar">
+			<span class="mui-icon mui-icon-home-filled"></span>
+			<span class="mui-tab-label">首页</span>
+		</a>
+		
+	</nav>
+	
+<div>
+	<table class="table table-striped table-bordered table-hover">
+		<thead>
+			<tr>
+				<th style="text-align: center;">编号</th>
+				<th style="text-align: center;">会员账号</th>
+				<th style="text-align: center;">推荐人</th>
+				<th style="text-align: center;">静态钱包</th>
+				<th style="text-align: center;">昵称</th>
+				<th style="text-align: center;">注册时间</th>
+				<th style="text-align: center;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for entry in all_users %}					  
+			<tr>
+			  <td><span class="label label-success">{{ entry.UE_ID }}</span></td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_account }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_accName }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_money }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.ue_theme }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_regtime }}</span>
+			  </td>
+			  <td>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">团队</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">删除</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">重置密码</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">登入</a></span>
+			  </td>
+			</tr>
+		{% endfor %}	
+		</tbody>
+	</table>
+</div> 
+  
+<script src="{{ url_for('static', filename='js/mui.min.js') }}"></script>
+	
+
+<script type="text/javascript">
+
+
+function timer(intDiff, tag){
+	// Note: intDiff is supposed to be of unit millisecond.
+	var __tmp = function(){
+		var day=0,
+			hour=0,
+			minute=0,
+			second=0;//时间默认值        
+		if(intDiff > 0){
+			day = Math.floor(intDiff / (60 * 60 * 24));
+			hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+			minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+			second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+		}
+		if (minute <= 9) minute = '0' + minute;
+		if (second <= 9) second = '0' + second;
+		$('.day_show' + tag).html('<s></s>'+day+"天");
+		$('.hour_show' + tag).html('<s></s>'+hour+'时');
+		$('.minute_show' + tag).html('<s></s>'+minute+'分');
+		$('.second_show' + tag).html('<s></s>'+second+'秒');
+		intDiff--;
+    };
+	__tmp();
+    window.setInterval(__tmp, 1000);
+} 
+
+function getDateTime() {
+    var now     = new Date(); 
+    var year    = now.getFullYear();
+    var month   = now.getMonth()+1; 
+    var day     = now.getDate();
+    var hour    = now.getHours();
+    var minute  = now.getMinutes();
+    var second  = now.getSeconds(); 
+    if(month.toString().length == 1) {
+        var month = '0'+month;
+    }
+    if(day.toString().length == 1) {
+        var day = '0'+day;
+    }   
+    if(hour.toString().length == 1) {
+        var hour = '0'+hour;
+    }
+    if(minute.toString().length == 1) {
+        var minute = '0'+minute;
+    }
+    if(second.toString().length == 1) {
+        var second = '0'+second;
+    }   
+    var dateTime = year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;   
+     return dateTime;
+}
+
+function string2date(s) {
+	var arr1 = s.split(" "); 
+	var sdate = arr1[0].split('-'); 
+	var date = new Date(sdate[0], sdate[1]-1, sdate[2]); 
+	var h_m_s = arr1[1].split(':');
+	date.setHours(h_m_s[0]);
+	date.setMinutes(h_m_s[1]);
+	date.setSeconds(h_m_s[2]);
+	return date;
+}
+
+$(function(){
+	$('.my_time').each(function(index){
+		console.log('index', index);
+		
+		$(this).after("&nbsp;<strong class='day_show_tag" + index + "'>0天</strong>" +
+			"<strong class='hour_show_tag" + index + "'>0时</strong>" + 
+			"<strong class='minute_show_tag" + index + "'>0分</strong>" +
+			"<strong class='second_show_tag" + index + "'>0秒</strong>");
+	
+		var date = string2date($(this).text());
+		console.log(date);
+		date.setHours(date.getHours() + 12); // 12 hours count-down
+		
+		//var now = string2date(getDateTime());//new Date();
+		var now = new Date();
+		console.log(now);
+		
+		var delta = (date.getTime() - now.getTime()) / 1000;
+		console.log('delta', delta);
+		timer(delta, '_tag' + index);
+	 });
+    
+}); 
+</script>
+
+{% endblock %}
