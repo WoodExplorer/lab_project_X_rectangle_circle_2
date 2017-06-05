@@ -1124,7 +1124,8 @@ def first_page():
     error_str = ''
     return render_template('first_page.html', error=error_str)
 
-def _login(selector, pwd_fetcher, post_handler, session_logged_in_key, session_logged_in_account_key, login_template_path, redirected_url_after_logging_in):
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     error_str = ''
     flag = False
 
@@ -1136,35 +1137,59 @@ def _login(selector, pwd_fetcher, post_handler, session_logged_in_key, session_l
         Session = sessionmaker(bind=engine)
         ses = Session()
 
-        cur_user = selector(ses, user_name)
-        #cur_user = ses.query(class_).filter_by(UE_account=user_name)
+        cur_user = ses.query(OT_User).filter_by(UE_account=user_name)
         if cur_user.count() == 0:
             error_str = u'用户名错误'
-        elif md5(password) != pwd_fetcher(cur_user):
+        elif md5(password) != cur_user[0].UE_password:
             error_str = u'密码错误'
         elif 0 == cur_user[0].not_help:
             error_str = u'帐号未激活，请联系推荐人'
         else:
             flag = True
-            session[session_logged_in_key] = True
-            session[session_logged_in_account_key] = user_name
+            session['logged_in'] = True
+            session['logged_in_account'] = user_name
             #flash(u'登陆成功')
         ses.close()
 
     if flag:
-        return redirect(url_for(redirected_url_after_logging_in))
+        return redirect(url_for('show_entries'))
     else:
         if not event_scheduler_on:
             error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
-        return render_template(login_template_path, error=error_str, form=form, post_handler=post_handler)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    return _login(lambda ses, user_name: ses.query(OT_User).filter_by(UE_account=user_name), lambda cur_user: cur_user[0].UE_password, url_for('login'), 'logged_in', 'logged_in_account', 'login.html', 'show_entries')
+        return render_template('login.html', error=error_str, form=form, post_handler=url_for('login'))
 
 @app.route('/login_admin', methods=['GET', 'POST'])
 def login_admin():
-    return _login(lambda ses, user_name: ses.query(OT_Member).filter_by(MB_username=user_name), lambda cur_user: cur_user[0].MB_userpwd, url_for('login_admin'), 'logged_in_admin', 'logged_in_account_admin', 'login_admin.html', 'change_password')
+    error_str = ''
+    flag = False
+
+    form = LoginForm()
+    if request.method == 'POST':
+        user_name = request.form['username']
+        password = request.form['password']
+
+        Session = sessionmaker(bind=engine)
+        ses = Session()
+
+        cur_user = ses.query(OT_Member).filter_by(MB_username=user_name)
+        if cur_user.count() == 0:
+            error_str = u'用户名错误'
+        elif md5(password) != cur_user[0].MB_userpwd:
+            error_str = u'密码错误'
+        else:
+            flag = True
+            session['logged_in_admin'] = True
+            session['logged_in_account_admin'] = user_name
+            #flash(u'登陆成功')
+        ses.close()
+
+    if flag:
+        return redirect(url_for('change_password'))
+    else:
+        if not event_scheduler_on:
+            error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
+        return render_template('login_admin.html', error=error_str, form=form, post_handler=url_for('login_admin'))
+
 
 @app.route('/logout')
 def logout():
