@@ -1158,6 +1158,18 @@ def login():
             error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
         return render_template('login.html', error=error_str, form=form, post_handler=url_for('login'))
 
+
+@app.route('/logout')
+def logout():
+    if not session.get('logged_in'):
+        abort(401)
+    session.pop('logged_in', None)
+    session.pop('logged_in_account', None)
+    flash(u'登出成功')
+    return redirect(url_for('login'))
+
+#################################################################################
+
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     error_str = ''
@@ -1178,8 +1190,8 @@ def admin_login():
             error_str = u'密码错误'
         else:
             flag = True
-            session['logged_in_admin'] = True
-            session['logged_in_account_admin'] = user_name
+            session['admin_logged_in'] = True
+            session['admin_logged_in_account'] = user_name
             #flash(u'登陆成功')
         ses.close()
 
@@ -1190,22 +1202,47 @@ def admin_login():
             error_str += "\nError: event_scheduler is off, which will cause tremendous loses."
         return render_template('admin_login.html', error=error_str, form=form, post_handler=url_for('admin_login'))
 
-
 @app.route('/admin_index')
 def admin_index():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    admin_account = session.get('admin_logged_in_account')
+
     Session = sessionmaker(bind=engine)
     ses = Session()
 
-    all_users = ses.query(OT_User).all()
+    all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
     ses.close()
     return render_template('admin_index.html', all_users=all_users)
 
-@app.route('/logout')
-def logout():
-    if not session.get('logged_in'):
-        abort(401)
-    session.pop('logged_in', None)
-    session.pop('logged_in_account', None)
-    flash(u'登出成功')
-    return redirect(url_for('login'))
 
+DEFAULT_PASSWORD = 'dangerous'
+@app.route('/admin_reset_password/<entry_id>')
+def admin_reset_password(entry_id):
+    global DEFAULT_PASSWORD
+
+    if not session.get('admin_logged_in'):
+        abort(401)
+    admin_account = session.get('admin_logged_in_account')
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    rec = ses.query(OT_User).filter_by(UE_ID=entry_id)
+    assert(1 == rec.count())
+    rec[0].UE_password = md5(DEFAULT_PASSWORD)
+
+    ses.commit()
+    ses.close()
+    flash(u'操作成功')
+    return redirect(url_for('admin_index'))
+
+
+@app.route('/admin_logout')
+def admin_logout():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    session.pop('admin_logged_in', None)
+    session.pop('admin_logged_in_account', None)
+    flash(u'登出成功')
+    return redirect(url_for('admin_login'))

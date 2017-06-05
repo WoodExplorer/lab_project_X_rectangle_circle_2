@@ -22,6 +22,7 @@
 			<span class="mui-tab-label">首页</span>
 		</a>
 		
+		<a href="{{ url_for('admin_logout') }}">管理员登出</a>
 	</nav>
 	
 <div>
@@ -57,10 +58,10 @@
 				<span class="label label-info">{{ entry.UE_regtime }}</span>
 			  </td>
 			  <td>
-				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">团队</a></span>
-				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">删除</a></span>
-				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">重置密码</a></span>
-				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.id) }}">登入</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">团队</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">删除</a></span>
+				<span class="label label-warning"><a href="{{ url_for('admin_reset_password', entry_id=entry.UE_ID) }}">重置密码</a></span>
+				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">登入</a></span>
 			  </td>
 			</tr>
 		{% endfor %}	
