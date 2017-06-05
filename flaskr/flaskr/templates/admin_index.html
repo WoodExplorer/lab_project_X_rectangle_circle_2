@@ -61,7 +61,7 @@
 				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">团队</a></span>
 				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">删除</a></span>
 				<span class="label label-warning"><a href="{{ url_for('admin_reset_password', entry_id=entry.UE_ID) }}">重置密码</a></span>
-				<span class="label label-warning"><a href="{{ url_for('entry_waiting_detail', entry_id=entry.UE_ID) }}">登入</a></span>
+				<span class="label label-warning"><a href="{{ url_for('admin_login_as_user', entry_id=entry.UE_ID) }}" target='_blank'>登入</a></span>
 			  </td>
 			</tr>
 		{% endfor %}	

@@ -1150,7 +1150,6 @@ def login():
             session['logged_in_account'] = user_name
             #flash(u'登陆成功')
         ses.close()
-
     if flag:
         return redirect(url_for('show_entries'))
     else:
@@ -1236,6 +1235,24 @@ def admin_reset_password(entry_id):
     ses.close()
     flash(u'操作成功')
     return redirect(url_for('admin_index'))
+
+
+@app.route('/admin_login_as_user/<entry_id>')
+def admin_login_as_user(entry_id):
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    cur_user = ses.query(OT_User).filter_by(UE_ID=entry_id)
+    assert(1 == cur_user.count())
+    cur_user = cur_user[0]
+    session['logged_in'] = True
+    session['logged_in_account'] = cur_user.UE_account
+    
+    ses.close()
+    return redirect(url_for('show_entries'))
 
 
 @app.route('/admin_logout')
