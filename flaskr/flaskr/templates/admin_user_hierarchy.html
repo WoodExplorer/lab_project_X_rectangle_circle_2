@@ -5,11 +5,7 @@
   
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   
-  <div>
-<a id="sign_in" href='#'>  
-    wq
-</a>  
-<div>
+
 <div id="user_list">
 	
 </div>
@@ -22,7 +18,7 @@
 		{
 			var i = 0;
 			var ret = '';
-			if (cnt > 0) {
+			if (cnt >= 0) {
 				for (; i<cnt; i++) {
 					ret += s;
 				}
@@ -67,55 +63,47 @@
 						}); 
 						user_list_div.after(user_list_html);						
 					}
-				});
+			});
+				
+			// CAREFUL! The following statement is indispensable: It prevents repeated fetching.
+			$('#' + ele_id).attr('onclick', '');
 		}
 		
 		$(document).ready(function(){
-			$("#sign_in").click(function(){
-				console.log("here");
+			
 				
-				// request information of all users
-				$.ajax({
-					type: "POST",
-					url: "{{ url_for('admin_all_users') }}",
-					data: { data: 'placeholder' },
-					//dataType: 'JSONP',
-					dataType: "json",
-					success: function(resp){
-						//console.log(resp);
-						
-						// turn response into json object
-						var jsonObj = eval('(' + resp + ')');
-						
-						// update web page: display user information
-						var user_list_div = $("#user_list");
-						var user_list_html = "";
-						var base_level = 0; // 
-						$.each(jsonObj, function(index, content){ 
-							//alert( "item #" + index + " its value is: " + content ); 
-							user_list_html += ('<div id=level_' + base_level + '_' + content + ' class="my_ordinary_user">' + 
-													content + 
-												'</div>');
-						}); 
-						user_list_div.html(user_list_html);
-						
-						// set up onclick event handlers
-						$('.my_ordinary_user').each(function(index){
-							console.log('index', index);
-							console.log('id', $(this).attr('id'));
-							var ele_id = $(this).attr('id')
-							var cur_user_id = ele_id;
-							// This only serves as a partial defense, for the full format of cur_user_id should be 'level_/d_/d+'
-							console.assert(0 == cur_user_id.indexOf('level_')); 
-							cur_user_id = cur_user_id.substr(8);	// HARD-CODED
-							$(this).attr('onclick', 'my_request_for_user_group_info("' + ele_id + '",' + cur_user_id + ')');
-						 });
-						 
-						console.log("here3");
-					}
-				});
-		  
-			})
+			// request information of all users
+			$.ajax({
+				type: "POST",
+				url: "{{ url_for('admin_all_users') }}",
+				data: { data: 'placeholder' },
+				//dataType: 'JSONP',
+				dataType: "json",
+				success: function(resp){
+					//console.log(resp);
+					
+					// turn response into json object
+					var jsonObj = eval('(' + resp + ')');
+					
+					// update web page: display user information
+					var user_list_div = $("#user_list");
+					var user_list_html = "";
+					var next_level = 0; // 
+					$.each(jsonObj, function(index, content){ 
+						//alert( "item #" + index + " its value is: " + content ); 	
+						var new_ele_id = '"level_' + next_level + '_' + content + '"';
+						var cur_user_id = content;
+						user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
+												'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
+											'>' + 
+											 repeat_string(g_indent, next_level) + content + 
+											'</div>');
+					}); 
+					user_list_div.html(user_list_html);
+					
+					console.log("here3");
+				}
+			});
 		});
 	</script>
 {% endblock %}
