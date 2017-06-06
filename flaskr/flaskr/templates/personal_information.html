@@ -57,20 +57,20 @@
 			$("#sign_in").click(function(){
 				//console.log("here");
 				$.ajax({
-							type: "POST",
-							url: "{{ url_for('sign_in') }}",
-							data: { data: 'placeholder' },
-							dataType: "json",
-							success: function(resp){
-								//console.log("here2");
-								console.log(resp);
-								if ('Ok' == resp.ret) {
-									//console.log("here");
-									$(window).attr('location', "{{ url_for('personal_information') }}"); 
-								}
-									
-							}
-						});
+					type: "POST",
+					url: "{{ url_for('sign_in') }}",
+					data: { data: 'placeholder' },
+					dataType: "json",
+					success: function(resp){
+						//console.log("here2");
+						console.log(resp);
+						if ('Ok' == resp.ret) {
+							//console.log("here");
+							$(window).attr('location', "{{ url_for('personal_information') }}"); 
+						}
+							
+					}
+				});
 		  
 			})
 		});

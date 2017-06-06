@@ -1277,19 +1277,36 @@ def admin_user_hierarchy(entry_id):
 def prepare_user_info_for_user_hierarchy(x):
     return str(x.UE_ID) + '[' + (u'已激活' if 1 == x.not_help else u'未激活') + ',' + x.UE_truename + ']'
 
-@app.route('/admin_all_users', methods=['POST'])
-def admin_all_users():
+@app.route('/admin_delete_user', methods=['POST'])
+def admin_delete_user():
     if not session.get('admin_logged_in'):
         abort(401)
     UE_account = session.get('admin_logged_in_account')
 
+    print 'request.data:', request.data
+
+    request_data_in_json = json.loads(request.data)
+    requested_user_id = request_data_in_json['user_id']
+
     Session = sessionmaker(bind=engine)
     ses = Session()
-    all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
-    ses.close()
 
-    all_users = json.dumps([prepare_user_info_for_user_hierarchy(x) for x in all_users])
-    return json.dumps(all_users)
+    target_user = ses.query(OT_User).filter_by(UE_ID=requested_user_id)
+    assert(1 == target_user.count())
+    target_user = target_user[0]
+
+    qu = ses.query(OT_Tgbz).filter_by(user=target_user.UE_account)
+    
+    if 0 == qu.count():
+        ses.delete(target_user)
+        ses.commit()
+        ret = json.dumps({ 'status': 'success' })
+        flash(u'删除成功')
+    else:
+        ret = json.dumps({ 'status': 'failure' })
+
+    ses.close()
+    return ret
 
 @app.route('/admin_generate_user_group', methods=['POST'])
 def admin_generate_user_group():
@@ -1307,6 +1324,7 @@ def admin_generate_user_group():
 
     request_data_in_json = json.loads(request.data)
     requested_user_id = request_data_in_json['user_id']
+
     Session = sessionmaker(bind=engine)
     ses = Session()
     requested_user_name = ses.query(OT_User).filter_by(UE_ID=requested_user_id)[0].UE_account

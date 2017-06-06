@@ -74,93 +74,29 @@
 
 <script type="text/javascript">
 
-
-function timer(intDiff, tag){
-	// Note: intDiff is supposed to be of unit millisecond.
-	var __tmp = function(){
-		var day=0,
-			hour=0,
-			minute=0,
-			second=0;//时间默认值        
-		if(intDiff > 0){
-			day = Math.floor(intDiff / (60 * 60 * 24));
-			hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
-			minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
-			second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
-		}
-		if (minute <= 9) minute = '0' + minute;
-		if (second <= 9) second = '0' + second;
-		$('.day_show' + tag).html('<s></s>'+day+"天");
-		$('.hour_show' + tag).html('<s></s>'+hour+'时');
-		$('.minute_show' + tag).html('<s></s>'+minute+'分');
-		$('.second_show' + tag).html('<s></s>'+second+'秒');
-		intDiff--;
-    };
-	__tmp();
-    window.setInterval(__tmp, 1000);
-} 
-
-function getDateTime() {
-    var now     = new Date(); 
-    var year    = now.getFullYear();
-    var month   = now.getMonth()+1; 
-    var day     = now.getDate();
-    var hour    = now.getHours();
-    var minute  = now.getMinutes();
-    var second  = now.getSeconds(); 
-    if(month.toString().length == 1) {
-        var month = '0'+month;
-    }
-    if(day.toString().length == 1) {
-        var day = '0'+day;
-    }   
-    if(hour.toString().length == 1) {
-        var hour = '0'+hour;
-    }
-    if(minute.toString().length == 1) {
-        var minute = '0'+minute;
-    }
-    if(second.toString().length == 1) {
-        var second = '0'+second;
-    }   
-    var dateTime = year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;   
-     return dateTime;
-}
-
-function string2date(s) {
-	var arr1 = s.split(" "); 
-	var sdate = arr1[0].split('-'); 
-	var date = new Date(sdate[0], sdate[1]-1, sdate[2]); 
-	var h_m_s = arr1[1].split(':');
-	date.setHours(h_m_s[0]);
-	date.setMinutes(h_m_s[1]);
-	date.setSeconds(h_m_s[2]);
-	return date;
-}
-
-$(function(){
-	$('.my_time').each(function(index){
-		console.log('index', index);
+var my_request_deleting_user = function (user_id) 
+	// fetch users recommended by user specified by para@user_id from server
+	{
+		console.log('user_id', user_id);
 		
-		$(this).after("&nbsp;<strong class='day_show_tag" + index + "'>0天</strong>" +
-			"<strong class='hour_show_tag" + index + "'>0时</strong>" + 
-			"<strong class='minute_show_tag" + index + "'>0分</strong>" +
-			"<strong class='second_show_tag" + index + "'>0秒</strong>");
-	
-		var date = string2date($(this).text());
-		console.log(date);
-		date.setHours(date.getHours() + 12); // 12 hours count-down
-		
-		//var now = string2date(getDateTime());//new Date();
-		var now = new Date();
-		console.log(now);
-		
-		var delta = (date.getTime() - now.getTime()) / 1000;
-		console.log('delta', delta);
-		timer(delta, '_tag' + index);
-	 });
-    
-}); 
+		$.ajax({
+				type: "POST",
+				url: "{{ url_for('admin_delete_user') }}",
+				data: JSON.stringify({ 'user_id': user_id }), 
+				dataType: "json",
+				contentType: 'application/json;charset=UTF-8',
+				success: function(resp){
+					console.log(resp);
+					
+					if ('success' == jsonObj['status'])
+						location.reload()
+					else {
+						alert("该用户存在排单，建议封号");
+					}
+				}
+		});
+	}
+
 </script>
 
 {% endblock %}
