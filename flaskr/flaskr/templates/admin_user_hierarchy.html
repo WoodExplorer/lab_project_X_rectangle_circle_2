@@ -15,7 +15,26 @@
 </div>
 
 <script>
-		var my_request_for_user_group_info = function (ele_id, user_id) {
+		var g_indent = '&nbsp;&nbsp;&nbsp;&nbsp;';
+
+		var repeat_string = function (s, cnt) 
+		// repeat a para@s para@cnt times
+		{
+			var i = 0;
+			var ret = '';
+			if (cnt > 0) {
+				for (; i<cnt; i++) {
+					ret += s;
+				}
+			} else {
+				alert("Negative cnt: " + cnt);
+			}
+			return ret;
+		}
+		
+		var my_request_for_user_group_info = function (ele_id, user_id) 
+		// fetch information of users recommended by user_id from server
+		{
 			console.log('ele_id', ele_id);
 			console.log('user_id', user_id);
 			var cur_level = parseInt(ele_id[6]); // HARD-CODED!
@@ -25,24 +44,28 @@
 					type: "POST",
 					url: "{{ url_for('admin_generate_user_group') }}",
 					data: JSON.stringify({ 'user_id': user_id }), 
-					//dataType: 'JSONP',
 					dataType: "json",
 					contentType: 'application/json;charset=UTF-8',
 					success: function(resp){
-						console.log("here_xx_2");
-						console.log(resp);
+						//console.log(resp);
 						
+						// turn response into json object
 						var jsonObj = eval('(' + resp + ')');
-						var user_list_div = $(ele_id);
+						
+						// update web page: display user information
+						var user_list_div = $('#' + ele_id);
 						var user_list_html = "";
 						$.each(jsonObj, function(index, content){ 
-							//alert( "item #" + index + " its value is: " + content ); 
-							
-							user_list_html += ('<div id=level_' + next_level + '_' + content + ' class="my_ordinary_user">&nbsp;&nbsp;&nbsp;&nbsp;' + content + '</div>');
-							
+							//alert( "item #" + index + " its value is: " + content ); 			
+							var new_ele_id = '"level_' + next_level + '_' + content + '"';
+							var cur_user_id = content;
+							user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
+													'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
+												'>' + 
+												 repeat_string(g_indent, next_level) + content + 
+												'</div>');
 						}); 
-						user_list_div.after(user_list_html);
-//						$('#' + ele_id).after("&nbsp;<strong class='day_show_tag" + index + "'>0天</strong>");
+						user_list_div.after(user_list_html);						
 					}
 				});
 		}
@@ -50,6 +73,8 @@
 		$(document).ready(function(){
 			$("#sign_in").click(function(){
 				console.log("here");
+				
+				// request information of all users
 				$.ajax({
 					type: "POST",
 					url: "{{ url_for('admin_all_users') }}",
@@ -57,18 +82,24 @@
 					//dataType: 'JSONP',
 					dataType: "json",
 					success: function(resp){
-						console.log("here2");
-						console.log(resp);
+						//console.log(resp);
+						
+						// turn response into json object
 						var jsonObj = eval('(' + resp + ')');
+						
+						// update web page: display user information
 						var user_list_div = $("#user_list");
 						var user_list_html = "";
+						var base_level = 0; // 
 						$.each(jsonObj, function(index, content){ 
 							//alert( "item #" + index + " its value is: " + content ); 
-							user_list_html += ('<div id=level_1_' + content + ' class="my_ordinary_user">' + content + '</div>');
+							user_list_html += ('<div id=level_' + base_level + '_' + content + ' class="my_ordinary_user">' + 
+													content + 
+												'</div>');
 						}); 
 						user_list_div.html(user_list_html);
 						
-						///
+						// set up onclick event handlers
 						$('.my_ordinary_user').each(function(index){
 							console.log('index', index);
 							console.log('id', $(this).attr('id'));
@@ -76,8 +107,8 @@
 							var cur_user_id = ele_id;
 							// This only serves as a partial defense, for the full format of cur_user_id should be 'level_/d_/d+'
 							console.assert(0 == cur_user_id.indexOf('level_')); 
-							cur_user_id = cur_user_id.substr(8);
-							$(this).attr('onclick', 'my_request_for_user_group_info(' + ele_id + ',' + cur_user_id + ')');
+							cur_user_id = cur_user_id.substr(8);	// HARD-CODED
+							$(this).attr('onclick', 'my_request_for_user_group_info("' + ele_id + '",' + cur_user_id + ')');
 						 });
 						 
 						console.log("here3");
