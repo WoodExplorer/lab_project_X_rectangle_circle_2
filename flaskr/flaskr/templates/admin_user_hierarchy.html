@@ -28,6 +28,24 @@
 			return ret;
 		}
 		
+		var handle_response_and_generate_user_items = function (resp, next_level) {		
+			// turn response into json object
+			var jsonObj = eval('(' + resp + ')');
+			
+			var user_list_html = "";
+			$.each(jsonObj, function(index, content){ 
+				//alert( "item #" + index + " its value is: " + content ); 	
+				var cur_user_id = content.substr(0, content.indexOf('['));							
+				var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
+				user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
+										'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
+									'>' + 
+									 repeat_string(g_indent, next_level) + content + 
+									'</div>');
+			}); 
+			return user_list_html;
+		}
+		
 		var my_request_for_user_group_info = function (ele_id, user_id) 
 		// fetch information of users recommended by user_id from server
 		{
@@ -45,22 +63,10 @@
 					success: function(resp){
 						//console.log(resp);
 						
-						// turn response into json object
-						var jsonObj = eval('(' + resp + ')');
 						
 						// update web page: display user information
 						var user_list_div = $('#' + ele_id);
-						var user_list_html = "";
-						$.each(jsonObj, function(index, content){ 
-							//alert( "item #" + index + " its value is: " + content ); 	
-							var cur_user_id = content.substr(0, content.indexOf('['));							
-							var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
-							user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
-													'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
-												'>' + 
-												 repeat_string(g_indent, next_level) + content + 
-												'</div>');
-						}); 
+						var user_list_html = handle_response_and_generate_user_items(resp, next_level);
 						user_list_div.after(user_list_html);						
 					}
 			});
@@ -82,23 +88,11 @@
 				success: function(resp){
 					//console.log(resp);
 					
-					// turn response into json object
-					var jsonObj = eval('(' + resp + ')');
-					
 					// update web page: display user information
 					var user_list_div = $("#user_list");
-					var user_list_html = "";
+					
 					var next_level = 0; // 
-					$.each(jsonObj, function(index, content){ 
-						//alert( "item #" + index + " its value is: " + content ); 	
-						var cur_user_id = content.substr(0, content.indexOf('['));							
-						var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
-						user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
-												'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
-											'>' + 
-											 repeat_string(g_indent, next_level) + content + 
-											'</div>');
-					}); 
+					var user_list_html = handle_response_and_generate_user_items(resp, next_level);
 					user_list_div.html(user_list_html);
 					
 					console.log("here3");
