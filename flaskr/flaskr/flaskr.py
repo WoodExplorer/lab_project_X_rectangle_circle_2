@@ -3,6 +3,7 @@
 # all the imports
 import os
 import sqlite3
+import json
 import math
 import platform
 import time
@@ -1263,3 +1264,52 @@ def admin_logout():
     session.pop('admin_logged_in_account', None)
     flash(u'登出成功')
     return redirect(url_for('admin_login'))
+
+
+@app.route('/admin_user_hierarchy')
+def admin_user_hierarchy():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    admin_account = session.get('admin_logged_in_account')
+
+    return render_template('admin_user_hierarchy.html')
+
+@app.route('/admin_all_users', methods=['POST'])
+def admin_all_users():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    UE_account = session.get('admin_logged_in_account')
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
+    ses.close()
+
+    all_users = json.dumps([x.UE_ID for x in all_users])
+    return json.dumps(all_users)
+
+@app.route('/admin_generate_user_group', methods=['POST'])
+def admin_generate_user_group():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    UE_account = session.get('admin_logged_in_account')
+
+    data = request.get_json()
+    print 'data:', data
+
+    user_id = request.form.get('user_id')
+    print 'user_id:', user_id
+
+    print 'request.data:', request.data
+
+    request_data_in_json = json.loads(request.data)
+    requested_user_id = request_data_in_json['user_id']
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    requested_user_name = ses.query(OT_User).filter_by(UE_ID=requested_user_id)[0].UE_account
+    requested_user_group = ses.query(OT_User).filter_by(UE_accName=requested_user_name).order_by(OT_User.UE_ID.asc())
+    ses.close()
+
+    requested_user_group = json.dumps([x.UE_ID for x in requested_user_group])
+    return json.dumps(requested_user_group)
+    #return 'hi'
