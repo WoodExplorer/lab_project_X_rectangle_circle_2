@@ -28,34 +28,34 @@
 			return ret;
 		}
 		
-		var handle_response_and_generate_user_list_html = function (resp, next_level) 
-		// para@next_level: Level for newly generated users.
+		var handle_response_and_generate_user_list_html = function (resp, cur_level) 
+		// para@cur_level: Level for newly generated users.
 		//					Levels start from 0.
 		{		
 			// turn response into json object
 			var jsonObj = eval('(' + resp + ')');
+			var next_level = cur_level + 1;
 			
 			var user_list_html = "";
 			$.each(jsonObj, function(index, content){ 
 				//alert( "item #" + index + " its value is: " + content ); 	
 				var cur_user_id = content.substr(0, content.indexOf('['));							
-				var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
+				var new_ele_id = '"level_' + cur_level + '_' + cur_user_id + '"';
 				user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
-										'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
+										'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + next_level + ',' + cur_user_id + ')' +
 									'>' + 
-									 repeat_string(g_indent, next_level) + content + 
+									 repeat_string(g_indent, cur_level) + content + 
 									'</div>');
 			}); 
 			return user_list_html;
 		}
 		
-		var my_request_for_user_group_info = function (ele_id, user_id) 
-		// fetch information of users recommended by user_id from server
+		var my_request_for_user_group_info = function (ele_id, cur_level, user_id) 
+		// fetch users recommended by user specified by para@user_id from server
 		{
 			console.log('ele_id', ele_id);
+			console.log('cur_level', cur_level);
 			console.log('user_id', user_id);
-			var cur_level = parseInt(ele_id[6]); // HARD-CODED!
-			var next_level = cur_level + 1;
 			
 			$.ajax({
 					type: "POST",
@@ -68,7 +68,7 @@
 						
 						// update web page: display user hierarchy
 						var user_list_div = $('#' + ele_id);
-						var user_list_html = handle_response_and_generate_user_list_html(resp, next_level);
+						var user_list_html = handle_response_and_generate_user_list_html(resp, cur_level);
 						user_list_div.after(user_list_html);						
 					}
 			});
@@ -78,25 +78,7 @@
 		}
 		
 		$(document).ready(function(){
-			// request information of all users
-			$.ajax({
-				type: "POST",
-				url: "{{ url_for('admin_all_users') }}",
-				data: { data: 'placeholder' },
-				dataType: "json",
-				success: function(resp){
-					//console.log(resp);
-					
-					// update web page: display user hierarchy
-					var user_list_div = $("#user_list");
-					
-					var next_level = 0; // 
-					var user_list_html = handle_response_and_generate_user_list_html(resp, next_level);
-					user_list_div.html(user_list_html);
-					
-					console.log("here3");
-				}
-			});
+			my_request_for_user_group_info("user_list", 0, {{ entry_id }});
 		});
 	</script>
 {% endblock %}
