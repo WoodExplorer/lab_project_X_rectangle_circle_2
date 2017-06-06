@@ -1274,6 +1274,9 @@ def admin_user_hierarchy():
 
     return render_template('admin_user_hierarchy.html')
 
+def prepare_user_info_for_user_hierarchy(x):
+    return str(x.UE_ID) + '[' + (u'已激活' if 1 == x.not_help else u'未激活') + ',' + x.UE_truename + ']'
+
 @app.route('/admin_all_users', methods=['POST'])
 def admin_all_users():
     if not session.get('admin_logged_in'):
@@ -1285,7 +1288,7 @@ def admin_all_users():
     all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
     ses.close()
 
-    all_users = json.dumps([x.UE_ID for x in all_users])
+    all_users = json.dumps([prepare_user_info_for_user_hierarchy(x) for x in all_users])
     return json.dumps(all_users)
 
 @app.route('/admin_generate_user_group', methods=['POST'])
@@ -1310,6 +1313,6 @@ def admin_generate_user_group():
     requested_user_group = ses.query(OT_User).filter_by(UE_accName=requested_user_name).order_by(OT_User.UE_ID.asc())
     ses.close()
 
-    requested_user_group = json.dumps([x.UE_ID for x in requested_user_group])
+    requested_user_group = json.dumps([prepare_user_info_for_user_hierarchy(x) for x in requested_user_group])
     return json.dumps(requested_user_group)
     #return 'hi'

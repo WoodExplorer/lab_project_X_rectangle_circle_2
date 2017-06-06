@@ -52,9 +52,9 @@
 						var user_list_div = $('#' + ele_id);
 						var user_list_html = "";
 						$.each(jsonObj, function(index, content){ 
-							//alert( "item #" + index + " its value is: " + content ); 			
-							var new_ele_id = '"level_' + next_level + '_' + content + '"';
-							var cur_user_id = content;
+							//alert( "item #" + index + " its value is: " + content ); 	
+							var cur_user_id = content.substr(0, content.indexOf('['));							
+							var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
 							user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
 													'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
 												'>' + 
@@ -91,8 +91,8 @@
 					var next_level = 0; // 
 					$.each(jsonObj, function(index, content){ 
 						//alert( "item #" + index + " its value is: " + content ); 	
-						var new_ele_id = '"level_' + next_level + '_' + content + '"';
-						var cur_user_id = content;
+						var cur_user_id = content.substr(0, content.indexOf('['));							
+						var new_ele_id = '"level_' + next_level + '_' + cur_user_id + '"';
 						user_list_html += ('<div id=' + new_ele_id + 'class="my_ordinary_user" ' + 
 												'onclick = my_request_for_user_group_info(' + new_ele_id + ',' + cur_user_id + ')' +
 											'>' + 
