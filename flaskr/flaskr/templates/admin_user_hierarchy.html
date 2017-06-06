@@ -28,7 +28,10 @@
 			return ret;
 		}
 		
-		var handle_response_and_generate_user_items = function (resp, next_level) {		
+		var handle_response_and_generate_user_list_html = function (resp, next_level) 
+		// para@next_level: Level for newly generated users.
+		//					Levels start from 0.
+		{		
 			// turn response into json object
 			var jsonObj = eval('(' + resp + ')');
 			
@@ -63,10 +66,9 @@
 					success: function(resp){
 						//console.log(resp);
 						
-						
-						// update web page: display user information
+						// update web page: display user hierarchy
 						var user_list_div = $('#' + ele_id);
-						var user_list_html = handle_response_and_generate_user_items(resp, next_level);
+						var user_list_html = handle_response_and_generate_user_list_html(resp, next_level);
 						user_list_div.after(user_list_html);						
 					}
 			});
@@ -76,23 +78,20 @@
 		}
 		
 		$(document).ready(function(){
-			
-				
 			// request information of all users
 			$.ajax({
 				type: "POST",
 				url: "{{ url_for('admin_all_users') }}",
 				data: { data: 'placeholder' },
-				//dataType: 'JSONP',
 				dataType: "json",
 				success: function(resp){
 					//console.log(resp);
 					
-					// update web page: display user information
+					// update web page: display user hierarchy
 					var user_list_div = $("#user_list");
 					
 					var next_level = 0; // 
-					var user_list_html = handle_response_and_generate_user_items(resp, next_level);
+					var user_list_html = handle_response_and_generate_user_list_html(resp, next_level);
 					user_list_div.html(user_list_html);
 					
 					console.log("here3");
