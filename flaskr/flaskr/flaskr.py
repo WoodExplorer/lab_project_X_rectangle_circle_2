@@ -1341,36 +1341,35 @@ def admin_reward():
         abort(401)
 
     error_str = ''
-    flag = False
-
     form = AdminRewardForm()
-    if request.method == 'POST':
-        account = request.form['account']
-        amount = request.form['amount']
+    if request.method == 'GET':
+        return render_template('admin_reward.html', error=error_str, form=form)
+    elif request.method == 'POST':
+        flag = False
+        if form.validate_on_submit():
+            account = request.form['account']
+            amount = request.form['amount']
 
-        object_type = request.form.getlist("object_type")[0]
-        assert('static' == object_type or 'dynamic' == object_type)
+            object_type = request.form.getlist("object_type")[0]
+            assert('static' == object_type or 'dynamic' == object_type)
 
-        Session = sessionmaker(bind=engine)
-        ses = Session()
+            Session = sessionmaker(bind=engine)
+            ses = Session()
 
-        cur_user = ses.query(OT_User).filter_by(UE_account=account)
-        if cur_user.count() == 1:
-            cur_user = cur_user[0]
-            if 'static' == object_type:
-                cur_user.UE_money = str(int(cur_user.UE_money) + int(amount))
+            cur_user = ses.query(OT_User).filter_by(UE_account=account)
+            if cur_user.count() == 1:
+                cur_user = cur_user[0]
+                if 'static' == object_type:
+                    cur_user.UE_money = str(int(cur_user.UE_money) + int(amount))
+                else:
+                    cur_user.tj_he = cur_user.tj_he + int(amount)
+
+                ses.commit()
+                flag = True
+                flash(u'发送成功')
             else:
-                cur_user.tj_he = cur_user.tj_he + int(amount)
+                error_str = u'不存在此用户'
+            ses.close()
 
-            ses.commit()
-            flag = True
-        else:
-            error_str = u'不存在此用户'
-        ses.close()
-
-    if flag:
-        flash(u'发送成功')
-        return redirect(url_for('admin_reward'))
-    else:
         return render_template('admin_reward.html', error=error_str, form=form)
 
