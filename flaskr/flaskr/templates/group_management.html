@@ -54,25 +54,17 @@
 						  	<caption></caption>
 						  	<thead>
 								<tr>
-							  		<th style="font-family: '微软雅黑';font-size: 15px;">用户ID</th>
-							  		<th style="font-family: '微软雅黑';font-size: 15px;">激活状态</th>
-							  		<th style="font-family: '微软雅黑';font-size: 15px;">用户账号</th>
-							  		<th style="font-family: '微软雅黑';font-size: 15px;">用户姓名</th>				  		
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">激活码数</th>
+							  		<th style="font-family: '微软雅黑';font-size: 15px;">日期</th>
+									<th style="font-family: '微软雅黑';font-size: 15px;">类型</th>			  		
 								</tr>
 						  	</thead>
 						  	<tbody>	
 							{% for entry in jhma_history %}
 							<tr>
-							  <td><span class="label label-warning">{{ entry.UE_ID }}</span></td>
-							  <td>
-								<span class="label label-info">{% if 0 == entry.not_help %}
-									未激活
-								{% else %}
-									已激活
-								{% endif %}</span>
-							  </td>
-							  <td><span class="label label-danger">{{ entry.UE_account }}</span></td>
-							  <td><span class="label label-success">{{ entry.UE_truename }}</span></td>
+								<td><span class="label label-info">{{ entry.UG_money }}</span></td>
+								<td><span class="label label-important">{{ entry.UG_getTime }}</span></td>
+								<td><span class="label label-important">{{ entry.UG_note }}</span></td>
 							</tr>
 							{% endfor %}
 						  </tbody>
@@ -95,17 +87,19 @@
 						  	<caption></caption>
 						  	<thead>
 								<tr>
-							  		<th style="font-family: '微软雅黑';font-size: 15px;">金额</th>
+							  		<!-- <th style="font-family: '微软雅黑';font-size: 15px;">金额</th> -->
 							  		<th style="font-family: '微软雅黑';font-size: 15px;">排单币数</th>
 							  		<th style="font-family: '微软雅黑';font-size: 15px;">日期</th>
+									<th style="font-family: '微软雅黑';font-size: 15px;">类型</th>
 								</tr>
 						  	</thead>
 						  	<tbody>	
 								{% for entry in pai_history %}
 								<tr>
-								  <td><span class="label label-warning">{{ entry.jb }}</span></td>
-								  <td><span class="label label-info">{{ (((entry.jb|float)*1.0/ 1000)|round(0, 'ceil')) |round(0, 'common')|int }}</span></td>
-								  <td><span class="label label-important">{{ entry.date }}</span></td>
+								  
+								  <td><span class="label label-info">{{ entry.UG_money }}</span></td>
+								  <td><span class="label label-important">{{ entry.UG_getTime }}</span></td>
+								  <td><span class="label label-important">{{ entry.UG_note }}</span></td>
 								</tr>
 								{% endfor %}
 						  </tbody>
@@ -244,7 +238,7 @@
 				
 		</div>
 
-		<a href="#dqtdddkyhxx"><div class=" alert" style="background-color: #500A6F;color: white;">当前用户团队的待打款用户信息：<span class="badge mui-badge-yellow mui-badge-inverted" style="position:absolute;right: 35px">></span></div></a>
+		<a href="#dqtdddkyhxx"><div class=" alert" style="background-color: #500A6F;color: white;">当前用户团队的待打款用户信息：<span class="badge mui-badge-purple">{{ dqtdddkyhxx|length }}</span><span class="badge mui-badge-yellow mui-badge-inverted" style="position:absolute;right: 35px">></span></div></a>
 
 		<div id="dqtdddkyhxx" class="mui-modal " style="overflow-y:scroll;overflow-y: visible;">
 				<header class=" mui-bar-nav " ><br>										

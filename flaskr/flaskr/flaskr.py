@@ -174,9 +174,15 @@ def show_entries():
     
     # third 'tab'
     entries_closed_in_tgbz_15_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs1=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
-    entries_closed_in_tgbz_15_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=2)[0] for x in entries_closed_in_tgbz_15_days]
+    entries_closed_in_tgbz_15_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_closed_in_tgbz_15_days]
+    entries_closed_in_tgbz_15_days = filter(lambda x: 2 == x.zt, entries_closed_in_tgbz_15_days)
+
     entries_closed_in_tgbz_30_days = ses.query(OT_Tgbz).filter_by(user=UE_account, zffs2=1, zt=1, qr_zt=1).order_by(OT_Tgbz.date.desc())
-    entries_closed_in_tgbz_30_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id, zt=2)[0] for x in entries_closed_in_tgbz_30_days]
+    entries_closed_in_tgbz_30_days = [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in entries_closed_in_tgbz_30_days]
+    entries_closed_in_tgbz_30_days = filter(lambda x: 2 == x.zt, entries_closed_in_tgbz_30_days)
+
+
+
     entries_closed_in_jsbz = ses.query(OT_Jsbz).filter_by(user=UE_account, zt=1, qr_zt=1).order_by(OT_Jsbz.date.desc())
 
     ses.close()
@@ -217,7 +223,7 @@ def entry_waiting_detail(entry_id):
     rec_in_ppdd = ses.query(OT_Ppdd).filter_by(p_id=entry_id)
     if 1 != rec_in_ppdd.count():
         ses.close()
-        return u'rec_in_ppdd表中有%d条p_id为%d的记录，而非预期的1条' % (rec_in_ppdd.count(), entry_id)
+        return u'rec_in_ppdd表中有%d条p_id为%s的记录，而非预期的1条' % (rec_in_ppdd.count(), entry_id)
     rec_in_ppdd = rec_in_ppdd[0]
 
     g_user = ses.query(OT_User).filter_by(UE_account=rec_in_ppdd.g_user)[0]
@@ -729,8 +735,8 @@ def group_management():
                         dqtdddkyhxx, 
                         [ses.query(OT_Ppdd).filter_by(p_id=x.id)[0] for x in dqtdddkyhxx])
 
-    jhma_history = ses.query(OT_User).filter_by(UE_accName=UE_account)
-    pai_history = ses.query(OT_Tgbz).filter_by(user=UE_account)
+    jhma_history = ses.query(OT_Userget).filter_by(UG_account=UE_account, UG_type='jhma')
+    pai_history = ses.query(OT_Userget).filter_by(UG_account=UE_account, UG_type='pai')
     form = SendPaiOrJhmaForm()
 
     if 'POST' == request.method:
@@ -781,7 +787,7 @@ def group_management():
                         entry.UG_money = '+' + str(amount)
                         entry.UG_balance = cur_user.pai
                         entry.UG_dataType = 'pai'
-                        entry.UG_note = u'生成排单币'
+                        entry.UG_note = u'赠送排单币'
                         entry.UG_getTime = cur_time
                         entry.jiang_zt = 0  # database not-null constraint
                         ses.add(entry)
@@ -800,7 +806,7 @@ def group_management():
                         entry.UG_money = '+' + str(amount)
                         entry.UG_balance = cur_user.jhma
                         entry.UG_dataType = 'jhma'
-                        entry.UG_note = u'生成激活码'
+                        entry.UG_note = u'赠送激活码'
                         entry.UG_getTime = cur_time
                         entry.jiang_zt = 0  # database not-null constraint
                         ses.add(entry)
@@ -815,7 +821,7 @@ def group_management():
                     #ses.close()
                     pass
 
-                flash(u'发送成功')
+                flash(u'赠送成功')
                 return redirect(url_for('group_management'))
                 break
     flash_errors(form)
