@@ -1214,13 +1214,20 @@ def admin_index():
         abort(401)
     admin_account = session.get('admin_logged_in_account')
 
+    return render_template('admin_index.html')
+
+@app.route('/admin_member_management')
+def admin_member_management():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    admin_account = session.get('admin_logged_in_account')
+
     Session = sessionmaker(bind=engine)
     ses = Session()
 
     all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
     ses.close()
-    return render_template('admin_index.html', all_users=all_users)
-
+    return render_template('admin_member_management.html', all_users=all_users)
 
 DEFAULT_PASSWORD = 'dangerous'
 @app.route('/admin_reset_password/<entry_id>')

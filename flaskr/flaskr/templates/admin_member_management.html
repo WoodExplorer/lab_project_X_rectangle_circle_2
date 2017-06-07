@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+
+	
+<div>
+	<table class="table table-striped table-bordered table-hover">
+		<thead>
+			<tr>
+				<th style="text-align: center;">编号</th>
+				<th style="text-align: center;">会员账号</th>
+				<th style="text-align: center;">推荐人</th>
+				<th style="text-align: center;">静态钱包</th>
+				<th style="text-align: center;">昵称</th>
+				<th style="text-align: center;">注册时间</th>
+				<th style="text-align: center;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for entry in all_users %}					  
+			<tr>
+			  <td><span class="label label-success">{{ entry.UE_ID }}</span></td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_account }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_accName }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_money }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.ue_theme }}</span>
+			  </td>
+			  <td>
+				<span class="label label-info">{{ entry.UE_regtime }}</span>
+			  </td>
+			  <td>
+				<span class="label label-warning"><a href="{{ url_for('admin_user_hierarchy', entry_id=entry.UE_ID) }}">团队</a></span>
+				<span class="label label-warning"><a onclick="my_request_deleting_user({{ entry.UE_ID }})">删除</a></span>
+				<span class="label label-warning"><a href="{{ url_for('admin_reset_password', entry_id=entry.UE_ID) }}">重置密码</a></span>
+				<span class="label label-warning"><a href="{{ url_for('admin_login_as_user', entry_id=entry.UE_ID) }}" target='_blank'>登入</a></span>
+			  </td>
+			</tr>
+		{% endfor %}	
+		</tbody>
+	</table>
+</div> 
+  	
+
+<script type="text/javascript">
+
+var my_request_deleting_user = function (user_id) 
+	// fetch users recommended by user specified by para@user_id from server
+	{
+		console.log('user_id', user_id);
+		
+		$.ajax({
+				type: "POST",
+				url: "{{ url_for('admin_delete_user') }}",
+				data: JSON.stringify({ 'user_id': user_id }), 
+				dataType: "json",
+				contentType: 'application/json;charset=UTF-8',
+				success: function(resp){
+					console.log(resp);
+					
+					var jsonObj = resp;//eval('(' + resp + ')');
+					if ('success' == jsonObj['status'])
+						location.reload()
+					else {
+						alert("该用户存在排单，建议封号");
+					}
+				}
+		});
+	}
+
+</script>
+
+{% endblock %}
