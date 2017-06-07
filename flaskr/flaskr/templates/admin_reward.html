@@ -8,7 +8,7 @@
   </div>
   
   <div class="">
-	<form role="form" action="{{ url_for('admin_reward') }}" method=post>
+	<form id="form_admin_reward" role="form" action="{{ url_for('admin_reward') }}" method=post>
 		{{ form.csrf_token }}
 		{{ form.hidden_tag() }}
 			
@@ -36,8 +36,49 @@
 		
 		<br />
 		<div class="form-group">
-			{{ form.submit(class_='btn btn-lg btn-login btn-block-lg') }}
+			<div style='display:none'>{{ form.submit(class_='btn btn-lg btn-login btn-block-lg') }}</div>
+			<a class='btn btn-lg btn-login btn-block-lg' onclick='my_post()'>确认保存</a>
 		</div>
 	</form>
   </div>
+
+
+<script type="text/javascript">
+  
+	function my_post() 
+	// http://hayageek.com/jquery-ajax-form-submit/
+	{
+		console.log('here');
+		
+		// data checking
+		var radio_val=$('input:radio[name="object_type"]:checked').val();
+		if (null == radio_val) {
+			alert('请选择赠送类型');
+			return;
+		}
+		if ($('#account').val().trim() == '') {
+			alert('请填写会员账号');
+			return;
+		}
+		if ($('#amount').val().trim() == '') {
+			alert('请填写数量');
+			return;
+		}
+			
+		var msg = "您确定要给用户" + $('#account').val() + "赠送数量为" + $('#amount').val() + "的";
+		if ('static' == radio_val)
+			msg += '金币';
+		else if ('dynamic' == radio_val)
+			msg += '动态奖金';
+		else
+			msg += '[unknown赠送类型，请联系管理员]'
+		var truthBeTold = window.confirm(msg); 
+		if (truthBeTold) { 
+			// real stuff: submit form
+			$("#submit").click();
+		}
+	}
+
+</script>
+  
 {% endblock %}
