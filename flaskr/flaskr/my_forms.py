@@ -141,5 +141,12 @@ class AccountSettingForm(FlaskForm):
     submit = SubmitField(u'提交', id='submit')
 
 
+class AdminRewardForm(FlaskForm):
+    object_type = RadioField(u'赠送类型', choices=[('static', u'金币'), ('dynamic', u'动态奖金')], validators=[DataRequired(message=u'')])
+    account = TextField(u'会员账号', validators=[DataRequired(message=u'请填写会员账号')])
+    amount = TextField(u'数量', validators=[DataRequired(message=u'请填写发送数量')])
+    submit = SubmitField(u'提交')
+
+
 class myForm(FlaskForm):
     fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])

@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  
+  <div class="col-lg-12 text-center">	  
+    <h3>金币赠送</h3>
+  </div>
+  
+  <div class="">
+	<form role="form" action="{{ url_for('admin_reward') }}" method=post>
+		{{ form.csrf_token }}
+		{{ form.hidden_tag() }}
+			
+		<br />
+		{% for subfield in form.object_type %}
+		<div class="radio">
+		  
+			{{ subfield }}
+			{{ subfield.label }}
+		  
+		</div>
+		{% endfor %}
+			
+		<br />
+		<div class="form-group">
+			<!--{{ form.account.label }}-->
+			{{ form.account(placeholder="请填写会员账号") }}
+		</div>
+		
+		<br />
+		<div class="form-group">
+			<!--{{ form.amount.label }}-->
+			{{ form.amount(placeholder="请填写数量")  }}
+		</div>
+		
+		<br />
+		<div class="form-group">
+			{{ form.submit(class_='btn btn-lg btn-login btn-block-lg') }}
+		</div>
+	</form>
+  </div>
+{% endblock %}

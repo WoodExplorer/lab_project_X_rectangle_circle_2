@@ -21,7 +21,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker, scoped_session
 from MD5 import md5
-from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm
+from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm, AdminRewardForm
 
 decimal.getcontext().prec = 2
 
@@ -1334,3 +1334,43 @@ def admin_generate_user_group():
     requested_user_group = json.dumps([prepare_user_info_for_user_hierarchy(x) for x in requested_user_group])
     return json.dumps(requested_user_group)
     #return 'hi'
+
+@app.route('/admin_reward', methods=['GET', 'POST'])
+def admin_reward():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    error_str = ''
+    flag = False
+
+    form = AdminRewardForm()
+    if request.method == 'POST':
+        account = request.form['account']
+        amount = request.form['amount']
+
+        object_type = request.form.getlist("object_type")[0]
+        assert('static' == object_type or 'dynamic' == object_type)
+
+        Session = sessionmaker(bind=engine)
+        ses = Session()
+
+        cur_user = ses.query(OT_User).filter_by(UE_account=account)
+        if cur_user.count() == 1:
+            cur_user = cur_user[0]
+            if 'static' == object_type:
+                cur_user.UE_money = str(int(cur_user.UE_money) + int(amount))
+            else:
+                cur_user.tj_he = cur_user.tj_he + int(amount)
+
+            ses.commit()
+            flag = True
+        else:
+            error_str = u'不存在此用户'
+        ses.close()
+
+    if flag:
+        flash(u'发送成功')
+        return redirect(url_for('admin_reward'))
+    else:
+        return render_template('admin_reward.html', error=error_str, form=form)
+
