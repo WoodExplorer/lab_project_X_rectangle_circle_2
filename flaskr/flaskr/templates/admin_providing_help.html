@@ -71,30 +71,29 @@
 
 
 <script type="text/javascript">
+	var my_generate_html = function (jsonObj) {
+		var info_list = '';
+		$.each(jsonObj, function(index, content){ 
+			//console.log( "item #" + index + " its value is: " + content ); 	
+			
+			info_list += ('<tr>' + 
+								'<td>' + content.id + '</td>' +
+								'<td>' + content.user + '</td>' +
+								'<td>' + content.user_nc + '</td>' +
+								'<td>' + content.jb + '</td>' +
+								'<td>' + content.date + '</td>' +
+						'</tr>');
+		}); 
+		console.log('info_list', info_list);
+		return info_list;
+	}
 	var my_query_by_account = function () {
 		$.post(
 			'{{ url_for("admin_providing_help_query") }}', 
 			{ account: $('#account').val() },     
-			function (data, textStatus){        
-				// data 可以是 xmlDoc, jsonObj, html, text, 等等.  
-				//this;
-				// 这个Ajax请求的选项配置信息，请参考jQuery.get()说到的this  
-				console.log(data);   
-
-				var jsonObj = data;//eval('(' + data + ')');
-				var info_list = '';
-				$.each(jsonObj, function(index, content){ 
-					//console.log( "item #" + index + " its value is: " + content ); 	
-					
-					info_list += ('<tr>' + 
-										'<td>' + content.id + '</td>' +
-										'<td>' + content.user + '</td>' +
-										'<td>' + content.user_nc + '</td>' +
-										'<td>' + content.jb + '</td>' +
-										'<td>' + content.date + '</td>' +
-								'</tr>');
-				}); 
-				console.log('info_list', info_list);
+			function (jsonObj, textStatus){        
+				console.log(jsonObj);   
+				var info_list = my_generate_html(jsonObj);
 				$('#query_result').html(info_list);
 			}, 
 			"json"
@@ -105,23 +104,9 @@
 		$.post(
 			'{{ url_for("admin_providing_help_unmatched_items") }}', 
 			{ },     
-			function (data, textStatus){        
-				console.log(data);   
-
-				var jsonObj = data;//eval('(' + data + ')');
-				var info_list = '';
-				$.each(jsonObj, function(index, content){ 
-					//console.log( "item #" + index + " its value is: " + content ); 	
-					
-					info_list += ('<tr>' + 
-										'<td>' + content.id + '</td>' +
-										'<td>' + content.user + '</td>' +
-										'<td>' + content.user_nc + '</td>' +
-										'<td>' + content.jb + '</td>' +
-										'<td>' + content.date + '</td>' +
-								'</tr>');
-				}); 
-				console.log('info_list', info_list);
+			function (jsonObj, textStatus){        
+				console.log(jsonObj);   
+				var info_list = my_generate_html(jsonObj);
 				$('#unmatched_items').html(info_list);
 			}, 
 			"json"
