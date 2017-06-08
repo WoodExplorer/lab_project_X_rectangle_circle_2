@@ -1448,3 +1448,52 @@ def admin_jhma_history():
     ses.close()
     return render_template('admin_jhma_history.html', jhma_history=jhma_history)
 
+@app.route('/admin_generate_pai', methods=['GET', 'POST'])
+def admin_generate_pai():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    error_str = ''
+    form = AdminGenerateJhmaForm()
+    if request.method == 'GET':
+        return render_template('admin_generate_pai.html', error=error_str, form=form)
+    elif request.method == 'POST':
+        flag = False
+        if form.validate_on_submit():
+            account = request.form['account']
+            amount = request.form['amount']
+            amount = int(amount)
+
+            Session = sessionmaker(bind=engine)
+            ses = Session()
+
+            cur_user = ses.query(OT_User).filter_by(UE_account=account)
+            if cur_user.count() == 1:
+                cur_time = datetime.now()
+
+                cur_user = cur_user[0]
+                cur_user.pai = cur_user.pai + amount
+
+                entry = construct_user_get(account, 'pai', amount, '+' + str(amount), cur_user.pai, 'pai', u'生成排单币', cur_time)
+                ses.add(entry)
+
+                ses.commit()
+                flag = True
+                flash(u'发送成功')
+            else:
+                error_str = u'不存在此用户'
+            ses.close()
+
+        return render_template('admin_generate_pai.html', error=error_str, form=form)
+
+@app.route('/admin_pai_history', methods=['GET'])
+def admin_pai_history():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    pai_history = ses.query(OT_Userget).filter_by(UG_type='pai')
+    ses.close()
+    return render_template('admin_pai_history.html', pai_history=pai_history)
+
