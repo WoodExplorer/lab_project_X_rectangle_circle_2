@@ -50,7 +50,7 @@ class OT_Tgbz(Base):
 
     def as_dict(self):
        #return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-       return {'user': self.user, 'jb': int(self.jb), 'user_nc': self.user_nc, 'date': self.date.strftime('%Y-%m-%d %H:%M:%S')}
+       return {'id': self.id, 'user': self.user, 'jb': int(self.jb), 'user_nc': self.user_nc, 'date': self.date.strftime('%Y-%m-%d %H:%M:%S')}
 
 class OT_Jsbz(Base):
     """"""
@@ -1537,20 +1537,35 @@ def admin_providing_help_query():
     if not session.get('admin_logged_in'):
         abort(401)
 
-    print 'request.data:', request.data
+    #print 'request.data:', request.data
     #request_data_in_json = json.loads(request.data)
     #requested_user_account = request_data_in_json['user_account']
-    print 'request.form["account"]:', request.form['account']
+    #print 'request.form["account"]:', request.form['account']
     requested_user_account = request.form['account']
     
     Session = sessionmaker(bind=engine)
     ses = Session()
 
-    selected_records = ses.query(OT_Tgbz).filter_by(user=requested_user_account)
+    selected_records = ses.query(OT_Tgbz).filter_by(user=requested_user_account).order_by(OT_Tgbz.id.asc())
     selected_records = [x.as_dict() for x in selected_records]
-    print selected_records
+    #print selected_records
     #ret = json.dumps(selected_records, default=date_handler)
     ret = json.dumps(selected_records)
    
     ses.close()
     return ret
+
+@app.route('/admin_providing_help_unmatched_items', methods=['POST'])
+def admin_providing_help_unmatched_items():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    selected_records = ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
+    selected_records = [x.as_dict() for x in selected_records]
+    ret = json.dumps(selected_records)
+   
+    ses.close()
+    return ret  
