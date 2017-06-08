@@ -5,6 +5,7 @@
   
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   
+ 
 
 <div id="user_list">
 	
@@ -33,7 +34,7 @@
 		//					Levels start from 0.
 		{		
 			// turn response into json object
-			var jsonObj = resp; //var jsonObj = eval('(' + resp + ')');
+			var jsonObj = resp;
 			var next_level = cur_level + 1;
 			
 			var user_list_html = "";
@@ -49,6 +50,7 @@
 			}); 
 			return user_list_html;
 		}
+		
 		
 		var my_request_for_user_group_info = function (ele_id, cur_level, user_id) 
 		// fetch users recommended by user specified by para@user_id from server
@@ -77,8 +79,34 @@
 			$('#' + ele_id).attr('onclick', '');
 		}
 		
+		
+		/////
+		
+		
+		
 		$(document).ready(function(){
-			my_request_for_user_group_info("user_list", 0, {{ entry_id }});
+			
+			console.log("here");
+			var cur_level = 0;
+			var ele_id = 'user_list';
+			
+			$.ajax({
+				type: "POST",
+				url: "{{ url_for('admin_all_users') }}",
+				data: { data: 'placeholder' },
+				//dataType: 'JSONP',
+				dataType: "json",
+				success: function(resp){
+					console.log("here2");
+					console.log(resp);
+					
+					var user_list_div = $('#' + ele_id);
+					var user_list_html = handle_response_and_generate_user_list_html(resp, cur_level);
+					user_list_div.after(user_list_html);
+				}
+			});
+		  
 		});
 	</script>
 {% endblock %}
+\ No newline at end of file

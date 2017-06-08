@@ -1356,9 +1356,30 @@ def admin_generate_user_group():
     requested_user_group = ses.query(OT_User).filter_by(UE_accName=requested_user_name).order_by(OT_User.UE_ID.asc())
     ses.close()
 
-    requested_user_group = json.dumps([prepare_user_info_for_user_hierarchy(x) for x in requested_user_group])
+    requested_user_group = [prepare_user_info_for_user_hierarchy(x) for x in requested_user_group]
     return json.dumps(requested_user_group)
     #return 'hi'
+
+@app.route('/admin_all_user_hierarchy')
+def admin_all_user_hierarchy():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    return render_template('admin_all_user_hierarchy.html')
+
+@app.route('/admin_all_users', methods=['POST'])
+def admin_all_users():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    UE_account = session.get('admin_logged_in_account')
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    all_users = ses.query(OT_User).order_by(OT_User.UE_ID.asc())
+    ses.close()
+
+    all_users = [prepare_user_info_for_user_hierarchy(x) for x in all_users]
+    return json.dumps(all_users)
 
 @app.route('/admin_reward', methods=['GET', 'POST'])
 def admin_reward():

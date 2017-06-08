@@ -2,11 +2,12 @@
 {% block body %}
   
 
+<a href="{{ url_for('admin_logout') }}">管理员登出</a>
 	
 <h2>会员管理</h2>	
-	<a href="{{ url_for('admin_member_management') }}">会员管理</a>
-	<a href="{{ url_for('admin_logout') }}">管理员登出</a>
+	<a href="{{ url_for('admin_member_management') }}">所有会员</a>
 	<a href="{{ url_for('admin_reward') }}">金币赠送</a>
+	<a href="{{ url_for('admin_all_user_hierarchy') }}">会员关系网</a>
 	
 	
 <h2>激活码/排单币管理</h2>
