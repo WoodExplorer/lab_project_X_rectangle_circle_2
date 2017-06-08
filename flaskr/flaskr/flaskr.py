@@ -21,7 +21,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker, scoped_session
 from MD5 import md5
-from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm, AdminRewardForm
+from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm, AdminRewardForm, AdminGenerateJhmaForm, AdminGeneratePaiForm
 
 decimal.getcontext().prec = 2
 
@@ -1385,4 +1385,66 @@ def admin_reward():
             ses.close()
 
         return render_template('admin_reward.html', error=error_str, form=form)
+
+def construct_user_get(UG_account, UG_type, UG_allGet, UG_money, UG_balance, UG_dataType, UG_note, UG_getTime):
+    entry = OT_Userget()
+    entry.UG_account = UG_account
+    entry.UG_type = UG_type
+    entry.UG_allGet = UG_allGet
+    entry.UG_money = UG_money
+    entry.UG_balance = UG_balance
+    entry.UG_dataType = UG_dataType
+    entry.UG_note = UG_note
+    entry.UG_getTime = UG_getTime
+    entry.jiang_zt = 0  # database not-null constraint
+    return entry
+
+@app.route('/admin_generate_jhma', methods=['GET', 'POST'])
+def admin_generate_jhma():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    error_str = ''
+    form = AdminGenerateJhmaForm()
+    if request.method == 'GET':
+        return render_template('admin_generate_jhma.html', error=error_str, form=form)
+    elif request.method == 'POST':
+        flag = False
+        if form.validate_on_submit():
+            account = request.form['account']
+            amount = request.form['amount']
+            amount = int(amount)
+
+            Session = sessionmaker(bind=engine)
+            ses = Session()
+
+            cur_user = ses.query(OT_User).filter_by(UE_account=account)
+            if cur_user.count() == 1:
+                cur_time = datetime.now()
+
+                cur_user = cur_user[0]
+                cur_user.jhma = cur_user.jhma + amount
+
+                entry = construct_user_get(account, 'jhma', amount, '+' + str(amount), cur_user.jhma, 'jhma', u'生成激活码', cur_time)
+                ses.add(entry)
+
+                ses.commit()
+                flag = True
+                flash(u'发送成功')
+            else:
+                error_str = u'不存在此用户'
+            ses.close()
+
+        return render_template('admin_generate_jhma.html', error=error_str, form=form)
+
+@app.route('/admin_jhma_history', methods=['GET'])
+def admin_jhma_history():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    jhma_history = ses.query(OT_Userget).filter_by(UG_type='jhma')
+    ses.close()
+    return render_template('admin_jhma_history.html', jhma_history=jhma_history)
 
