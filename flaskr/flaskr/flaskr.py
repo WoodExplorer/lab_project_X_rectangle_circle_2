@@ -1555,17 +1555,30 @@ def admin_providing_help_query():
     ses.close()
     return ret
 
+def query_OT_Tgbz(cond):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    selected_records = cond(ses)#ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
+    ses.close()
+    return selected_records
+
 @app.route('/admin_providing_help_unmatched_items', methods=['POST'])
 def admin_providing_help_unmatched_items():
     if not session.get('admin_logged_in'):
         abort(401)
 
-    Session = sessionmaker(bind=engine)
-    ses = Session()
-
-    selected_records = ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
+    selected_records = query_OT_Tgbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
-    ret = json.dumps(selected_records)
-   
-    ses.close()
-    return ret  
+    json_str = json.dumps(selected_records)
+    return json_str  
+
+
+@app.route('/admin_providing_help_matched_items', methods=['POST'])
+def admin_providing_help_matched_items():
+    if not session.get('admin_logged_in'):
+        abort(401)
+    
+    selected_records = query_OT_Tgbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=1).order_by(OT_Tgbz.id.asc()))
+    selected_records = [x.as_dict() for x in selected_records]
+    json_str = json.dumps(selected_records)
+    return json_str  
