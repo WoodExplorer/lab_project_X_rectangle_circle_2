@@ -1138,25 +1138,28 @@ def login():
 
     form = LoginForm()
     if request.method == 'POST':
-        user_name = request.form['username']
-        password = request.form['password']
+        if form.validate_on_submit():
+            user_name = request.form['username']
+            password = request.form['password']
 
-        Session = sessionmaker(bind=engine)
-        ses = Session()
+            Session = sessionmaker(bind=engine)
+            ses = Session()
 
-        cur_user = ses.query(OT_User).filter_by(UE_account=user_name)
-        if cur_user.count() == 0:
-            error_str = u'用户名错误'
-        elif md5(password) != cur_user[0].UE_password:
-            error_str = u'密码错误'
-        elif 0 == cur_user[0].not_help:
-            error_str = u'帐号未激活，请联系推荐人'
+            cur_user = ses.query(OT_User).filter_by(UE_account=user_name)
+            if cur_user.count() == 0:
+                error_str = u'用户名错误'
+            elif md5(password) != cur_user[0].UE_password:
+                error_str = u'密码错误'
+            elif 0 == cur_user[0].not_help:
+                error_str = u'帐号未激活，请联系推荐人'
+            else:
+                flag = True
+                session['logged_in'] = True
+                session['logged_in_account'] = user_name
+                #flash(u'登陆成功')
+            ses.close()
         else:
-            flag = True
-            session['logged_in'] = True
-            session['logged_in_account'] = user_name
-            #flash(u'登陆成功')
-        ses.close()
+            flash_errors(form)
     if flag:
         return redirect(url_for('show_entries'))
     else:
@@ -1183,23 +1186,26 @@ def admin_login():
 
     form = LoginForm()
     if request.method == 'POST':
-        user_name = request.form['username']
-        password = request.form['password']
+        if form.validate_on_submit():
+            user_name = request.form['username']
+            password = request.form['password']
 
-        Session = sessionmaker(bind=engine)
-        ses = Session()
+            Session = sessionmaker(bind=engine)
+            ses = Session()
 
-        cur_user = ses.query(OT_Member).filter_by(MB_username=user_name)
-        if cur_user.count() == 0:
-            error_str = u'用户名错误'
-        elif md5(password) != cur_user[0].MB_userpwd:
-            error_str = u'密码错误'
+            cur_user = ses.query(OT_Member).filter_by(MB_username=user_name)
+            if cur_user.count() == 0:
+                error_str = u'用户名错误'
+            elif md5(password) != cur_user[0].MB_userpwd:
+                error_str = u'密码错误'
+            else:
+                flag = True
+                session['admin_logged_in'] = True
+                session['admin_logged_in_account'] = user_name
+                #flash(u'登陆成功')
+            ses.close()
         else:
-            flag = True
-            session['admin_logged_in'] = True
-            session['admin_logged_in_account'] = user_name
-            #flash(u'登陆成功')
-        ses.close()
+            flash_errors(form)
 
     if flag:
         return redirect(url_for('admin_index'))
@@ -1383,6 +1389,8 @@ def admin_reward():
             else:
                 error_str = u'不存在此用户'
             ses.close()
+        else:
+            flash_errors(form)
 
         return render_template('admin_reward.html', error=error_str, form=form)
 
@@ -1434,6 +1442,8 @@ def admin_generate_jhma():
             else:
                 error_str = u'不存在此用户'
             ses.close()
+        else:
+            flash_errors(form)
 
         return render_template('admin_generate_jhma.html', error=error_str, form=form)
 
@@ -1483,6 +1493,8 @@ def admin_generate_pai():
             else:
                 error_str = u'不存在此用户'
             ses.close()
+        else:
+            flash_errors(form)
 
         return render_template('admin_generate_pai.html', error=error_str, form=form)
 
