@@ -147,7 +147,7 @@ class AdminRewardForm(FlaskForm):
     account = TextField(u'会员账号', validators=[DataRequired(message=u'请填写会员账号')])
     amount = TextField(u'数量', validators=[DataRequired(message=u'请填写发送数量')])
     submit = SubmitField(u'提交')
-    
+
     def validate_amount(form, field):
         amount_int = None
         try:
@@ -184,6 +184,13 @@ class AdminGeneratePaiForm(FlaskForm):
             raise ValidationError(u'请输入合法数字')
         if amount_int <= 0:
             raise ValidationError(u'请输入大于0的整数')
+
+
+class AdminQueryByAccountForm(FlaskForm):
+    account = TextField(u'会员账号', validators=[DataRequired(message=u'请填写会员账号')])
+    submit = SubmitField(u'提交')
+
+    
 
 class myForm(FlaskForm):
     fileName = FileField(u'my_file', validators=[DataRequired(message=u'请选择文件')])

@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.idTabs.min.js') }}"></script>
+  
+	{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  
+	<div class="col-lg-12 text-center">	  
+		<h3>提供帮助</h3>
+	</div>
+  
+	<em>这里是一个tab选项卡，使用的是jquery idTabs（<a href='http://www.sunsean.com/idTabs/'>http://www.sunsean.com/idTabs/</a>），目前还没有为其设置样式</em>
+	<ul class="idTabs"> 
+	  <li><a href="#query">搜索</a></li> 
+	  <li><a href="#unmatched">未匹配查询</a></li> 
+	  <li><a href="#matched">已匹配查询</a></li> 
+	</ul> 
+	
+	<div id="query">
+		<form id="" role="form" action="" method=post>
+			{{ form.csrf_token }}
+			{{ form.hidden_tag() }}
+				
+			<br />
+			<div class="form-group">
+				<!--{{ form.account.label }}-->
+				{{ form.account(placeholder="请填写会员账号") }}
+			</div>
+			
+			<br />
+			<div class="form-group">
+				<!-- {{ form.submit(class_='btn btn-lg btn-login btn-block-lg') }} -->
+				<a onclick='my_submit_form()'>提交</a>
+			</div>
+		</form>
+		
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+				<tr>
+					<th style="text-align: center;">账号</th>
+					<th style="text-align: center;">用户姓名</th>
+					<th style="text-align: center;">金额</th>
+					<th style="text-align: center;">时间</th>
+				</tr>
+			</thead>
+			<tbody id="query_result">		
+				
+			</tbody>
+		</table>
+	</div>
+	<div id="unmatched">
+	</div> 
+	<div id="matched">
+	</div>
+  
+
+
+<script type="text/javascript">
+	var my_submit_form = function () {
+		$.post(
+			'{{ url_for("admin_providing_help_query") }}', 
+			{ account: $('#account').val() },     
+			function (data, textStatus){        
+				// data 可以是 xmlDoc, jsonObj, html, text, 等等.  
+				//this;
+				// 这个Ajax请求的选项配置信息，请参考jQuery.get()说到的this  
+				console.log(data);   
+
+				var jsonObj = data;//eval('(' + data + ')');
+				var info_list = '';
+				$.each(jsonObj, function(index, content){ 
+					//console.log( "item #" + index + " its value is: " + content ); 	
+					
+					info_list += ('<tr>' + 
+										'<td>' + content.user + '</td>' +
+										'<td>' + content.user_nc + '</td>' +
+										'<td>' + content.jb + '</td>' +
+										'<td>' + content.date + '</td>' +
+								'</tr>');
+				}); 
+				console.log('info_list', info_list);
+				$('#query_result').html(info_list);
+			}, 
+			"json"
+		);
+	}
+ </script>
+ 
+{% endblock %}

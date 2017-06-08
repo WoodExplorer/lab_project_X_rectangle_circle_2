@@ -21,7 +21,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker, scoped_session
 from MD5 import md5
-from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm, ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm, AdminRewardForm, AdminGenerateJhmaForm, AdminGeneratePaiForm
+from my_forms import LoginForm, ChangePasswordForm, InvestmentForm, ExtractFromStaticPurseForm, UploadCertificateForm,          \
+                    ConfirmationForm, SendPaiOrJhmaForm, AccountSettingForm, DynamicPurseForm, RegisterForm, AdminRewardForm,   \
+                    AdminGenerateJhmaForm, AdminGeneratePaiForm, AdminQueryByAccountForm
 
 decimal.getcontext().prec = 2
 
@@ -45,6 +47,10 @@ class OT_Tgbz(Base):
     """"""
     __tablename__ = 'ot_tgbz'
     __table_args__ = {'autoload':True}
+
+    def as_dict(self):
+       #return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+       return {'user': self.user, 'jb': int(self.jb), 'user_nc': self.user_nc, 'date': self.date.strftime('%Y-%m-%d %H:%M:%S')}
 
 class OT_Jsbz(Base):
     """"""
@@ -1509,3 +1515,42 @@ def admin_pai_history():
     ses.close()
     return render_template('admin_pai_history.html', pai_history=pai_history)
 
+@app.route('/admin_providing_help', methods=['GET'])
+def admin_providing_help():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    error_str = ''
+    form = AdminQueryByAccountForm()
+    return render_template('admin_providing_help.html', error=error_str, form=form)
+    
+#date_handler = lambda obj: (
+#    #obj.isoformat()
+#    obj.strftime('%Y-%m-%d %H:%M:%S')
+#    if isinstance(obj, (datetime))
+#    else int(obj) if isinstance(obj, (int))
+#    else None
+#)
+
+@app.route('/admin_providing_help_query', methods=['POST'])
+def admin_providing_help_query():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    print 'request.data:', request.data
+    #request_data_in_json = json.loads(request.data)
+    #requested_user_account = request_data_in_json['user_account']
+    print 'request.form["account"]:', request.form['account']
+    requested_user_account = request.form['account']
+    
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+
+    selected_records = ses.query(OT_Tgbz).filter_by(user=requested_user_account)
+    selected_records = [x.as_dict() for x in selected_records]
+    print selected_records
+    #ret = json.dumps(selected_records, default=date_handler)
+    ret = json.dumps(selected_records)
+   
+    ses.close()
+    return ret
