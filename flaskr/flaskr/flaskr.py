@@ -1291,13 +1291,13 @@ def admin_logout():
     return redirect(url_for('admin_login'))
 
 
-@app.route('/admin_user_hierarchy/<entry_id>')
-def admin_user_hierarchy(entry_id):
+@app.route('/admin_user_hierarchy_for_specific_user/<entry_id>')
+def admin_user_hierarchy_for_specific_user(entry_id):
     if not session.get('admin_logged_in'):
         abort(401)
     admin_account = session.get('admin_logged_in_account')
 
-    return render_template('admin_user_hierarchy.html', entry_id=entry_id)
+    return render_template('admin_user_hierarchy_for_specific_user.html', entry_id=entry_id)
 
 def prepare_user_info_for_user_hierarchy(x):
     return str(x.UE_ID) + '[' + (u'已激活' if 1 == x.not_help else u'未激活') + ',' + x.UE_truename + ']'
@@ -1360,12 +1360,12 @@ def admin_generate_user_group():
     return json.dumps(requested_user_group)
     #return 'hi'
 
-@app.route('/admin_all_user_hierarchy')
-def admin_all_user_hierarchy():
+@app.route('/admin_user_hierarchy_for_all_users')
+def admin_user_hierarchy_for_all_users():
     if not session.get('admin_logged_in'):
         abort(401)
 
-    return render_template('admin_all_user_hierarchy.html')
+    return render_template('admin_user_hierarchy_for_all_users.html')
 
 @app.route('/admin_all_users', methods=['POST'])
 def admin_all_users():

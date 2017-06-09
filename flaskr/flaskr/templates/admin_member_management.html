@@ -36,7 +36,7 @@
 				<span class="label label-info">{{ entry.UE_regtime }}</span>
 			  </td>
 			  <td>
-				<span class="label label-warning"><a href="{{ url_for('admin_user_hierarchy', entry_id=entry.UE_ID) }}">团队</a></span>
+				<span class="label label-warning"><a href="{{ url_for('admin_user_hierarchy_for_specific_user', entry_id=entry.UE_ID) }}">团队</a></span>
 				<span class="label label-warning"><a onclick="my_request_deleting_user({{ entry.UE_ID }})">删除</a></span>
 				<span class="label label-warning"><a href="{{ url_for('admin_reset_password', entry_id=entry.UE_ID) }}">重置密码</a></span>
 				<span class="label label-warning"><a href="{{ url_for('admin_login_as_user', entry_id=entry.UE_ID) }}" target='_blank'>登入</a></span>
