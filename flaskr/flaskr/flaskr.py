@@ -57,6 +57,11 @@ class OT_Jsbz(Base):
     __tablename__ = 'ot_jsbz'
     __table_args__ = {'autoload':True}
 
+    def as_dict(self):
+       #return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+       return {'id': self.id, 'user': self.user, 'jb': int(self.jb), 'user_nc': self.user_nc, 'date': self.date.strftime('%Y-%m-%d %H:%M:%S')}
+
+
 class OT_Userget(Base):
     """"""
     __tablename__ = 'ot_userget'
@@ -1576,7 +1581,7 @@ def admin_providing_help_query():
     ses.close()
     return ret
 
-def query_OT_Tgbz(cond):
+def query_OT_Tgbz_or_OT_Jsbz(cond):
     Session = sessionmaker(bind=engine)
     ses = Session()
     selected_records = cond(ses)#ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
@@ -1588,7 +1593,7 @@ def admin_providing_help_unmatched_items():
     if not session.get('admin_logged_in'):
         abort(401)
 
-    selected_records = query_OT_Tgbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc()))
+    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
     json_str = json.dumps(selected_records)
     return json_str  
@@ -1599,7 +1604,55 @@ def admin_providing_help_matched_items():
     if not session.get('admin_logged_in'):
         abort(401)
     
-    selected_records = query_OT_Tgbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=1).order_by(OT_Tgbz.id.asc()))
+    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=1).order_by(OT_Tgbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
     json_str = json.dumps(selected_records)
     return json_str  
+
+@app.route('/admin_providing_help_unmatched_jsbz_items_with_specifi_jb', methods=['POST'])
+def admin_providing_help_unmatched_items_with_specifi_jb():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    jb = request.form['jb']
+    
+    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(zt=0, jb=jb).order_by(OT_Jsbz.id.asc()))
+    selected_records = [x.as_dict() for x in selected_records]
+    json_str = json.dumps(selected_records)
+    return json_str
+
+@app.route('/admin_providing_help_match_tgbz_to_jsbz', methods=['POST'])
+def admin_providing_help_match_tgbz_to_jsbz():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    tgbz_item_id = request.form['tgbz_item_id']
+    jsbz_item_id = request.form['jsbz_item_id']
+
+    Ses = scoped_session(sessionmaker(bind=engine))
+    ses = Ses()
+
+    target_tgbz_item = ses.query(OT_Tgbz).filter_by(id=tgbz_item_id)[0]
+    target_jsbz_item = ses.query(OT_Jsbz).filter_by(id=jsbz_item_id)[0]
+   
+    assert(target_tgbz_item.jb == target_jsbz_item.jb)
+    new_ppdd = OT_Ppdd()
+    new_ppdd.jb = target_jsbz_item.jb
+    new_ppdd.p_id = target_tgbz_item.id
+    new_ppdd.g_id = target_jsbz_item.id
+    new_ppdd.p_user = target_tgbz_item.user
+    new_ppdd.g_user = target_jsbz_item.user
+    new_ppdd.date = datetime.now()
+    new_ppdd.zt = 0
+    new_ppdd.zffs1 = target_tgbz_item.zffs1
+    new_ppdd.zffs2 = target_tgbz_item.zffs2
+    new_ppdd.zffs3 = 0
+
+    ses.add(new_ppdd)
+    ses.commit()
+    ses.close()
+    Ses.remove()
+
+    flash(u'匹配成功')
+    return json.dumps({'status': 'Ok'})
+    
