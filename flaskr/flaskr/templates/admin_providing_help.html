@@ -2,7 +2,8 @@
 {% block body %}
   
 	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.idTabs.min.js') }}"></script>
-  
+	<script src="{{ url_for('static', filename='js/my_admin.js') }}"></script>
+
 	{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   
 	<div class="col-lg-12 text-center">	  
@@ -126,123 +127,34 @@
 <link href="{{ url_for('static', filename='css/remodal.css') }}" rel="stylesheet"></link>
 <script src="{{ url_for('static', filename='js/remodal.js') }}" rel="stylesheet"></script>
 <script type="text/javascript">
-	var my_confirm_match = function (tgbz_item_id, jsbz_item_id) {
-		$.post(
-			'{{ url_for("admin_providing_help_match_tgbz_to_jsbz") }}', 	// Careful! Do not put wrong url here!
-			{ tgbz_item_id: tgbz_item_id, jsbz_item_id: jsbz_item_id },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				//alert('match completed');
-				top.location = "{{ url_for('admin_providing_help') }}";
-			}, 
-			"json"
-		);
-	}
+	var my_query_by_account = my_post_and_generate_html_function_generator(
+			'{{ url_for("admin_providing_help_query") }}', 
+			{ account: $('#account').val() },
+			my_generate_html,
+			'query_result'
+	);
+	var my_fetch_unmatched = my_post_and_generate_html_function_generator(
+		'{{ url_for("admin_providing_help_unmatched_items") }}', 
+		{},
+		my_generate_html_with_operation_query_candidates,
+		'unmatched_items'
+	);
+	var my_fetch_matched = my_post_and_generate_html_function_generator(
+		'{{ url_for("admin_providing_help_matched_items") }}', 
+		{},
+		my_generate_html,
+		'matched_items'
+	);
 	
-	var my_trying_to_match = function (tgbz_item_id, jb) {
-		console.log('tgbz_item_id', tgbz_item_id);
-		
-		$.post(
-			'{{ url_for("admin_providing_help_unmatched_items_with_specifi_jb") }}', 	// Careful! Do not put wrong url here!
-			{ tgbz_item_id: tgbz_item_id, jb: jb },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html_with_operation_confirm(tgbz_item_id, jsonObj);
-				$('#modal2Table').html(info_list);			// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_generate_html = function (jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_generate_html_with_operation_query_candidates = function (jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-								'<td>' + '<a href="#modal2" onclick="my_trying_to_match(' + content.id + ',' + content.jb + ')">' + '手动匹配' + '</a>' + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_generate_html_with_operation_confirm = function (tgbz_item_id, jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-								'<td>' + '<a href="#modal2" onclick="my_confirm_match(' + tgbz_item_id + ',' + content.id + ')">' + '确认匹配' + '</a>' + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_query_by_account = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_query") }}', 	// Careful! Do not put wrong url here!
-			{ account: $('#account').val() },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html(jsonObj);
-				$('#query_result').html(info_list);			// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_fetch_unmatched = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_unmatched_items") }}',  // Careful! Do not put wrong url here!
-			{ },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html_with_operation_query_candidates(jsonObj);
-				$('#unmatched_items').html(info_list);			 	// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_fetch_matched = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_matched_items") }}', 	// Careful! Do not put wrong url here!
-			{ },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html(jsonObj);
-				$('#matched_items').html(info_list);			 	// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
+	var my_trying_to_match = my_trying_to_match_generator(
+		'{{ url_for("admin_providing_help_unmatched_items_with_specifi_jb") }}',
+		my_generate_html_with_operation_confirm,
+		'modal2Table'
+	);
+	var my_confirm_match = my_confirm_match_generator(
+		'{{ url_for("admin_providing_help_match_tgbz_to_jsbz") }}',
+		"{{ url_for('admin_providing_help') }}"
+	);
 	
 	$(document).ready(function(){
 		$('#unmatched').click();
