@@ -17,7 +17,8 @@
 <a href="{{ url_for('admin_pai_history') }}">排单币记录</a>
 
 <h2>匹配系统</h2>
-<a href="{{ url_for('admin_providing_help') }}">提供帮助</a>
+<a href="{{ url_for('admin_providing_and_receiving_help', request_type='providing_help') }}">提供帮助</a>
+<a href="{{ url_for('admin_providing_and_receiving_help', request_type='receiving_help') }}">接受帮助</a>
 
 {% endblock %}
 

@@ -1,5 +1,5 @@
-{% extends "layout.html" %}
-{% block body %}
+{% extends "admin_providing_help_and_receiving_help_common_part.html" %}
+{% block specialized_part %}
   
 	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.idTabs.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/my_admin_providing_receiving_help.js') }}"></script>
@@ -10,240 +10,38 @@
 		<h3>接受帮助</h3>
 	</div>
   
-	<em>这里是一个tab选项卡，使用的是jquery idTabs（<a href='http://www.sunsean.com/idTabs/'>http://www.sunsean.com/idTabs/</a>），目前还没有为其设置样式</em>
-	<ul class="idTabs"> 
-	  <li><a href="#query">搜索</a></li> 
-	  <li><a id='unmatched' href="#unmatched" onclick='my_fetch_unmatched()'>未匹配查询</a></li> 
-	  <li><a href="#matched" onclick='my_fetch_matched()'>已匹配查询</a></li> 
-	</ul> 
+	{% block admin_providing_help_and_receiving_help_body %}{% endblock %}
 	
-	<div id="query">
-		<form id="" role="form" action="" method=post>
-			{{ form.csrf_token }}
-			{{ form.hidden_tag() }}
-				
-			<br />
-			<div class="form-group">
-				<!--{{ form.account.label }}-->
-				{{ form.account(placeholder="请填写会员账号") }}
-			</div>
-			
-			<br />
-			<div class="form-group">
-				<!-- {{ form.submit(class_='btn btn-lg btn-login btn-block-lg') }} -->
-				<a onclick='my_query_by_account()'>提交</a>
-			</div>
-		</form>
-		
-		<table class="table table-striped table-bordered table-hover">
-			<thead>
-				<tr>
-					<th style="text-align: center;">id</th>
-					<th style="text-align: center;">账号</th>
-					<th style="text-align: center;">用户姓名</th>
-					<th style="text-align: center;">金额</th>
-					<th style="text-align: center;">时间</th>
-				</tr>
-			</thead>
-			<tbody id="query_result">		
-				
-			</tbody>
-		</table>
-	</div>
-	<div id="unmatched">
-		<table class="table table-striped table-bordered table-hover">
-			<thead>
-				<tr>
-					<th style="text-align: center;">id</th>
-					<th style="text-align: center;">账号</th>
-					<th style="text-align: center;">用户姓名</th>
-					<th style="text-align: center;">金额</th>
-					<th style="text-align: center;">时间</th>
-					<th style="text-align: center;">操作</th>
-				</tr>
-			</thead>
-			<tbody id="unmatched_items">		
-				
-			</tbody>
-		</table>
-	</div> 
-	<div id="matched">
-		<table class="table table-striped table-bordered table-hover">
-			<thead>
-				<tr>
-					<th style="text-align: center;">id</th>
-					<th style="text-align: center;">账号</th>
-					<th style="text-align: center;">用户姓名</th>
-					<th style="text-align: center;">金额</th>
-					<th style="text-align: center;">时间</th>
-				</tr>
-			</thead>
-			<tbody id="matched_items">		
-				
-			</tbody>
-		</table>
-	</div>
-  
-
-<div data-remodal-id="modal2" role="dialog" aria-labelledby="modal2Title" aria-describedby="modal2Desc">
-  <div>
-    <table class="table table-striped table-bordered table-hover">
-		<thead>
-			<tr>
-				<th style="text-align: center;">id</th>
-				<th style="text-align: center;">账号</th>
-				<th style="text-align: center;">用户姓名</th>
-				<th style="text-align: center;">金额</th>
-				<th style="text-align: center;">时间</th>
-				<th style="text-align: center;">操作</th>
-			</tr>
-		</thead>
-		<tbody id="modal2Table">		
-			
-		</tbody>
-	</table>
-  </div>
-  <br>
-  <button data-remodal-action="confirm" class="remodal-confirm">Hello!</button>
-</div>
-
-
-
-<style>
-    .remodal-bg.with-red-theme.remodal-is-opening,
-    .remodal-bg.with-red-theme.remodal-is-opened {
-      filter: none;
-    }
-
-    .remodal-overlay.with-red-theme {
-      background-color: #f44336;
-    }
-
-    .remodal.with-red-theme {
-      background: #fff;
-    }
-  </style>
-<link href="{{ url_for('static', filename='css/remodal-default-theme.css') }}" rel="stylesheet"></link>
-<link href="{{ url_for('static', filename='css/remodal.css') }}" rel="stylesheet"></link>
 <script src="{{ url_for('static', filename='js/remodal.js') }}" rel="stylesheet"></script>
 <script type="text/javascript">
-	var my_confirm_match = function (tgbz_item_id, jsbz_item_id) {
-		$.post(
-			'{{ url_for("admin_providing_help_match_tgbz_to_jsbz") }}', 	// Careful! Do not put wrong url here!
-			{ tgbz_item_id: tgbz_item_id, jsbz_item_id: jsbz_item_id },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				//alert('match completed');
-				top.location = "{{ url_for('admin_providing_help') }}";
-			}, 
-			"json"
-		);
-	}
+	var my_query_by_account = my_post_and_generate_html_function_generator(
+			'{{ url_for("admin_receiving_help_query") }}', 
+			{ account: $('#account').val() },
+			my_generate_html,
+			'query_result'
+	);
+	var my_fetch_unmatched = my_post_and_generate_html_function_generator(
+		'{{ url_for("admin_receiving_help_unmatched_items") }}', 
+		{},
+		my_generate_html_with_operation_query_candidates,
+		'unmatched_items'
+	);
+	var my_fetch_matched = my_post_and_generate_html_function_generator(
+		'{{ url_for("admin_receiving_help_matched_items") }}', 
+		{},
+		my_generate_html,
+		'matched_items'
+	);
 	
-	var my_trying_to_match = function (tgbz_item_id, jb) {
-		console.log('tgbz_item_id', tgbz_item_id);
-		
-		$.post(
-			'{{ url_for("admin_providing_help_unmatched_items_with_specifi_jb") }}', 	// Careful! Do not put wrong url here!
-			{ tgbz_item_id: tgbz_item_id, jb: jb },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html_with_operation_confirm(tgbz_item_id, jsonObj);
-				$('#modal2Table').html(info_list);			// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_generate_html = function (jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_generate_html_with_operation_query_candidates = function (jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-								'<td>' + '<a href="#modal2" onclick="my_trying_to_match(' + content.id + ',' + content.jb + ')">' + '手动匹配' + '</a>' + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_generate_html_with_operation_confirm = function (tgbz_item_id, jsonObj) {
-		var info_list = '';
-		$.each(jsonObj, function(index, content){ 
-			//console.log( "item #" + index + " its value is: " + content ); 	
-			
-			info_list += ('<tr>' + 
-								'<td>' + content.id + '</td>' +
-								'<td>' + content.user + '</td>' +
-								'<td>' + content.user_nc + '</td>' +
-								'<td>' + content.jb + '</td>' +
-								'<td>' + content.date + '</td>' +
-								'<td>' + '<a href="#modal2" onclick="my_confirm_match(' + tgbz_item_id + ',' + content.id + ')">' + '确认匹配' + '</a>' + '</td>' +
-						'</tr>');
-		}); 
-		console.log('info_list', info_list);
-		return info_list;
-	}
-	var my_query_by_account = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_query") }}', 	// Careful! Do not put wrong url here!
-			{ account: $('#account').val() },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html(jsonObj);
-				$('#query_result').html(info_list);			// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_fetch_unmatched = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_unmatched_items") }}',  // Careful! Do not put wrong url here!
-			{ },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html_with_operation_query_candidates(jsonObj);
-				$('#unmatched_items').html(info_list);			 	// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
-	var my_fetch_matched = function () {
-		$.post(
-			'{{ url_for("admin_providing_help_matched_items") }}', 	// Careful! Do not put wrong url here!
-			{ },     
-			function (jsonObj, textStatus){        
-				console.log(jsonObj);   
-				var info_list = my_generate_html(jsonObj);
-				$('#matched_items').html(info_list);			 	// Careful! Do not put wrong id here!
-			}, 
-			"json"
-		);
-	}
-	
+	var my_trying_to_match = my_trying_to_match_generator(
+		'{{ url_for("admin_receiving_help_unmatched_items_with_specifi_jb") }}',
+		my_generate_html_with_operation_confirm,
+		'modal2Table'
+	);
+	var my_confirm_match = my_confirm_match_generator(
+		'{{ url_for("admin_providing_and_receiving_help_match_tgbz_and_jsbz") }}',
+		"{{ url_for('admin_providing_and_receiving_help', requested_type='receiving_help') }}"
+	);
 	
 	$(document).ready(function(){
 		$('#unmatched').click();

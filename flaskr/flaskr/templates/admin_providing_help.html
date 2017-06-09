@@ -39,8 +39,8 @@
 		'modal2Table'
 	);
 	var my_confirm_match = my_confirm_match_generator(
-		'{{ url_for("admin_providing_help_match_tgbz_to_jsbz") }}',
-		"{{ url_for('admin_providing_help') }}"
+		'{{ url_for("admin_providing_and_receiving_help_match_tgbz_and_jsbz") }}',
+		"{{ url_for('admin_providing_and_receiving_help', request_type='providing_help') }}"
 	);
 	
 	$(document).ready(function(){

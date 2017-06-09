@@ -1541,14 +1541,25 @@ def admin_pai_history():
     ses.close()
     return render_template('admin_pai_history.html', pai_history=pai_history)
 
-@app.route('/admin_providing_help', methods=['GET'])
-def admin_providing_help():
+def validate_request_type(request_type):
+    assert('receive_help' == request_type or 'providing_help' == request_type)
+
+def is_request_type_of_providing_help(request_type):
+    return True if 'providing_help' == request_type else False
+
+@app.route('/admin_providing_and_receiving_help/<request_type>', methods=['GET'])
+def admin_providing_and_receiving_help(request_type):
     if not session.get('admin_logged_in'):
         abort(401)
 
     error_str = ''
     form = AdminQueryByAccountForm()
-    return render_template('admin_providing_help.html', error=error_str, form=form)
+
+    validate_request_type(request_type)
+    if is_request_type_of_providing_help(request_type):
+        return render_template('admin_providing_help.html', error=error_str, form=form)
+    else:
+        return render_template('admin_receiving_help.html', error=error_str, form=form)
     
 #date_handler = lambda obj: (
 #    #obj.isoformat()
@@ -1621,14 +1632,7 @@ def admin_providing_help_unmatched_items_with_specifi_jb():
     json_str = json.dumps(selected_records)
     return json_str
 
-@app.route('/admin_providing_help_match_tgbz_to_jsbz', methods=['POST'])
-def admin_providing_help_match_tgbz_to_jsbz():
-    if not session.get('admin_logged_in'):
-        abort(401)
-
-    tgbz_item_id = request.form['tgbz_item_id']
-    jsbz_item_id = request.form['jsbz_item_id']
-
+def insert_new_ppdd(tgbz_item_id, jsbz_item_id):
     Ses = scoped_session(sessionmaker(bind=engine))
     ses = Ses()
 
@@ -1653,6 +1657,17 @@ def admin_providing_help_match_tgbz_to_jsbz():
     ses.close()
     Ses.remove()
 
+@app.route('/admin_providing_and_receiving_help_match_tgbz_and_jsbz', methods=['POST'])
+def admin_providing_and_receiving_help_match_tgbz_and_jsbz():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    tgbz_item_id = request.form['tgbz_item_id']
+    jsbz_item_id = request.form['jsbz_item_id']
+
+    insert_new_ppdd(tgbz_item_id, jsbz_item_id)
+
     flash(u'匹配成功')
     return json.dumps({'status': 'Ok'})
-    
+
+
