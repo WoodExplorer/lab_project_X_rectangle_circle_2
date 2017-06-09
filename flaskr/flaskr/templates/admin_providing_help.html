@@ -12,7 +12,7 @@
 	<em>这里是一个tab选项卡，使用的是jquery idTabs（<a href='http://www.sunsean.com/idTabs/'>http://www.sunsean.com/idTabs/</a>），目前还没有为其设置样式</em>
 	<ul class="idTabs"> 
 	  <li><a href="#query">搜索</a></li> 
-	  <li><a href="#unmatched" onclick='my_fetch_unmatched()'>未匹配查询</a></li> 
+	  <li><a id='unmatched' href="#unmatched" onclick='my_fetch_unmatched()'>未匹配查询</a></li> 
 	  <li><a href="#matched" onclick='my_fetch_matched()'>已匹配查询</a></li> 
 	</ul> 
 	
@@ -58,6 +58,7 @@
 					<th style="text-align: center;">用户姓名</th>
 					<th style="text-align: center;">金额</th>
 					<th style="text-align: center;">时间</th>
+					<th style="text-align: center;">操作</th>
 				</tr>
 			</thead>
 			<tbody id="unmatched_items">		
@@ -85,6 +86,10 @@
 
 
 <script type="text/javascript">
+	var my_trying_to_match = function (item_id) {
+		console.log('item_id', item_id);
+	}
+	
 	var my_generate_html = function (jsonObj) {
 		var info_list = '';
 		$.each(jsonObj, function(index, content){ 
@@ -96,6 +101,23 @@
 								'<td>' + content.user_nc + '</td>' +
 								'<td>' + content.jb + '</td>' +
 								'<td>' + content.date + '</td>' +
+						'</tr>');
+		}); 
+		console.log('info_list', info_list);
+		return info_list;
+	}
+	var my_generate_html_with_operation = function (jsonObj) {
+		var info_list = '';
+		$.each(jsonObj, function(index, content){ 
+			//console.log( "item #" + index + " its value is: " + content ); 	
+			
+			info_list += ('<tr>' + 
+								'<td>' + content.id + '</td>' +
+								'<td>' + content.user + '</td>' +
+								'<td>' + content.user_nc + '</td>' +
+								'<td>' + content.jb + '</td>' +
+								'<td>' + content.date + '</td>' +
+								'<td>' + '<a onclick="my_trying_to_match(' + content.id + ')">' + '手动匹配' + '</a>' + '</td>' +
 						'</tr>');
 		}); 
 		console.log('info_list', info_list);
@@ -120,7 +142,7 @@
 			{ },     
 			function (jsonObj, textStatus){        
 				console.log(jsonObj);   
-				var info_list = my_generate_html(jsonObj);
+				var info_list = my_generate_html_with_operation(jsonObj);
 				$('#unmatched_items').html(info_list);			 	// Careful! Do not put wrong id here!
 			}, 
 			"json"
@@ -139,6 +161,11 @@
 			"json"
 		);
 	}
+	
+	
+	$(document).ready(function(){
+		$('#unmatched').click();
+	});
  </script>
  
 {% endblock %}
