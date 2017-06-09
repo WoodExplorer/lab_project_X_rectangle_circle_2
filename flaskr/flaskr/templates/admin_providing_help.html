@@ -84,10 +84,44 @@
 	</div>
   
 
+<div data-remodal-id="modal2" role="dialog" aria-labelledby="modal2Title" aria-describedby="modal2Desc">
+  <div>
+    <h2 id="modal2Title">Another one window</h2>
+    <p id="modal2Desc">
+      Hello!
+    </p>
+	<div id="modal2Div">
+      Hello!
+    </div>
+  </div>
+  <br>
+  <button data-remodal-action="confirm" class="remodal-confirm">Hello!</button>
+</div>
 
+
+
+<style>
+    .remodal-bg.with-red-theme.remodal-is-opening,
+    .remodal-bg.with-red-theme.remodal-is-opened {
+      filter: none;
+    }
+
+    .remodal-overlay.with-red-theme {
+      background-color: #f44336;
+    }
+
+    .remodal.with-red-theme {
+      background: #fff;
+    }
+  </style>
+<link href="{{ url_for('static', filename='css/remodal-default-theme.css') }}" rel="stylesheet"></link>
+<link href="{{ url_for('static', filename='css/remodal.css') }}" rel="stylesheet"></link>
+<script src="{{ url_for('static', filename='js/remodal.js') }}" rel="stylesheet"></script>
 <script type="text/javascript">
 	var my_trying_to_match = function (item_id) {
 		console.log('item_id', item_id);
+		
+		$('#modal2Div').html('<em>hi</em>');
 	}
 	
 	var my_generate_html = function (jsonObj) {
@@ -117,7 +151,7 @@
 								'<td>' + content.user_nc + '</td>' +
 								'<td>' + content.jb + '</td>' +
 								'<td>' + content.date + '</td>' +
-								'<td>' + '<a onclick="my_trying_to_match(' + content.id + ')">' + '手动匹配' + '</a>' + '</td>' +
+								'<td>' + '<a href="#modal2" onclick="my_trying_to_match(' + content.id + ')">' + '手动匹配' + '</a>' + '</td>' +
 						'</tr>');
 		}); 
 		console.log('info_list', info_list);
@@ -165,6 +199,10 @@
 	
 	$(document).ready(function(){
 		$('#unmatched').click();
+		
+		$('[data-remodal-id=modal2]').remodal({
+			modifier: 'with-red-theme'
+		});
 	});
  </script>
  
