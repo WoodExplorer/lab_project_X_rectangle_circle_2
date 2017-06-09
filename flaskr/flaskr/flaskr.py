@@ -1542,10 +1542,17 @@ def admin_pai_history():
     return render_template('admin_pai_history.html', pai_history=pai_history)
 
 def validate_request_type(request_type):
-    assert('receive_help' == request_type or 'providing_help' == request_type)
+    assert('receiving_help' == request_type or 'providing_help' == request_type)
 
 def is_request_type_of_providing_help(request_type):
     return True if 'providing_help' == request_type else False
+
+def query_OT_Tgbz_or_OT_Jsbz(cond):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    selected_records = cond(ses)#ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
+    ses.close()
+    return selected_records
 
 @app.route('/admin_providing_and_receiving_help/<request_type>', methods=['GET'])
 def admin_providing_and_receiving_help(request_type):
@@ -1569,68 +1576,72 @@ def admin_providing_and_receiving_help(request_type):
 #    else None
 #)
 
-@app.route('/admin_providing_help_query', methods=['POST'])
-def admin_providing_help_query():
+@app.route('/admin_providing_and_receiving_help_query/<request_type>', methods=['POST'])
+def admin_providing_and_receiving_help_query(request_type):
     if not session.get('admin_logged_in'):
         abort(401)
 
-    #print 'request.data:', request.data
-    #request_data_in_json = json.loads(request.data)
-    #requested_user_account = request_data_in_json['user_account']
-    #print 'request.form["account"]:', request.form['account']
     requested_user_account = request.form['account']
     
-    Session = sessionmaker(bind=engine)
-    ses = Session()
-
-    selected_records = ses.query(OT_Tgbz).filter_by(user=requested_user_account).order_by(OT_Tgbz.id.asc())
+    selected_records = None
+    validate_request_type(request_type)
+    if '' == requested_user_account:  # If browser sent empty account, serve it with all records.
+        if is_request_type_of_providing_help(request_type):
+            selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).order_by(OT_Tgbz.id.asc()))
+        else:
+            selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).order_by(OT_Jsbz.id.asc()))
+    else:
+        if is_request_type_of_providing_help(request_type):
+            selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(user=requested_user_account).order_by(OT_Tgbz.id.asc()))
+        else:
+            selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(user=requested_user_account).order_by(OT_Jsbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
-    #print selected_records
-    #ret = json.dumps(selected_records, default=date_handler)
-    ret = json.dumps(selected_records)
-   
-    ses.close()
-    return ret
+    return json.dumps(selected_records)
 
-def query_OT_Tgbz_or_OT_Jsbz(cond):
-    Session = sessionmaker(bind=engine)
-    ses = Session()
-    selected_records = cond(ses)#ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc())
-    ses.close()
-    return selected_records
-
-@app.route('/admin_providing_help_unmatched_items', methods=['POST'])
-def admin_providing_help_unmatched_items():
+@app.route('/admin_providing_and_receiving_help_unmatched_items/<request_type>', methods=['POST'])
+def admin_providing_and_receiving_help_unmatched_items(request_type):
     if not session.get('admin_logged_in'):
         abort(401)
 
-    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc()))
+    selected_records = None
+    validate_request_type(request_type)
+    if is_request_type_of_providing_help(request_type):
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0).order_by(OT_Tgbz.id.asc()))
+    else:
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(zt=0).order_by(OT_Jsbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
-    json_str = json.dumps(selected_records)
-    return json_str  
+    return json.dumps(selected_records)  
 
 
-@app.route('/admin_providing_help_matched_items', methods=['POST'])
-def admin_providing_help_matched_items():
+@app.route('/admin_providing_and_receiving_help_matched_items/<request_type>', methods=['POST'])
+def admin_providing_and_receiving_help_matched_items(request_type):
     if not session.get('admin_logged_in'):
         abort(401)
     
-    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=1).order_by(OT_Tgbz.id.asc()))
+    selected_records = None
+    validate_request_type(request_type)
+    if is_request_type_of_providing_help(request_type):
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=1).order_by(OT_Tgbz.id.asc()))
+    else:
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(zt=1).order_by(OT_Jsbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
-    json_str = json.dumps(selected_records)
-    return json_str  
+    return json.dumps(selected_records)  
 
-@app.route('/admin_providing_help_unmatched_jsbz_items_with_specifi_jb', methods=['POST'])
-def admin_providing_help_unmatched_items_with_specifi_jb():
+@app.route('/admin_providing_and_receiving_help_unmatched_items_with_specifi_jb/<request_type>', methods=['POST'])
+def admin_providing_and_receiving_help_unmatched_items_with_specifi_jb(request_type):
     if not session.get('admin_logged_in'):
         abort(401)
 
     jb = request.form['jb']
     
-    selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(zt=0, jb=jb).order_by(OT_Jsbz.id.asc()))
+    selected_records = None
+    validate_request_type(request_type)
+    if is_request_type_of_providing_help(request_type):
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Jsbz).filter_by(zt=0, jb=jb).order_by(OT_Jsbz.id.asc()))
+    else:
+        selected_records = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0, jb=jb).order_by(OT_Tgbz.id.asc()))
     selected_records = [x.as_dict() for x in selected_records]
-    json_str = json.dumps(selected_records)
-    return json_str
+    return json.dumps(selected_records)
 
 def insert_new_ppdd(tgbz_item_id, jsbz_item_id):
     Ses = scoped_session(sessionmaker(bind=engine))

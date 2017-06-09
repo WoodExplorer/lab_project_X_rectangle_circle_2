@@ -15,27 +15,27 @@
 <script src="{{ url_for('static', filename='js/remodal.js') }}" rel="stylesheet"></script>
 <script type="text/javascript">
 	var my_query_by_account = my_post_and_generate_html_function_generator(
-			'{{ url_for("admin_providing_help_query") }}', 
-			{ account: $('#account').val() },
+			'{{ url_for("admin_providing_and_receiving_help_query", request_type="providing_help") }}', 
+			function () { return { account: $('#account').val() }; },
 			my_generate_html,
 			'query_result'
 	);
 	var my_fetch_unmatched = my_post_and_generate_html_function_generator(
-		'{{ url_for("admin_providing_help_unmatched_items") }}', 
-		{},
+		'{{ url_for("admin_providing_and_receiving_help_unmatched_items", request_type="providing_help") }}', 
+		function () { return {}; },
 		my_generate_html_with_operation_query_candidates,
 		'unmatched_items'
 	);
 	var my_fetch_matched = my_post_and_generate_html_function_generator(
-		'{{ url_for("admin_providing_help_matched_items") }}', 
-		{},
+		'{{ url_for("admin_providing_and_receiving_help_matched_items", request_type="providing_help") }}', 
+		function () { return {}; },
 		my_generate_html,
 		'matched_items'
 	);
 	
 	var my_trying_to_match = my_trying_to_match_generator(
-		'{{ url_for("admin_providing_help_unmatched_items_with_specifi_jb") }}',
-		my_generate_html_with_operation_confirm,
+		'{{ url_for("admin_providing_and_receiving_help_unmatched_items_with_specifi_jb", request_type="providing_help") }}',
+		my_generate_html_with_operation_confirm_generator('providing_help'),
 		'modal2Table'
 	);
 	var my_confirm_match = my_confirm_match_generator(
@@ -44,11 +44,14 @@
 	);
 	
 	$(document).ready(function(){
-		$('#unmatched').click();
+		//$('#unmatched').click();  <== Uncomment this statement and you will get some weird 'ui logic error'.
 		
 		$('[data-remodal-id=modal2]').remodal({
 			modifier: 'with-red-theme'
 		});
+		
+		my_query_by_account();
+	
 	});
  </script>
  

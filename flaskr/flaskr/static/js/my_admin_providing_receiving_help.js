@@ -34,29 +34,41 @@ var my_generate_html_with_operation_query_candidates = function (jsonObj) {
     console.log('info_list', info_list);
     return info_list;
 }
-var my_generate_html_with_operation_confirm = function (tgbz_item_id, jsonObj) {
-    var info_list = '';
-    $.each(jsonObj, function(index, content){ 
-        //console.log( "item #" + index + " its value is: " + content );    
-        
-        info_list += ('<tr>' + 
-                            '<td>' + content.id + '</td>' +
-                            '<td>' + content.user + '</td>' +
-                            '<td>' + content.user_nc + '</td>' +
-                            '<td>' + content.jb + '</td>' +
-                            '<td>' + content.date + '</td>' +
-                            '<td>' + '<a href="#modal2" onclick="my_confirm_match(' + tgbz_item_id + ',' + content.id + ')">' + '确认匹配' + '</a>' + '</td>' +
-                    '</tr>');
-    }); 
-    console.log('info_list', info_list);
-    return info_list;
+var my_generate_html_with_operation_confirm_generator = function (request_type) {
+    if ('receiving_help' != request_type && 'providing_help' != request_type) {
+        alert('Unknown request_type:' + request_type + '. Pleasee contact administrator.');
+        return;
+    }
+    return function(item_id, jsonObj) {
+                var info_list = '';
+                $.each(jsonObj, function(index, content){ 
+                    //console.log( "item #" + index + " its value is: " + content );    
+                    info_list += ('<tr>' + 
+                                        '<td>' + content.id + '</td>' +
+                                        '<td>' + content.user + '</td>' +
+                                        '<td>' + content.user_nc + '</td>' +
+                                        '<td>' + content.jb + '</td>' +
+                                        '<td>' + content.date + '</td>' +
+                                        '<td>' + '<a href="#modal2" onclick="my_confirm_match(' + 
+                                                                                            (
+                                                                                                'providing_help' == request_type? 
+                                                                                                    ('' + item_id + ',' + content.id):
+                                                                                                    ('' + content.id + ',' + item_id)
+                                                                                            ) + 
+                                                                                            ')">' + '确认匹配' + '</a>' + '</td>' +
+                                '</tr>');
+                }); 
+                console.log('info_list', info_list);
+                return info_list;
+    };
+    
 }
 
-var my_post_and_generate_html_function_generator = function (target_url, posted_data, html_generator, target_container_id) {
+var my_post_and_generate_html_function_generator = function (target_url, posted_data_generator, html_generator, target_container_id) {
     return function () {
         $.post(
             target_url,
-            posted_data,     
+            posted_data_generator(),     
             function (jsonObj, textStatus){        
                 console.log(jsonObj);   
                 var info_list = html_generator(jsonObj);
