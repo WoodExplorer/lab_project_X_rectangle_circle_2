@@ -1713,3 +1713,29 @@ def admin_ongoing_orders():
 
     composite_info_obj = query_OT_Tgbz_or_OT_Jsbz(fetch_ongoing_order_info)
     return render_template('admin_ongoing_orders.html', composite_info_obj=composite_info_obj)
+
+@app.route('/admin_delete_ongoing_order/', methods=['POST'])
+def admin_delete_ongoing_order():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    ppdd_id = request.form['ppdd_id']
+    p_id = request.form['p_id']
+    g_id = request.form['g_id']
+    
+    Ses = scoped_session(sessionmaker(bind=engine))
+    ses = Ses()
+
+    target_ppdd_item = ses.query(OT_Ppdd).filter_by(id=ppdd_id)[0]
+    target_tgbz_item = ses.query(OT_Tgbz).filter_by(id=p_id)[0]
+    target_jsbz_item = ses.query(OT_Jsbz).filter_by(id=g_id)[0]
+   
+    ses.delete(target_tgbz_item)
+    target_jsbz_item.zt = 0
+    ses.delete(target_ppdd_item)
+
+    ses.commit()
+    ses.close()
+    Ses.remove()
+    flash(u'删除成功')
+    return json.dumps({ 'status': 'Ok'})

@@ -18,6 +18,7 @@
 					<th style="font-family: '微软雅黑';font-size: 15px;">提供帮助人电话</th>
 					<th style="font-family: '微软雅黑';font-size: 15px;">接受帮助人电话</th>
 					<th style="font-family: '微软雅黑';font-size: 15px;">状态</th>
+					<th style="font-family: '微软雅黑';font-size: 15px;">操作</th>
 				</tr>
 			</thead>
 			<tbody>	
@@ -38,11 +39,31 @@
 						Unknown zt: {{ entry[0].zt }}
 					{% endif %}
 				  </span></td>
-				  
+				  <td>
+					<a href='#' onclick='admin_delete_ongoing_order( {{ entry[0].id }} , {{ entry[0].p_id }} , {{ entry[0].g_id }} )'>删除</a>
+				  </td>
 				</tr>
 				{% endfor %}
 		  </tbody>
 		</table>
 	</div>
 
+<script type="text/javascript">
+	var admin_delete_ongoing_order = function (ppdd_id, p_id, g_id) {
+		$.post(
+            {{ url_for('admin_delete_ongoing_order') }},
+            { ppdd_id: ppdd_id, p_id: p_id, g_id: g_id },     
+            function (jsonObj, textStatus){        
+                console.log(jsonObj);   
+                location.reload();
+            }, 
+            "json"
+        );
+	}
+	
+	$(document).ready(function(){
+		
+	});
+		
+</script>
 {% endblock %}
