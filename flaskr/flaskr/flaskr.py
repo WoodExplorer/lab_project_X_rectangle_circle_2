@@ -1693,20 +1693,34 @@ def fetch_ppdd_order_info(cond):
     composite_info_obj = cond(ses)
 
     # check all p_user and g_user exist in OT_User
+    p_user_list = []
+    g_user_list = []
+
     try:
         for step, x in enumerate(composite_info_obj):
-            if 0 == ses.query(OT_User).filter_by(UE_account = x.p_user).count():
-                raise MyException('step[' + str(step) + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User')
-            if 0 == ses.query(OT_User).filter_by(UE_account = x.g_user).count():
-                raise MyException('step[' + str(step) + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User')
+            p_user_query_result = ses.query(OT_User).filter_by(UE_account = x.p_user)
+            if 0 == p_user_query_result.count():
+                msg - 'step[' + str(step) + '/' + composite_info_obj.count() + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
+                #raise MyException(msg)
+                p_user_list.push({})
+                flash(repr(msg))
+            else:
+                assert(1 == p_user_query_result.count())
+                p_user_list.append(p_user_query_result[0])
+
+            g_user_query_result = ses.query(OT_User).filter_by(UE_account = x.g_user)
+            if 0 == g_user_query_result.count():
+                msg = 'step[' + str(step) + '/' + composite_info_obj.count() + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
+                #raise MyException(msg)
+                g_user_list.push({})
+                flash(repr(msg))
+            else:
+                assert(1 == g_user_query_result.count())
+                g_user_list.append(g_user_query_result[0])
     except Exception, e:
         raise e
 
-    composite_info_obj = [(x,
-            ses.query(OT_User).filter_by(UE_account = x.p_user)[0], 
-            ses.query(OT_User).filter_by(UE_account = x.g_user)[0], 
-            ) for x in composite_info_obj
-    ]
+    composite_info_obj = zip(composite_info_obj, p_user_list, g_user_list)
 
     ses.close()
     return composite_info_obj
