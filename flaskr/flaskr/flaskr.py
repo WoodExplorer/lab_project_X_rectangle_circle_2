@@ -1686,8 +1686,11 @@ class MyException(Exception):
         Exception.__init__ (self, msg)
         self.msg = msg
 
-def fetch_ongoing_order_info(ses):
-    composite_info_obj = ses.query(OT_Ppdd).filter(OT_Ppdd.zt != 2).order_by(OT_Ppdd.id.asc())
+def fetch_ppdd_order_info(cond):
+    Session = sessionmaker(bind=engine)
+    ses = Session()
+    
+    composite_info_obj = cond(ses)
 
     # check all p_user and g_user exist in OT_User
     try:
@@ -1704,6 +1707,8 @@ def fetch_ongoing_order_info(ses):
             ses.query(OT_User).filter_by(UE_account = x.g_user)[0], 
             ) for x in composite_info_obj
     ]
+
+    ses.close()
     return composite_info_obj
 
 @app.route('/admin_ongoing_orders', methods=['GET'])
@@ -1711,7 +1716,7 @@ def admin_ongoing_orders():
     if not session.get('admin_logged_in'):
         abort(401)
 
-    composite_info_obj = query_OT_Tgbz_or_OT_Jsbz(fetch_ongoing_order_info)
+    composite_info_obj = fetch_ppdd_order_info(lambda ses: ses.query(OT_Ppdd).filter(OT_Ppdd.zt != 2).order_by(OT_Ppdd.id.asc()))
     return render_template('admin_ongoing_orders.html', composite_info_obj=composite_info_obj)
 
 @app.route('/admin_delete_ongoing_order/', methods=['POST'])
@@ -1738,4 +1743,31 @@ def admin_delete_ongoing_order():
     ses.close()
     Ses.remove()
     flash(u'删除成功')
+    return json.dumps({ 'status': 'Ok'})
+
+@app.route('/admin_successful_orders', methods=['GET'])
+def admin_successful_orders():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    composite_info_obj = fetch_ppdd_order_info(lambda ses: ses.query(OT_Ppdd).filter_by(zt = 2).order_by(OT_Ppdd.id.asc()))
+    return render_template('admin_successful_orders.html', composite_info_obj=composite_info_obj)
+
+@app.route('/admin_lock_p_user/', methods=['POST'])
+def admin_lock_p_user():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    p_user = request.form['p_user']
+    
+    Ses = scoped_session(sessionmaker(bind=engine))
+    ses = Ses()
+
+    target_user = ses.query(OT_User).filter_by(UE_account=p_user)[0]
+    target_user.UE_status = 1
+
+    ses.commit()
+    ses.close()
+    Ses.remove()
+    flash(u'打款者封号处理成功')
     return json.dumps({ 'status': 'Ok'})
