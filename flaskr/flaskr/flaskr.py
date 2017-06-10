@@ -1687,20 +1687,25 @@ class MyException(Exception):
         self.msg = msg
 
 def fetch_ppdd_order_info(cond):
+    """
+    para@cond is a function with one parameter. When para@cond is called, ses(db session) is passed to it
+        and it is supposed to return a container of ppdd items.
+
+         DO NOT call count on para@cond's return value! DO NOT assume para@cond's return value to be a 
+         query result object! ==> look at func@admin_late_orders and func@fetch_late_orders!
+    """
     Session = sessionmaker(bind=engine)
     ses = Session()
     
-    composite_info_obj = cond(ses)
+    composite_info_obj = cond(ses)       # DO NOT call count on composite_info_obj! DO NOT assume it to be a query result object!
 
-    # check all p_user and g_user exist in OT_User
     p_user_list = []
     g_user_list = []
-
     try:
         for step, x in enumerate(composite_info_obj):
             p_user_query_result = ses.query(OT_User).filter_by(UE_account = x.p_user)
-            if 0 == p_user_query_result.count():
-                msg - 'step[' + str(step) + '/' + composite_info_obj.count() + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
+            if 0 == p_user_query_result.count():    # check user existence
+                msg - 'step[' + str(step) + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
                 #raise MyException(msg)
                 p_user_list.push({})
                 flash(repr(msg))
@@ -1709,8 +1714,8 @@ def fetch_ppdd_order_info(cond):
                 p_user_list.append(p_user_query_result[0])
 
             g_user_query_result = ses.query(OT_User).filter_by(UE_account = x.g_user)
-            if 0 == g_user_query_result.count():
-                msg = 'step[' + str(step) + '/' + composite_info_obj.count() + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
+            if 0 == g_user_query_result.count():    # check user existence
+                msg = 'step[' + str(step) + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
                 #raise MyException(msg)
                 g_user_list.push({})
                 flash(repr(msg))
@@ -1785,3 +1790,24 @@ def admin_lock_p_user():
     Ses.remove()
     flash(u'打款者封号处理成功')
     return json.dumps({ 'status': 'Ok'})
+
+def fetch_late_orders(ses):
+    tgbz_items = ses.query(OT_Tgbz).filter_by(zt = 1, qr_zt = 0)
+    ppdd_items = [ses.query(OT_Ppdd).filter_by(p_id = x.id)[0] for x in tgbz_items]
+    cur_time = datetime.now()
+    for tmp in ppdd_items:
+        print tmp.date
+        print cur_time
+        print (cur_time - tmp.date).seconds
+    ppdd_items = filter(lambda ppdd_it: (cur_time - ppdd_it.date).seconds > 12 * 3600, ppdd_items)
+    return ppdd_items
+
+@app.route('/admin_late_orders', methods=['GET'])
+def admin_late_orders():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    composite_info_obj = fetch_ppdd_order_info(fetch_late_orders)
+    return render_template('admin_late_orders.html', composite_info_obj=composite_info_obj)
+
+
