@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block body %}
+  
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  
+	<div class="col-lg-12 text-center">	  
+		<h3>交易中订单</h3>
+	</div>
+  
+	<div class="table-responsive" >
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+				<tr>
+					<th style="text-align: center;">id</th>
+					<th style="text-align: center;">账号</th>
+					<th style="text-align: center;">用户姓名</th>
+					<th style="text-align: center;">金额</th>
+					<th style="text-align: center;">时间</th>
+					<th style="text-align: center;">操作</th>
+				</tr>
+			</thead>
+			<tbody id="unmatched_items">		
+				{% for entry in entries %}
+				<tr>
+					<td>{{ entry.id }}</td>
+					<td>{{ entry.user }}</td>
+					<td>{{ entry.user_nc }}</td>
+					<td>{{ entry.jb }}</td>
+					<td>{{ entry.date }}</td>
+					<td>
+						<input type="text" id='input_{{ entry.id }}' />
+						<a href='#' onclick='admin_split_providing_help( {{ entry.id }}, {{ entry.jb }} )'>确认拆分</a>
+					</td>
+				</tr>
+				{% endfor %}
+		  </tbody>
+		</table>
+	</div>
+
+<script type="text/javascript">
+	var admin_split_providing_help = function (entry_id, jb) {
+		var corresponding_input_id = 'input_' + entry_id;
+		var split_detail = $('#' + corresponding_input_id).val();
+			
+		var pieces = split_detail.split(",");      
+		for (var i=0; i<pieces.length ; i++)   
+		{   
+			if (isNaN(pieces[i])) {
+				alert("请输入合法数字，并用英文逗号分隔。");
+			}
+		}  
+		pieces = pieces.map(function (x) { return Number(x); });
+		var sum_of_pieces = pieces.reduce(function(acc,x){ return x+acc; });
+		if (sum_of_pieces != jb) {
+			alert("拆分后的分订单的金额总额与原订单不同。");
+		}
+		
+		$.post(
+            {{ url_for('admin_split_providing_help') }},
+            { entry_id: entry_id, 'pieces': pieces.join(',') },     
+            function (jsonObj, textStatus){        
+                console.log(jsonObj);   
+                location.reload();
+            }, 
+            "json"
+        );
+	}
+	
+	$(document).ready(function(){
+		
+	});
+		
+</script>
+{% endblock %}

@@ -52,6 +52,12 @@ class OT_Tgbz(Base):
        #return {c.name: getattr(self, c.name) for c in self.__table__.columns}
        return {'id': self.id, 'user': self.user, 'jb': int(self.jb), 'user_nc': self.user_nc, 'date': self.date.strftime('%Y-%m-%d %H:%M:%S')}
 
+    def as_duplicate(self, another_obj):
+        for c in self.__table__.columns:
+            if 'id' != c.name:
+                #print dir(another_obj)
+                setattr(another_obj, c.name, getattr(self, c.name))
+
 class OT_Jsbz(Base):
     """"""
     __tablename__ = 'ot_jsbz'
@@ -1830,4 +1836,37 @@ def admin_not_confirmed_orders():
 
     composite_info_obj = fetch_ppdd_order_info(fetch_not_confirmed_orders)
     return render_template('admin_not_confirmed_orders.html', composite_info_obj=composite_info_obj)
+
+@app.route('/admin_split_providing_help/', methods=['GET', 'POST'])
+def admin_split_providing_help():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    if request.method == 'GET':
+        entries = query_OT_Tgbz_or_OT_Jsbz(lambda ses: ses.query(OT_Tgbz).filter_by(zt=0, qr_zt=0).order_by(OT_Tgbz.id.asc()))
+        return render_template('admin_split_providing_help.html', entries=entries)
+
+    entry_id = request.form['entry_id']
+    pieces = request.form['pieces']
+    pieces = [int(x) for x in pieces.split(',')]
+    
+    Ses = scoped_session(sessionmaker(bind=engine))
+    ses = Ses()
+
+    target_tgbz_item = ses.query(OT_Tgbz).filter_by(id=entry_id)[0]
+    
+    for piece in pieces:
+        new_tgbz_item = OT_Tgbz()
+        target_tgbz_item.as_duplicate(new_tgbz_item)
+        new_tgbz_item.jb = piece
+        ses.add(new_tgbz_item)
+
+    ses.delete(target_tgbz_item)
+
+    ses.commit()
+    ses.close()
+    Ses.remove()
+    flash(u'拆分成功')
+    return json.dumps({ 'status': 'Ok'})
+
 
