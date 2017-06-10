@@ -1805,11 +1805,11 @@ def fetch_late_orders(ses):
     tgbz_items = ses.query(OT_Tgbz).filter_by(zt = 1, qr_zt = 0).order_by(OT_Tgbz.id.asc())
     ppdd_items = [ses.query(OT_Ppdd).filter_by(p_id = x.id)[0] for x in tgbz_items]
     cur_time = datetime.now()
-    #for tmp in ppdd_items:
-    #    print tmp.date
-    #    print cur_time
-    #    print (cur_time - tmp.date).seconds
-    ppdd_items = filter(lambda ppdd_it: (cur_time - ppdd_it.date).seconds > 12 * 3600, ppdd_items)
+    for tmp in ppdd_items:
+        print tmp.date
+        print cur_time
+        print (cur_time - tmp.date).total_seconds()
+    ppdd_items = filter(lambda ppdd_it: (cur_time - ppdd_it.date).total_seconds() > 12 * 3600, ppdd_items)
     return ppdd_items
 
 @app.route('/admin_late_orders', methods=['GET'])
