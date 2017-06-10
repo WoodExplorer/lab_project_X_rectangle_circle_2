@@ -1681,4 +1681,35 @@ def admin_providing_and_receiving_help_match_tgbz_and_jsbz():
     flash(u'匹配成功')
     return json.dumps({'status': 'Ok'})
 
+class MyException(Exception):
+    def __init__(self, msg):
+        Exception.__init__ (self, msg)
+        self.msg = msg
 
+def fetch_ongoing_order_info(ses):
+    composite_info_obj = ses.query(OT_Ppdd).filter(OT_Ppdd.zt != 2).order_by(OT_Ppdd.id.asc())
+
+    # check all p_user and g_user exist in OT_User
+    try:
+        for step, x in enumerate(composite_info_obj):
+            if 0 == ses.query(OT_User).filter_by(UE_account = x.p_user).count():
+                raise MyException('step[' + str(step) + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User')
+            if 0 == ses.query(OT_User).filter_by(UE_account = x.g_user).count():
+                raise MyException('step[' + str(step) + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User')
+    except Exception, e:
+        raise e
+
+    composite_info_obj = [(x,
+            ses.query(OT_User).filter_by(UE_account = x.p_user)[0], 
+            ses.query(OT_User).filter_by(UE_account = x.g_user)[0], 
+            ) for x in composite_info_obj
+    ]
+    return composite_info_obj
+
+@app.route('/admin_ongoing_orders', methods=['GET'])
+def admin_ongoing_orders():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    composite_info_obj = query_OT_Tgbz_or_OT_Jsbz(fetch_ongoing_order_info)
+    return render_template('admin_ongoing_orders.html', composite_info_obj=composite_info_obj)
