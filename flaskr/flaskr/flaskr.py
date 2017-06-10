@@ -7,7 +7,7 @@ import json
 import math
 import platform
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import decimal
 import traceback
@@ -1705,9 +1705,9 @@ def fetch_ppdd_order_info(cond):
         for step, x in enumerate(composite_info_obj):
             p_user_query_result = ses.query(OT_User).filter_by(UE_account = x.p_user)
             if 0 == p_user_query_result.count():    # check user existence
-                msg - 'step[' + str(step) + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
+                msg = 'step[' + str(step) + ']: User ' + x.p_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
                 #raise MyException(msg)
-                p_user_list.push({})
+                p_user_list.append({})
                 flash(repr(msg))
             else:
                 assert(1 == p_user_query_result.count())
@@ -1717,7 +1717,7 @@ def fetch_ppdd_order_info(cond):
             if 0 == g_user_query_result.count():    # check user existence
                 msg = 'step[' + str(step) + ']: User ' + x.g_user + ' of record ppdd#' + str(x.id) + ' does not exist in OT_User'
                 #raise MyException(msg)
-                g_user_list.push({})
+                g_user_list.append({})
                 flash(repr(msg))
             else:
                 assert(1 == g_user_query_result.count())
@@ -1792,13 +1792,13 @@ def admin_lock_p_user():
     return json.dumps({ 'status': 'Ok'})
 
 def fetch_late_orders(ses):
-    tgbz_items = ses.query(OT_Tgbz).filter_by(zt = 1, qr_zt = 0)
+    tgbz_items = ses.query(OT_Tgbz).filter_by(zt = 1, qr_zt = 0).order_by(OT_Tgbz.id.asc())
     ppdd_items = [ses.query(OT_Ppdd).filter_by(p_id = x.id)[0] for x in tgbz_items]
     cur_time = datetime.now()
-    for tmp in ppdd_items:
-        print tmp.date
-        print cur_time
-        print (cur_time - tmp.date).seconds
+    #for tmp in ppdd_items:
+    #    print tmp.date
+    #    print cur_time
+    #    print (cur_time - tmp.date).seconds
     ppdd_items = filter(lambda ppdd_it: (cur_time - ppdd_it.date).seconds > 12 * 3600, ppdd_items)
     return ppdd_items
 
@@ -1810,4 +1810,24 @@ def admin_late_orders():
     composite_info_obj = fetch_ppdd_order_info(fetch_late_orders)
     return render_template('admin_late_orders.html', composite_info_obj=composite_info_obj)
 
+
+def fetch_not_confirmed_orders(ses):
+    target_users = set([x.g_user for x in ses.query(OT_Ppdd).filter_by(zt = 1)])
+    print 'target_users:', repr(target_users)
+
+    cur_time = datetime.now()
+    time_limit = cur_time - timedelta(0, 24 * 3600)
+    target_jsbz_items = ses.query(OT_Jsbz).filter(OT_Jsbz.zt == 1, OT_Jsbz.qr_zt == 0, OT_Jsbz.user.in_(target_users))
+
+    ppdd_items = ses.query(OT_Ppdd).filter(OT_Ppdd.g_id.in_(set([x.id for x in target_jsbz_items])), OT_Ppdd.date < time_limit).order_by(OT_Ppdd.id.asc())
+    
+    return ppdd_items
+
+@app.route('/admin_not_confirmed_orders', methods=['GET'])
+def admin_not_confirmed_orders():
+    if not session.get('admin_logged_in'):
+        abort(401)
+
+    composite_info_obj = fetch_ppdd_order_info(fetch_not_confirmed_orders)
+    return render_template('admin_not_confirmed_orders.html', composite_info_obj=composite_info_obj)
 
